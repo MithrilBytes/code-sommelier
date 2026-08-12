@@ -84,6 +84,16 @@ found by per language regex. Real cyclomatic complexity would require a parser
 for each language, which would mean taking on dependencies. Both numbers are
 labelled as proxies wherever they appear, and `--sober` prints them raw.
 
+The file inventory comes from `git ls-files --cached --others
+--exclude-standard`, so gitignored build output is left out of the body,
+largest file, nesting depth and marker density, while work that is written but
+not yet committed is counted. Vendored directories are pruned separately, which
+catches a `node_modules` in a repository that never told git to ignore it. The
+sediment course is a different question and keeps its own committed-only view,
+because an uncommitted local virtualenv is untidy rather than a sin. `--sober`
+and `--json` report which inventory was used, and the card says so in a footnote
+whenever git could not answer and the counts fell back to a filesystem walk.
+
 The tool completes on any directory of code, whatever language it is written in
 and whatever condition it has been left in. Absent input is treated as a finding
 rather than an error, so a repository lacking a README, a dependency manifest, a

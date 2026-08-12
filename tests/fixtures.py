@@ -250,6 +250,7 @@ def synthetic_metrics(
         longest_function_name=longest_function_name,
         longest_function_path=longest_function_path,
         sampled=sampled,
+        inventory="git",
         scanned_file_count=resolved_scanned,
     )
     return RepoMetrics(

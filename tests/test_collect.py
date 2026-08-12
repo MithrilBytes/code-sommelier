@@ -166,7 +166,10 @@ def assert_full_metrics(case: unittest.TestCase, metrics: RepoMetrics) -> None:
     case.assertIsInstance(metrics.dropped, tuple)
     for dropped in metrics.dropped:
         case.assertIsInstance(dropped.name, str)
-        case.assertIn(dropped.reason, {"exceeded time budget", "unreadable"})
+        case.assertIn(
+            dropped.reason,
+            {"exceeded time budget", "unreadable", "git unavailable"},
+        )
 
 
 class HealthyPythonRepoTest(unittest.TestCase):
@@ -454,6 +457,95 @@ class NeglectedJavaScriptRepoTest(unittest.TestCase):
         self.assertFalse(nose.has_contributing)
         self.assertFalse(nose.has_ci)
         self.assertFalse(nose.has_tests)
+
+
+class FileInventoryTest(unittest.TestCase):
+    """The file inventory asks git what belongs to the project.
+
+    Body, largest file, nesting depth and marker density all describe the code
+    the author wrote. Generated output that git has been told to ignore is not
+    that, however much of it is sitting on disk.
+    """
+
+    def _repo(self, files: dict[str, str], *, commit: bool = True) -> fixtures.Fixture:
+        fixture = fixtures.Fixture("inventory")
+        fixtures.write_tree(fixture.path, files)
+        fixtures.git_init(fixture.path)
+        if commit:
+            fixtures.git_commit(fixture.path, "add everything", day="2024-03-01")
+        return fixture
+
+    def test_gitignored_source_directory_is_excluded(self) -> None:
+        fixtures.require_git()
+        body = "package junk\n" + "var x = 1\n" * 300
+        files = {
+            "main.go": "package main\nfunc main() {}\n",
+            ".gitignore": "junk/\n",
+        }
+        files.update({f"junk/big{n}.go": body for n in range(1, 6)})
+        with self._repo(files) as fixture:
+            palate = collect(fixture.path).palate
+        self.assertEqual(palate.inventory, "git")
+        self.assertEqual(palate.source_file_count, 1)
+        self.assertEqual(palate.largest_file_path, "main.go")
+        self.assertLess(palate.total_lines, 100)
+
+    def test_untracked_but_unignored_file_is_included(self) -> None:
+        """A repo mid-change still counts work that is not committed yet."""
+        fixtures.require_git()
+        with self._repo({"main.go": "package main\n"}) as fixture:
+            fixtures.write_tree(fixture.path, {"brandnew.go": "package new\nvar z = 3\n"})
+            palate = collect(fixture.path).palate
+        self.assertEqual(palate.inventory, "git")
+        self.assertEqual(palate.source_file_count, 2)
+
+    def test_vendored_directory_is_excluded_without_a_gitignore(self) -> None:
+        """--others would otherwise surface an unignored node_modules."""
+        fixtures.require_git()
+        files = {"main.js": "var a = 1;\n"}
+        files.update({f"node_modules/m{n}.js": "var m = 1;\n" for n in range(1, 4)})
+        with self._repo(files) as fixture:
+            metrics = collect(fixture.path)
+        self.assertEqual(metrics.palate.inventory, "git")
+        self.assertEqual(metrics.palate.source_file_count, 1)
+        self.assertGreater(metrics.sediment.vendored_file_count, 0)
+
+    def test_editor_directory_is_not_counted_as_source(self) -> None:
+        fixtures.require_git()
+        files = {"main.js": "var a = 1;\n", "util.js": "var b = 2;\n"}
+        files.update({f".vscode/s{n}.js": "var v = 1;\n" for n in range(1, 4)})
+        with self._repo(files) as fixture:
+            metrics = collect(fixture.path)
+        self.assertEqual(metrics.palate.source_file_count, 2)
+        editor = [item.path for item in metrics.sediment.items if item.kind == "editor"]
+        self.assertIn(".vscode", editor)
+
+    def test_directory_without_git_still_tastes(self) -> None:
+        with fixtures.Fixture("nogit") as fixture:
+            fixtures.write_tree(fixture.path, {"a.py": "def a():\n    return 1\n"})
+            metrics = collect(fixture.path)
+        assert_full_metrics(self, metrics)
+        self.assertEqual(metrics.palate.inventory, "filesystem")
+        self.assertEqual(metrics.palate.source_file_count, 1)
+
+    def test_broken_git_falls_back_and_says_so(self) -> None:
+        """A .git that git cannot read must degrade, not raise."""
+        with fixtures.Fixture("brokengit") as fixture:
+            (fixture.path / ".git").mkdir()
+            fixtures.write_tree(fixture.path, {"a.py": "def a():\n    return 1\n"})
+            metrics = collect(fixture.path)
+        assert_full_metrics(self, metrics)
+        self.assertEqual(metrics.palate.inventory, "filesystem")
+        self.assertIn("inventory", [item.name for item in metrics.dropped])
+
+    def test_sediment_still_reports_only_what_was_committed(self) -> None:
+        """The inventory change must not leak into the sediment course."""
+        fixtures.require_git()
+        with self._repo({"a.py": "x = 1\n"}) as fixture:
+            fixtures.write_tree(fixture.path, {".venv/lib.py": "y = 1\n"})
+            metrics = collect(fixture.path)
+        self.assertEqual(metrics.sediment.vendored_file_count, 0)
+        self.assertEqual(metrics.palate.source_file_count, 1)
 
 
 class SecretNameTest(unittest.TestCase):

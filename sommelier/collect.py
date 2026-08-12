@@ -65,6 +65,20 @@ VENDORED_DIRS: Final[frozenset[str]] = frozenset(
         ".terraform",
         "elm-stuff",
         ".svelte-kit",
+        "obj",
+        ".dart_tool",
+        "DerivedData",
+        "_build",
+        "deps",
+        ".stack-work",
+        "env",
+        ".direnv",
+        ".turbo",
+        ".parcel-cache",
+        ".bundle",
+        ".cargo",
+        ".yarn",
+        "vendor-bundle",
     }
 )
 
@@ -147,6 +161,12 @@ class PalateMetrics:
     longest_function_path: str | None
     sampled: bool
     scanned_file_count: int
+    inventory: str
+    """Where the file list came from: "git" or "filesystem".
+
+    Printed by --sober and carried in --json so a reader can tell whether the
+    counts were filtered by git or taken straight off the disk.
+    """
 
 
 @dataclass(frozen=True)
@@ -928,7 +948,19 @@ def collect(path: Path, *, budget_seconds: float = 10.0) -> RepoMetrics:
     records = walk.files
     rel_paths = frozenset(record.rel for record in records)
     by_rel = {record.rel: record for record in records}
-    source_records = tuple(record for record in records if _is_source(record))
+
+    # Both filters are needed. The git set drops ignored build output, and the
+    # vendored prune already applied in _walk drops node_modules in the repos
+    # that never told git to ignore it.
+    project = _project_index(resolved, budget)
+    inventory = "filesystem" if project is None else "git"
+    if project is None and (resolved / ".git").exists():
+        dropped.append(DroppedAnalyzer(name="inventory", reason="git unavailable"))
+    source_records = tuple(
+        record
+        for record in records
+        if _is_source(record) and (project is None or record.rel in project)
+    )
 
     nose = _nose(resolved, records, walk.directories)
     structure = _structure(resolved, records)
@@ -937,7 +969,13 @@ def collect(path: Path, *, budget_seconds: float = 10.0) -> RepoMetrics:
     if git_truncated:
         dropped.append(DroppedAnalyzer(name="git", reason="exceeded time budget"))
 
-    scan = _scan(resolved, source_records, budget, len(records) + walk.vendored_file_count)
+    scan = _scan(
+        resolved,
+        source_records,
+        budget,
+        len(records) + walk.vendored_file_count,
+        inventory,
+    )
     if scan.truncated:
         dropped.append(DroppedAnalyzer(name="abandonment", reason="exceeded time budget"))
         dropped.append(DroppedAnalyzer(name="palate", reason="exceeded time budget"))
@@ -1083,10 +1121,14 @@ def _walk(root: Path, budget: _Budget) -> _WalkResult:
                     continue
                 directories.append(child_rel)
                 if entry.name in _EDITOR_DIRS:
+                    # Pruned like a vendored directory. Editor state is
+                    # reported as sediment, and descending would also count it
+                    # as the author's source.
                     count, size = _count_tree(Path(entry.path), budget)
                     editor_dirs.append(
                         _VendoredDir(rel=child_rel, file_count=count, size_bytes=size)
                     )
+                    continue
                 queue.append((Path(entry.path), child_rel))
                 continue
             try:
@@ -1931,7 +1973,11 @@ def _sample(
 
 
 def _scan(
-    root: Path, source_records: Sequence[_FileRecord], budget: _Budget, total_files: int
+    root: Path,
+    source_records: Sequence[_FileRecord],
+    budget: _Budget,
+    total_files: int,
+    inventory: str,
 ) -> _ScanResult:
     """Read the sampled source files once and derive palate and abandonment together.
 
@@ -2013,6 +2059,7 @@ def _scan(
         longest_function_path=function_path,
         sampled=sampled,
         scanned_file_count=scanned,
+        inventory=inventory,
     )
     abandonment = AbandonmentMetrics(
         todo=todo,
@@ -2391,6 +2438,31 @@ def _tracked_index(root: Path, budget: _Budget) -> frozenset[str] | None:
     if code != 0:
         return None
     return frozenset(line for line in output.splitlines() if line)
+
+
+def _project_index(root: Path, budget: _Budget) -> frozenset[str] | None:
+    """Every path git considers part of the project, or None when git cannot say.
+
+    Deliberately not the same question as _tracked_index above. Sediment asks
+    what was committed, so an uncommitted local virtualenv is not a sin. The
+    file inventory asks what the author wrote, and generated output that git
+    has been told to ignore is not the author's code however much of it there
+    is on disk.
+
+    --cached and --others together also cover a repository mid-change, where a
+    new file is real work that has simply not been committed yet.
+    """
+    if shutil.which("git") is None or not (root / ".git").exists():
+        return None
+    timeout = min(GIT_CALL_TIMEOUT, max(0.5, budget.remaining()))
+    # -z keeps paths raw, so non-ASCII names need no unquoting and a newline in
+    # a filename cannot split one path into two.
+    code, output = _run_git(
+        root, ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], timeout
+    )
+    if code != 0:
+        return None
+    return frozenset(path for path in output.split("\0") if path)
 
 
 def _tracked_under(index: frozenset[str], rel: str) -> int:

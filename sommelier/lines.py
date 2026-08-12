@@ -445,3 +445,11 @@ PAIRINGS: Final[tuple[str, ...]] = (
 
 # Shown when an analyzer was dropped. Plain, because a footnote is not a joke.
 FOOTNOTE_DROPPED: Final[str] = "{name} was dropped from the card: {reason}."
+
+# Shown when git could not supply the file list. The reader needs to know the
+# counts above came off the disk, since they may include generated files that
+# the project itself does not claim.
+FOOTNOTE_INVENTORY: Final[str] = (
+    "The file counts above came from a plain filesystem walk rather than from "
+    "git, so they may include generated files."
+)

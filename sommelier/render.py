@@ -213,6 +213,7 @@ def _sober_sections(metrics: RepoMetrics, judgement: Judgement) -> tuple[_Sectio
         _Section(
             "Files",
             (
+                ("file inventory", palate.inventory),
                 ("source files", _count(palate.source_file_count)),
                 ("total files", _count(palate.total_file_count)),
                 ("scanned files", _count(palate.scanned_file_count)),

@@ -17,7 +17,13 @@ from random import Random
 
 from sommelier.collect import RepoMetrics
 from sommelier.judge import COURSES, Finding, Judgement
-from sommelier.lines import CELLAR, FOOTNOTE_DROPPED, PAIRINGS, VERDICTS
+from sommelier.lines import (
+    CELLAR,
+    FOOTNOTE_DROPPED,
+    FOOTNOTE_INVENTORY,
+    PAIRINGS,
+    VERDICTS,
+)
 
 COURSE_TITLES: dict[str, str] = {
     "label": "The label",
@@ -131,7 +137,9 @@ def pour(
     verdict = VERDICTS[rng.randrange(len(VERDICTS))].format(score=judgement.score)
     pairing = PAIRINGS[rng.randrange(len(PAIRINGS))]
     footnotes = tuple(
-        FOOTNOTE_DROPPED.format(name=dropped.name, reason=dropped.reason)
+        FOOTNOTE_INVENTORY
+        if dropped.name == "inventory"
+        else FOOTNOTE_DROPPED.format(name=dropped.name, reason=dropped.reason)
         for dropped in metrics.dropped
     )
 

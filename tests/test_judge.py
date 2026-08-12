@@ -166,6 +166,7 @@ BASE_NOSE = NoseMetrics(
 )
 
 BASE_PALATE = PalateMetrics(
+    inventory="git",
     source_file_count=40,
     total_file_count=46,
     total_lines=4000,
@@ -349,7 +350,8 @@ def repo_with_palate(
             longest_function_name=longest_function_name,
             longest_function_path=longest_function_path,
             sampled=sampled,
-            scanned_file_count=scanned_file_count,
+            inventory="git",
+        scanned_file_count=scanned_file_count,
         ),
     )
 
@@ -523,6 +525,7 @@ def worst_metrics() -> RepoMetrics:
         longest_function_name="render",
         longest_function_path="src/legacy.js",
         sampled=True,
+        inventory="git",
         scanned_file_count=5000,
     )
     manifest = DependencyManifest(
@@ -642,6 +645,7 @@ def empty_metrics() -> RepoMetrics:
         longest_function_lines=0,
         longest_function_name=None,
         longest_function_path=None,
+        inventory="git",
         scanned_file_count=0,
     )
     terroir = TerroirMetrics(languages=(), primary_language=None, frameworks=())
