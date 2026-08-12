@@ -20,13 +20,13 @@ The label    This is todo-app. It is JavaScript. There are 3 source files, and
 Vintage      2019. A vintage of 0.8 years and 3 commits, and the sommelier has
              tasted every one of them. 7 years old. 2019 was a long time ago,
              and this has been here for all of it.
-Nose         No .gitignore. Not a short one, not a wrong one, not a copied one.
-             None. Everything todo-app has ever produced by accident is a
-             candidate for the permanent record, and across 20 files the record
-             has been keeping. 36 unresolved markers, 30 of them TODOs.
-             src/legacy.js has 20 and has clearly been asking for help for some
-             time. There is no README. 3 source files, 955 lines, and not one
-             sentence explaining why.
+Nose         todo-app has no .gitignore of any kind, not even a copied one.
+             Everything it has ever produced by accident is a candidate for the
+             permanent record, and across 20 files the record has been keeping.
+             36 unresolved markers, 30 of them TODOs. src/legacy.js has 20 and
+             has clearly been asking for help for some time. There is no
+             README. 3 source files, 955 lines, and not one sentence explaining
+             why.
 Palate       Body: 3 files, 318.3 lines on average, peaking at 900 lines in
              src/legacy.js. The body is enormous. src/legacy.js is 900 lines
              long and it has never once been opened with confidence.

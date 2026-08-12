@@ -107,8 +107,8 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "and the sommelier has tasted every one of them.",
     ),
     "vintage.no_history": (
-        "No repository, no history, no vintage. {name} has {file_count} files "
-        "and no provenance whatsoever.",
+        "There is no repository here. {name} holds {file_count} files of entirely "
+        "unknown provenance.",
         "This has never been committed. {name} is not a vintage, it is a puddle.",
         "{name} has no git directory. Not one of its {file_count} files has a "
         "date, an author, or a reason.",
@@ -186,10 +186,9 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "among the {total_files} files in {name} has been offered to the "
         "repository, and the repository has accepted. This is the finding the "
         "sommelier will think about tonight.",
-        "No .gitignore. Not a short one, not a wrong one, not a copied one. "
-        "None. Everything {name} has ever produced by accident is a candidate "
-        "for the permanent record, and across {total_files} files the record "
-        "has been keeping.",
+        "{name} has no .gitignore of any kind, not even a copied one. Everything "
+        "it has ever produced by accident is a candidate for the permanent "
+        "record, and across {total_files} files the record has been keeping.",
         "{name} has no .gitignore file. Every temporary thing among its "
         "{total_files} files is one careless git add away from being permanent. "
         "The sommelier has seen the consequences of this and would rather not "
@@ -217,7 +216,7 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "nobody has been honest in writing.",
         "{total_lines} lines in {source_files} files and zero markers. A clean "
         "nose. Suspiciously clean.",
-        "No TODO, no FIXME, no HACK, nothing, across {total_lines} lines. The "
+        "Not a single marker of any kind across {total_lines} lines. The "
         "sommelier does not believe it, and cannot prove otherwise.",
     ),
     "abandonment.notes": (
@@ -369,7 +368,7 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "No history. The code claims to have always existed.",
         "There is no git history at all. {name} has no finish, because it has "
         "no beginning.",
-        "No commits, no authors, no dates. {name} and its {file_count} files "
+        "There is nothing in the log to read. {name} and its {file_count} files "
         "arrived fully formed and unexplained.",
     ),
     "finish.void": (
