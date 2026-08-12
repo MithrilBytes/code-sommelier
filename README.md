@@ -1,10 +1,10 @@
 # code-sommelier
 
-Point it at a git repository and it performs genuine static analysis: repo age,
-file sizes, complexity proxies, dependency health, commit history, hygiene sins.
-It then reads the findings back to you as a wine tasting card, with total
-conviction and no mercy. The comedy is the delivery mechanism, and every joke
-can cite the number it came from.
+Point it at a git repository and it measures repo age, file sizes, complexity
+proxies, dependency health, commit history and hygiene problems. It then
+presents those findings as a wine tasting card, delivered with rather more
+confidence than the situation warrants. Every line on the card is generated
+from one of those measurements, and `--sober` prints the measurements instead.
 
 ## The card
 
@@ -62,12 +62,11 @@ sommelier taste ./some-repo
 | `--seed N` | override the seeded selection, for anyone demanding a second opinion |
 
 Line selection is seeded on the repository name, so the same repository always
-receives the same tasting. A professional does not revise his verdict when
-asked twice.
+receives the same tasting. Pass `--seed` to force a different selection.
 
-Exit code is 0 for any completed tasting, however damning, including bare
-directories and repositories with no commits. Exit code 1 means the path could
-not be read, and says so in one line. No traceback ever reaches you.
+Exit code 0 covers any completed tasting, including bare directories and
+repositories with no commits. Exit code 1 means the path could not be read, and
+prints a single line saying so. Failures are never reported as a traceback.
 
 ## What it measures
 
@@ -80,25 +79,26 @@ not be read, and says so in one line. No traceback ever reaches you.
 | Structure | dependency counts per ecosystem, manifest against lockfile |
 | Finish | commit count, fix ratio, longest silence, bus factor |
 
-Complexity is measured by proxy: maximum indentation depth and function length
-by per language regex. Proper cyclomatic analysis needs parsers, parsers need
-dependencies, and dependencies are banned. The proxies are honest about being
-proxies, and `--sober` prints them raw.
+Complexity is measured by proxy: maximum indentation depth, and function length
+found by per language regex. Real cyclomatic complexity would require a parser
+for each language, which would mean taking on dependencies. Both numbers are
+labelled as proxies wherever they appear, and `--sober` prints them raw.
 
-Every glass gets tasted. The tool completes on any directory of code, in any
-language, in any state of neglect. A missing README, a missing manifest, an
-unrecognised language, no git history at all: each absence is a finding, never
-an error.
+The tool completes on any directory of code, whatever language it is written in
+and whatever condition it has been left in. Absent input is treated as a finding
+rather than an error, so a repository lacking a README, a dependency manifest, a
+recognised language or a git history still produces a full card and exits 0.
 
 ## Design rules
 
 1. Measurement and comedy never share a file. `collect.py` returns data,
    `judge.py` applies thresholds, `voice.py` turns findings into lines, and
-   every template string lives in `lines.py`. A joke in an analyzer fails
-   review.
+   every template string lives in `lines.py`. Anything written for effect
+   belongs in `lines.py` and is rejected in review anywhere else.
 2. Zero runtime dependencies. Python 3.11 or newer, standard library only.
-3. No em-dashes. Not in output, not in docs, not in comments. A unit test
-   fails the build. The sommelier does not pause for breath.
+3. Em-dashes and en-dashes are banned throughout the repository, covering code,
+   comments, documentation and generated output. `tests/test_style.py` fails
+   the build on either character.
 4. Deterministic output, seeded on the repository name.
 5. Every threshold lives in the `BANDS` table in `judge.py` and nowhere else.
 
@@ -109,7 +109,7 @@ python -m unittest discover -s tests -t .
 ```
 
 The suite uses `unittest` from the standard library, so the zero dependency
-promise holds all the way into the tests. Type checking is the other gate:
+rule applies to the tests as well. Type checking is the second gate:
 
 ```bash
 mypy --strict sommelier tests
@@ -117,30 +117,29 @@ mypy --strict sommelier tests
 
 ## Contributing
 
-New tasting lines are welcome, and are the most useful thing you can add.
-Each one must:
+New tasting lines are the most useful contribution. Each one must:
 
 - cite a metric, using only the facts its finding key provides in
-  `judge.KEY_FACTS`. If the number cannot be printed beside the sentence, the
-  sentence is cut.
-- pass the read-aloud bar. Say it once. If it needs explaining, or a second run
-  at it, it does not enter the cellar.
-- survive `tests/test_style.py`, which bans em-dashes, en-dashes, emoji and
-  exclamation marks, and refuses any template citing a number that was never
-  measured.
+  `judge.KEY_FACTS`. A line that cannot print its number beside the sentence
+  gets cut.
+- read correctly when spoken once. Anything needing a second pass to parse
+  stays out of the cellar.
+- survive `tests/test_style.py`, which rejects em-dashes, en-dashes, emoji,
+  exclamation marks, and any template citing a number that was never measured.
 
-Keep to the register: total conviction, no hedging, no outside analogies, and
-nothing that leaves the repository being tasted. The ceiling of available
-praise is "Adequate."
+The register is documented at the top of `lines.py`. The short version is that
+the sommelier states everything as fact, stays inside the repository he is
+tasting, and rates the best code he has ever seen as "Adequate."
 
-Every finding key needs at least three lines. If the cellar runs thin, ship
-fewer keys rather than weaker lines.
+Every finding key needs at least three lines so that a course does not repeat
+itself between runs. Where the material is thin, drop the key instead of
+lowering the bar.
 
 ### Commit and pull request titles
 
-Subject line only. No bodies, no footers, no trailers. Imperative, lower case,
-50 characters or fewer. One logical change per commit. Allowed prefixes: `add`,
-`fix`, `rm`, `docs`, `test`, `perf`.
+Use a subject line on its own, with no body, footer or trailer. Write it in the
+imperative, in lower case, at 50 characters or fewer, covering one logical
+change. Allowed prefixes: `add`, `fix`, `rm`, `docs`, `test`, `perf`.
 
 ```
 add commit gap detection
