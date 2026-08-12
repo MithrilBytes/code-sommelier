@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "code-sommelier"
+version = "1.0.0"
+description = "Real static analysis, delivered as tasting notes."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["static-analysis", "code-quality", "cli", "git", "metrics"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Utilities",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["mypy>=1.8"]
+
+[project.scripts]
+sommelier = "sommelier.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/MithrilBytes/code-sommelier"
+Source = "https://github.com/MithrilBytes/code-sommelier"
+
+[tool.setuptools]
+packages = ["sommelier"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["sommelier", "tests"]
+strict = true
+warn_unreachable = true
+warn_unused_configs = true

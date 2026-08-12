@@ -1,0 +1,80 @@
+# Byte-compiled and optimised files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Packaging and build artefacts
+build/
+dist/
+sdist/
+wheels/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+parts/
+var/
+*.egg-info/
+*.egg
+MANIFEST
+pip-wheel-metadata/
+share/python-wheels/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Type checkers, linters and test runners
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+.pytest_cache/
+.tox/
+.nox/
+.cache/
+.hypothesis/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+nosetests.xml
+*.cover
+
+# Notebooks and profiling
+.ipynb_checkpoints/
+*.prof
+
+# Editors
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Local environment files
+.env
+.env.*
