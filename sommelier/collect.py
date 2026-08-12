@@ -13,6 +13,7 @@ import os
 import re
 import shutil
 import subprocess
+import threading
 import time
 import tomllib
 from collections import Counter, deque
@@ -370,7 +371,6 @@ _AMBIGUOUS_TOKENS: Final[frozenset[str]] = frozenset({"--", ";", "%"})
 
 _HASH_ONLY: Final[tuple[str, ...]] = ("#",)
 _PYTHON_TOKENS: Final[tuple[str, ...]] = ("#", '"""', "'''")
-_TRIPLE_QUOTES: Final[frozenset[str]] = frozenset({'"""', "'''"})
 _SLASH_ONLY: Final[tuple[str, ...]] = ("//", "/*")
 _SLASH_AND_HASH: Final[tuple[str, ...]] = ("//", "/*", "#")
 _DASH_ONLY: Final[tuple[str, ...]] = ("--",)
@@ -830,7 +830,8 @@ _LOCKFILES_BY_MANIFEST: Final[Mapping[str, tuple[str, ...]]] = {
 _LOCK_MARKERS: Final[Mapping[str, str]] = {
     "package-lock.json": '"resolved":',
     "npm-shrinkwrap.json": '"resolved":',
-    "yarn.lock": "\n  version ",
+    # Yarn 1 writes `version "1.2.3"`, Yarn 2 and later write `version: 1.2.3`.
+    "yarn.lock": "\n  version",
     "pnpm-lock.yaml": "resolution:",
     "poetry.lock": "[[package]]",
     "uv.lock": "[[package]]",
@@ -859,6 +860,9 @@ class _Budget:
 
     def remaining(self) -> float:
         return max(0.0, self._seconds - self.elapsed())
+
+    def remaining_before(self, fraction: float) -> float:
+        return max(0.0, self._seconds * fraction - self.elapsed())
 
 
 @dataclass(frozen=True)
@@ -1224,6 +1228,8 @@ def _run_git(root: Path, args: Sequence[str], timeout: float) -> tuple[int, str]
             cwd=str(root),
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=timeout,
             check=False,
             env=_git_env(),
@@ -1325,6 +1331,25 @@ def _git_log(
         _terminate(process)
         return (_empty_git(is_repo), False)
 
+    # The in-loop check below only runs when a line arrives. A git that stalls
+    # would otherwise read past the deadline forever, so the deadline also gets
+    # enforced from a timer that closes the pipe by killing the process.
+    killed = False
+
+    def kill_on_deadline() -> None:
+        nonlocal killed
+        killed = True
+        try:
+            process.kill()
+        except OSError:
+            pass
+
+    watchdog = threading.Timer(
+        max(0.5, budget.remaining_before(_GIT_FRACTION)), kill_on_deadline
+    )
+    watchdog.daemon = True
+    watchdog.start()
+
     try:
         for index, line in enumerate(stream):
             if index % 256 == 0 and budget.over(_GIT_FRACTION):
@@ -1352,7 +1377,11 @@ def _git_log(
     except (OSError, ValueError):
         pass
     finally:
+        watchdog.cancel()
         _terminate(process)
+
+    if killed:
+        truncated = True
 
     if commit_count == 0:
         return (_empty_git(is_repo), truncated)
@@ -2339,6 +2368,10 @@ def _is_secret_name(name: str) -> bool:
         return True
     if lowered.startswith(".env"):
         return True
+    # prod.env and secrets.env are as committed as .env is, and the safe
+    # suffixes above still let .env.example through untouched.
+    if lowered.endswith(".env"):
+        return True
     return lowered.endswith(_SECRET_SUFFIXES)
 
 
@@ -2352,10 +2385,12 @@ def _tracked_index(root: Path, budget: _Budget) -> frozenset[str] | None:
     if shutil.which("git") is None or not (root / ".git").exists():
         return None
     timeout = min(GIT_CALL_TIMEOUT, max(0.5, budget.remaining()))
-    code, output = _run_git(root, ["ls-files"], timeout)
+    # Without core.quotePath=false git escapes any path holding a non-ASCII
+    # byte, and those paths then never match the ones the walk recorded.
+    code, output = _run_git(root, ["-c", "core.quotePath=false", "ls-files"], timeout)
     if code != 0:
         return None
-    return frozenset(line.strip() for line in output.splitlines() if line.strip())
+    return frozenset(line for line in output.splitlines() if line)
 
 
 def _tracked_under(index: frozenset[str], rel: str) -> int:
