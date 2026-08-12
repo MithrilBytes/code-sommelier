@@ -116,8 +116,10 @@ def string_literals(path: Path) -> list[tuple[int, str]]:
 
 class DashTests(unittest.TestCase):
     def test_no_long_dashes_anywhere(self) -> None:
+        paths = scanned_files()
+        self.assertTrue(paths, "the dash scan found nothing to read")
         offences: list[str] = []
-        for path in scanned_files():
+        for path in paths:
             for number, line in numbered_lines(path):
                 for column, character in enumerate(line, start=1):
                     if character in BANNED_DASHES:
@@ -135,8 +137,10 @@ class DashTests(unittest.TestCase):
 
 class EmojiTests(unittest.TestCase):
     def test_no_emoji_anywhere(self) -> None:
+        paths = scanned_files()
+        self.assertTrue(paths, "the emoji scan found nothing to read")
         offences: list[str] = []
-        for path in scanned_files():
+        for path in paths:
             for number, line in numbered_lines(path):
                 for column, character in enumerate(line, start=1):
                     if is_emoji(character):
