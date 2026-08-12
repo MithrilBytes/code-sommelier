@@ -10,7 +10,12 @@ from pathlib import Path
 from typing import ClassVar
 from unittest import mock
 
-from sommelier.collect import RepoMetrics, TastingError, collect
+from sommelier.collect import (
+    RepoMetrics,
+    TastingError,
+    _is_secret_name,
+    collect,
+)
 from tests import fixtures
 
 
@@ -449,6 +454,22 @@ class NeglectedJavaScriptRepoTest(unittest.TestCase):
         self.assertFalse(nose.has_contributing)
         self.assertFalse(nose.has_ci)
         self.assertFalse(nose.has_tests)
+
+
+class SecretNameTest(unittest.TestCase):
+    """What counts as a committed secret, and what deliberately does not."""
+
+    def test_secret_names_are_recognised(self) -> None:
+        for name in (".env", ".env.local", ".envrc", "prod.env", "secrets.env",
+                     "id_rsa", "server.pem", "keystore.p12", "credentials"):
+            with self.subTest(name=name):
+                self.assertTrue(_is_secret_name(name))
+
+    def test_sample_files_are_not_secrets(self) -> None:
+        for name in (".env.example", ".env.sample", "prod.env.template",
+                     "config.env.dist", "readme.md", "environment.py"):
+            with self.subTest(name=name):
+                self.assertFalse(_is_secret_name(name))
 
 
 class DirectoryWithoutGitTest(unittest.TestCase):
