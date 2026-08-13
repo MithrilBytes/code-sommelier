@@ -1,0 +1,25 @@
+CODE SOMMELIER                                   tasting no. 71
+
+The label    cellar-book. Python, 4 files, 90 lines. It exists, which is the
+             strongest thing that can be said for it so far. 100 percent of
+             this is Python, across 4 files. Commitment, of a sort.
+Vintage      2021. The first commit landed on 2021-03-01 and the last on
+             2022-01-20, 0.9 years apart, across 4 commits. 5 years old. 2021
+             was a long time ago, and this has been here for all of it.
+Nose         The nose is clean. 13 lines of README, licensed MIT, and nothing
+             to complain about, which is itself suspicious. Not one TODO across
+             90 lines. Either this is finished, or nobody has been honest in
+             writing.
+Palate       Average length 22.5 lines across 4 files, with src/cellar/core.py
+             at 63 and nesting down to depth 4.
+Structure    No lockfile anywhere, against 6 declared in requirements.txt. The
+             versions are whatever the registry felt like that morning.
+Finish       4 commits from 2 authors. 25 percent say fix. The last one, on
+             2022-01-20, says Add a test for the pour helper. 1,665 days since
+             the last commit on 2022-01-20, which is 4.6 years. Whatever this
+             was going to be, it has finished being it. There is a gap of 311
+             days, 2021-03-05 to 2022-01-10. Something happened, and it was not
+             development.
+Verdict      92 points. Everything scores between 87 and 94 points. The notes
+             are where the truth lives.
+Pairing      Pairs with a fresh branch and lowered expectations.

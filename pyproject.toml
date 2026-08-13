@@ -43,6 +43,8 @@ packages = ["sommelier"]
 [tool.mypy]
 python_version = "3.11"
 files = ["sommelier", "tests"]
+# Cloned third party repositories, not ours to type check.
+exclude = ["^tests/corpus_cache/"]
 strict = true
 warn_unreachable = true
 warn_unused_configs = true

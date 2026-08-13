@@ -1,0 +1,21 @@
+CODE SOMMELIER                                   tasting no. 15
+
+The label    loose-scripts. Python. 2 source files out of 3 on disk, and 10
+             lines between them. 100 percent Python. There is no second opinion
+             anywhere in this tree.
+Vintage      There is no repository here. loose-scripts holds 3 files of
+             entirely unknown provenance.
+Nose         loose-scripts has no .gitignore of any kind, not even a copied
+             one. Everything it has ever produced by accident is a candidate
+             for the permanent record, and across 3 files the record has been
+             keeping. No tests. 2 source files, 10 lines, all of them correct
+             by assertion. No LICENSE file anywhere. loose-scripts is public
+             and unusable at the same time.
+Palate       2 files averaging 5.0 lines. The largest, helper.py, runs to 5.
+             Nesting reaches depth 1.
+Structure    No manifest of any kind. Whatever these 2 files need, they need it
+             in secret.
+Finish       There is no git history at all. loose-scripts has no finish,
+             because it has no beginning.
+Verdict      90 points. The number is a formality. Read the notes again.
+Pairing      Decant into smaller files and revisit in a year.

@@ -1,0 +1,70 @@
+{
+  "comment": [
+    "Real repositories, pinned by commit. Chosen for variety of shape rather",
+    "than fame: ecosystem, age, activity, and how badly they break an",
+    "assumption. Add entries freely; each one costs about a second.",
+    "Run `python3 -m tests.corpus --sync` to populate the cache."
+  ],
+  "repositories": [
+    {
+      "slug": "antirez_kilo",
+      "url": "https://github.com/antirez/kilo",
+      "commit": "323d93b29bd89a2cb446de90c4ed4fea1764176e",
+      "note": "C, two files, twenty commits, dormant since 2016. The smallest real thing."
+    },
+    {
+      "slug": "github_gitignore",
+      "url": "https://github.com/github/gitignore",
+      "commit": "57286c3887203259752b747db94e6c3ad10ec53d",
+      "note": "No program at all. Thousands of commits over a tree of templates."
+    },
+    {
+      "slug": "golang_example",
+      "url": "https://github.com/golang/example",
+      "commit": "7f05d217867b2af52b0a28c6d1c91df97e1b5b39",
+      "note": "Go, multi module, deliberately tidy. The well-behaved case."
+    },
+    {
+      "slug": "jashkenas_underscore",
+      "url": "https://github.com/jashkenas/underscore",
+      "commit": "e70d5bd070f1d883b40e786a955a61e4f4b3c2c6",
+      "note": "JavaScript from 2009. Long history, many authors, committed build output."
+    },
+    {
+      "slug": "kelseyhightower_envconfig",
+      "url": "https://github.com/kelseyhightower/envconfig",
+      "commit": "7834011875d613aec60c606b52c2b0fe8949fe91",
+      "note": "Go, single purpose, quiet for years. Tests the dormancy bands."
+    },
+    {
+      "slug": "pallets_itsdangerous",
+      "url": "https://github.com/pallets/itsdangerous",
+      "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+      "note": "Python, mature, maintained. Modern packaging metadata."
+    },
+    {
+      "slug": "psf_requests",
+      "url": "https://github.com/psf/requests",
+      "commit": "8068356288978c4f54661ae6f95afe0e0831885e",
+      "note": "Python, six thousand commits, hundreds of authors. Bus factor and fix ratio."
+    },
+    {
+      "slug": "rbenv_rbenv",
+      "url": "https://github.com/rbenv/rbenv",
+      "commit": "07e9b1e297a5977298c6aadc9971ae0e9eb7f0dc",
+      "note": "Ruby and shell mixed, long lived. Language attribution across two families."
+    },
+    {
+      "slug": "sharkdp_fd",
+      "url": "https://github.com/sharkdp/fd",
+      "commit": "ee20f426ddf338ac7ead5c5f00ea49258005caaf",
+      "note": "Rust, active, lockfile committed. The healthy modern case."
+    },
+    {
+      "slug": "sindresorhus_slugify",
+      "url": "https://github.com/sindresorhus/slugify",
+      "commit": "7c318bd1aa4b4affab29761f15a9604323fe2a3b",
+      "note": "JavaScript, four files. Small enough to reason about by hand."
+    }
+  ]
+}

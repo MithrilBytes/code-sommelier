@@ -78,3 +78,6 @@ Desktop.ini
 # Local environment files
 .env
 .env.*
+
+# Corpus clones, populated by `python3 -m tests.corpus --sync`
+tests/corpus_cache/

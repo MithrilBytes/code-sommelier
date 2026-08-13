@@ -42,11 +42,23 @@ EMOJI_RANGES: tuple[tuple[int, int], ...] = (
 ALLOWED_IMPORT_ROOTS = frozenset(sys.stdlib_module_names) | {"sommelier"}
 
 
+# Cloned third party repositories used by the corpus tests. They live under
+# tests/ so they are easy to find, which puts them in the way of every gate
+# that walks the tree. The house rules are ours and do not apply to them.
+VENDORED_TEST_DATA = (TESTS_DIR / "corpus_cache",)
+
+
+def _is_vendored(path: Path) -> bool:
+    return any(path.is_relative_to(directory) for directory in VENDORED_TEST_DATA)
+
+
 def python_sources() -> list[Path]:
     found: list[Path] = []
     for directory in (PACKAGE_DIR, TESTS_DIR):
         if directory.is_dir():
-            found.extend(sorted(directory.rglob("*.py")))
+            found.extend(
+                sorted(p for p in directory.rglob("*.py") if not _is_vendored(p))
+            )
     return found
 
 

@@ -1,0 +1,30 @@
+CODE SOMMELIER                                   tasting no. 97
+
+The label    This is todo-app. It is JavaScript. There are 3 source files, and
+             every one of them was somebody's idea. There is a tracked .env.
+             The sommelier has decided not to read it, which is more restraint
+             than the internet will show. 12 of the 20 files here are vendored,
+             which is 60 percent of the repository. The sommelier will pretend
+             not to have seen that.
+Vintage      2019. A vintage of 0.8 years and 3 commits, and the sommelier has
+             tasted every one of them. 7 years old. 2019 was a long time ago,
+             and this has been here for all of it.
+Nose         todo-app has no .gitignore of any kind, not even a copied one.
+             Everything it has ever produced by accident is a candidate for the
+             permanent record, and across 20 files the record has been keeping.
+             36 unresolved markers, 30 of them TODOs. src/legacy.js has 20 and
+             has clearly been asking for help for some time. There is no
+             README. 3 source files, 955 lines, and not one sentence explaining
+             why.
+Palate       Body: 3 files, 318.3 lines on average, peaking at 900 lines in
+             src/legacy.js. The body is enormous. src/legacy.js is 900 lines
+             long and it has never once been opened with confidence.
+Structure    package.json declares 5 dependencies and there is no lockfile.
+             Every install is a fresh guess.
+Finish       3 commits from 1 author. 33 percent say fix. The last one, on
+             2019-11-03, says fix login again. Nothing has been committed for
+             2,474 days. The last was 2019-11-03. This is not a project, it is
+             a preserve. 3 commits. 1 of them titled fix. It is not fixed.
+Verdict      87 points, because wine scoring is compressed and the sommelier
+             respects tradition. The notes are not compressed.
+Pairing      Decant into smaller files and revisit in a year.

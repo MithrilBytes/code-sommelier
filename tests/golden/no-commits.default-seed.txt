@@ -1,0 +1,21 @@
+CODE SOMMELIER                                    tasting no. 6
+
+The label    unstarted. Python, 1 files, 5 lines. It exists, which is the
+             strongest thing that can be said for it so far. 100 percent of
+             this is Python, across 1 files. Commitment, of a sort.
+Vintage      A git repository containing no commits. unstarted has been
+             prepared for a history it has not begun, and 2 files are waiting.
+Nose         unstarted has no .gitignore file. Every temporary thing among its
+             2 files is one careless git add away from being permanent. The
+             sommelier has seen the consequences of this and would rather not
+             discuss them. There is no test suite. The 1 files here have never
+             been asked to prove anything. No LICENSE file anywhere. unstarted
+             is public and unusable at the same time.
+Palate       Average length 5.0 lines across 1 files, with main.py at 5 and
+             nesting down to depth 1.
+Structure    No manifest of any kind. Whatever these 1 files need, they need it
+             in secret.
+Finish       Zero commits. The tasting of unstarted ends here, on the void,
+             which at least is clean.
+Verdict      90 points. The number is a formality. Read the notes again.
+Pairing      Pairs with silence, and a very slow read of the largest file.
