@@ -14,8 +14,10 @@ from dataclasses import replace
 
 from sommelier.collect import (
     AbandonmentMetrics,
+    Coverage,
     DependencyManifest,
     GitMetrics,
+    LanguagePalate,
     LanguageShare,
     NoseMetrics,
     PalateMetrics,
@@ -165,6 +167,20 @@ BASE_NOSE = NoseMetrics(
     has_tests=True,
 )
 
+BASE_LANGUAGE_PALATE = LanguagePalate(
+    name="Python",
+    file_count=40,
+    line_count=4000,
+    max_indent_depth=3,
+    max_indent_path="src/app.py",
+    largest_file_lines=180,
+    largest_file_path="src/app.py",
+    longest_function_lines=42,
+    longest_function_name="handle",
+    longest_function_path="src/app.py",
+    function_detector_ran=True,
+)
+
 BASE_PALATE = PalateMetrics(
     inventory="git",
     source_file_count=40,
@@ -180,6 +196,21 @@ BASE_PALATE = PalateMetrics(
     longest_function_path="src/app.py",
     sampled=False,
     scanned_file_count=40,
+    by_language=(BASE_LANGUAGE_PALATE,),
+)
+
+# Everything measured, nothing withheld. A test that cares about a gap says
+# so by replacing the field it cares about.
+BASE_COVERAGE = Coverage(
+    lines_complete=True,
+    truncated_files=0,
+    structural_scan_complete=True,
+    function_detector_files=40,
+    attributed_files=40,
+    source_files=40,
+    history_complete=True,
+    authorship_measured=True,
+    dependencies_measured=True,
 )
 
 BASE_MANIFEST = DependencyManifest(
@@ -234,6 +265,7 @@ BASE_METRICS = RepoMetrics(
     terroir=BASE_TERROIR,
     nose=BASE_NOSE,
     palate=BASE_PALATE,
+    coverage=BASE_COVERAGE,
     structure=BASE_STRUCTURE,
     abandonment=BASE_ABANDONMENT,
     sediment=BASE_SEDIMENT,
@@ -334,6 +366,7 @@ def repo_with_palate(
     longest_function_path: str | None = BASE_PALATE.longest_function_path,
     sampled: bool = BASE_PALATE.sampled,
     scanned_file_count: int = BASE_PALATE.scanned_file_count,
+    by_language: tuple[LanguagePalate, ...] = BASE_PALATE.by_language,
 ) -> RepoMetrics:
     return replace(
         BASE_METRICS,
@@ -351,7 +384,8 @@ def repo_with_palate(
             longest_function_path=longest_function_path,
             sampled=sampled,
             inventory="git",
-        scanned_file_count=scanned_file_count,
+            scanned_file_count=scanned_file_count,
+            by_language=by_language,
         ),
     )
 
@@ -527,6 +561,30 @@ def worst_metrics() -> RepoMetrics:
         sampled=True,
         inventory="git",
         scanned_file_count=5000,
+        by_language=(
+            LanguagePalate(
+                name="JavaScript",
+                file_count=5000,
+                line_count=900000,
+                max_indent_depth=12,
+                max_indent_path="src/legacy.js",
+                largest_file_lines=2400,
+                largest_file_path="src/legacy.js",
+                longest_function_lines=400,
+                longest_function_name="render",
+                longest_function_path="src/legacy.js",
+                function_detector_ran=True,
+            ),
+        ),
+    )
+    # Sampled, so the line totals describe 5,000 files of 6,000.
+    coverage = replace(
+        BASE_COVERAGE,
+        lines_complete=False,
+        structural_scan_complete=False,
+        function_detector_files=5000,
+        attributed_files=6000,
+        source_files=6000,
     )
     manifest = DependencyManifest(
         ecosystem="javascript",
@@ -604,6 +662,7 @@ def worst_metrics() -> RepoMetrics:
         terroir=terroir,
         nose=nose,
         palate=palate,
+        coverage=coverage,
         structure=structure,
         abandonment=abandonment,
         sediment=sediment,
@@ -647,6 +706,16 @@ def empty_metrics() -> RepoMetrics:
         longest_function_path=None,
         inventory="git",
         scanned_file_count=0,
+        by_language=(),
+    )
+    # Nothing to read is not a gap in the reading.
+    coverage = replace(
+        BASE_COVERAGE,
+        function_detector_files=0,
+        attributed_files=0,
+        source_files=0,
+        history_complete=False,
+        authorship_measured=False,
     )
     terroir = TerroirMetrics(languages=(), primary_language=None, frameworks=())
     abandonment = replace(
@@ -667,6 +736,7 @@ def empty_metrics() -> RepoMetrics:
         git=git,
         terroir=terroir,
         palate=palate,
+        coverage=coverage,
         abandonment=abandonment,
     )
 
@@ -693,7 +763,16 @@ def no_history_metrics() -> RepoMetrics:
         top_author_share=0.0,
         last_commit_subject=None,
     )
-    return replace(BASE_METRICS, name="loose-files", is_git_repo=False, git=git)
+    coverage = replace(
+        BASE_COVERAGE, history_complete=False, authorship_measured=False
+    )
+    return replace(
+        BASE_METRICS,
+        name="loose-files",
+        is_git_repo=False,
+        git=git,
+        coverage=coverage,
+    )
 
 
 def spread() -> tuple[tuple[str, RepoMetrics], ...]:

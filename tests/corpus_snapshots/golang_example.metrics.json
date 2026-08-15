@@ -11,6 +11,17 @@
     "worst_file_path": "slog-handler-guide/indenthandler1/indent_handler.go",
     "xxx": 0
   },
+  "coverage": {
+    "attributed_files": 46,
+    "authorship_measured": true,
+    "dependencies_measured": true,
+    "function_detector_files": 38,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 55,
+    "structural_scan_complete": true,
+    "truncated_files": 0
+  },
   "dropped": [],
   "git": {
     "author_count": 22,
@@ -50,6 +61,99 @@
   },
   "palate": {
     "average_lines": 71.6909,
+    "by_language": [
+      {
+        "file_count": 37,
+        "function_detector_ran": true,
+        "largest_file_lines": 283,
+        "largest_file_path": "internal/cmd/weave/weave.go",
+        "line_count": 3523,
+        "longest_function_lines": 154,
+        "longest_function_name": "main",
+        "longest_function_path": "internal/cmd/weave/weave.go",
+        "max_indent_depth": 5,
+        "max_indent_path": "internal/cmd/weave/weave.go",
+        "name": "Go"
+      },
+      {
+        "file_count": 9,
+        "function_detector_ran": false,
+        "largest_file_lines": 72,
+        "largest_file_path": "ragserver/ragserver-genkit/go.mod",
+        "line_count": 280,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 4,
+        "max_indent_path": "template/index.tmpl",
+        "name": ""
+      },
+      {
+        "file_count": 4,
+        "function_detector_ran": false,
+        "largest_file_lines": 24,
+        "largest_file_path": "ragserver/tests/query.sh",
+        "line_count": 67,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 4,
+        "max_indent_path": "ragserver/tests/weaviate-show-all.sh",
+        "name": "Shell"
+      },
+      {
+        "file_count": 2,
+        "function_detector_ran": false,
+        "largest_file_lines": 13,
+        "largest_file_path": "gotypes/Makefile",
+        "line_count": 26,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "gotypes/Makefile",
+        "name": "Makefile"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 9,
+        "largest_file_path": "appengine-hello/static/style.css",
+        "line_count": 9,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "appengine-hello/static/style.css",
+        "name": "CSS"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 24,
+        "largest_file_path": "appengine-hello/static/index.html",
+        "line_count": 24,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "appengine-hello/static/index.html",
+        "name": "HTML"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": true,
+        "largest_file_lines": 14,
+        "largest_file_path": "appengine-hello/static/script.js",
+        "line_count": 14,
+        "longest_function_lines": 6,
+        "longest_function_name": "fetchMessage",
+        "longest_function_path": "appengine-hello/static/script.js",
+        "max_indent_depth": 1,
+        "max_indent_path": "appengine-hello/static/script.js",
+        "name": "JavaScript"
+      }
+    ],
     "inventory": "git",
     "largest_file_lines": 283,
     "largest_file_path": "internal/cmd/weave/weave.go",

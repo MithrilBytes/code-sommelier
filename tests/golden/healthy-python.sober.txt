@@ -1,105 +1,122 @@
 Repository
-  name                    cellar-book
-  path                    <REPO>
-  git repository          yes
-  empty                   no
+  name                      cellar-book
+  path                      <REPO>
+  git repository            yes
+  empty                     no
 
 History
-  commits                 4
-  has commits             yes
-  shallow clone           no
-  first commit            2021-03-01
-  last commit             2022-01-20
-  days since last commit  1,665
-  fix commits             1
-  fix ratio               0.2500
-  longest gap days        311
-  longest gap start       2021-03-05
-  longest gap end         2022-01-10
-  authors                 2
-  top author              Ada Lovelace
-  top author commits      3
-  top author share        0.7500
-  last commit subject     Add a test for the pour helper
+  commits                   4
+  has commits               yes
+  shallow clone             no
+  first commit              2021-03-01
+  last commit               2022-01-20
+  days since last commit    1,665
+  fix commits               1
+  fix ratio                 0.2500
+  longest gap days          311
+  longest gap start         2021-03-05
+  longest gap end           2022-01-10
+  authors                   2
+  top author                Ada Lovelace
+  top author commits        3
+  top author share          0.7500
+  last commit subject       Add a test for the pour helper
 
 Languages
-  primary language        Python
-  languages detected      1
-  frameworks              Click, Requests
-  language Python         4 files, 90 lines, 100 percent
+  primary language          Python
+  languages detected        1
+  frameworks                Click, Requests
+  language Python           4 files, 90 lines, 100 percent
 
 Documentation
-  readme                  README.md
-  readme lines            13
-  readme bytes            210
-  license file            LICENSE
-  license name            MIT
-  gitignore               .gitignore
-  gitignore rules         5
-  contributing guide      yes
-  continuous integration  yes
-  tests present           yes
+  readme                    README.md
+  readme lines              13
+  readme bytes              210
+  license file              LICENSE
+  license name              MIT
+  gitignore                 .gitignore
+  gitignore rules           5
+  contributing guide        yes
+  continuous integration    yes
+  tests present             yes
 
 Files
-  file inventory          git
-  source files            4
-  total files             10
-  scanned files           4
-  sampled                 no
-  source lines            90
-  average lines per file  22.5
-  largest file            src/cellar/core.py
-  largest file lines      63
-  max indent depth        4
-  max indent file         src/cellar/core.py
-  longest function        remove
-  longest function lines  7
-  longest function file   src/cellar/core.py
+  file inventory            git
+  source files              4
+  total files               10
+  scanned files             4
+  sampled                   no
+  source lines              90
+  average lines per file    22.5
+  largest file              src/cellar/core.py
+  largest file lines        63
+  max indent depth          4
+  max indent file           src/cellar/core.py
+  longest function          remove
+  longest function lines    7
+  longest function file     src/cellar/core.py
+
+Coverage
+  line counts complete      yes
+  truncated files           0
+  structural scan complete  yes
+  files with a detector     4
+  attributed files          4
+  unattributed files        0
+  history complete          yes
+  authorship measured       yes
+  dependencies measured     yes
+
+Palate by language
+  Python                    4 files, 90 lines
+  Python largest file       src/cellar/core.py, 63 lines
+  Python max indent         depth 4, src/cellar/core.py
+  Python longest function   remove, 7 lines, src/cellar/core.py
 
 Dependencies
-  manifests               1
-  declared dependencies   6
-  ecosystems              python
-  no manifest found       no
-  manifest                requirements.txt: python, 6 declared, 0 dev, 0 locked, lockfile none, drift yes, no lockfile
+  manifests                 1
+  declared dependencies     6
+  ecosystems                python
+  no manifest found         no
+  manifest                  requirements.txt: python, 6 declared, 0 dev, 0 locked, lockfile none, drift yes, no lockfile
 
 Markers
-  todo                    0
-  fixme                   0
-  hack                    0
-  xxx                     0
-  total markers           0
-  markers per kloc        0.0
-  worst file              none
-  worst file markers      0
-  debug prints            0
-  commented out lines     0
+  todo                      0
+  fixme                     0
+  hack                      0
+  xxx                       0
+  total markers             0
+  markers per kloc          0.0
+  worst file                none
+  worst file markers        0
+  debug prints              0
+  commented out lines       0
 
 Sediment
-  vendored files          0
-  vendored directories    0
-  secret files            0
-  os cruft files          0
-  large binaries          0
-  largest binary          none
-  largest binary bytes    0
-  largest binary size     0.0 MB
+  vendored files            0
+  vendored directories      0
+  secret files              0
+  os cruft files            0
+  large binaries            0
+  largest binary            none
+  largest binary bytes      0
+  largest binary size       0.0 MB
 
 Judgement
-  score                   92
-  total severity          6
-  findings                11
-  finding                 label.identity: course label, severity 0
-  finding                 label.monoculture: course label, severity 0
-  finding                 vintage.aged: course vintage, severity 0
-  finding                 vintage.declared: course vintage, severity 0
-  finding                 abandonment.suspiciously_clean: course nose, severity 0
-  finding                 nose.documented: course nose, severity 0
-  finding                 palate.body: course palate, severity 0
-  finding                 structure.no_lockfile: course structure, severity 2
-  finding                 finish.dormant: course finish, severity 2
-  finding                 finish.the_silence: course finish, severity 2
-  finding                 finish.history: course finish, severity 0
+  score                     92
+  total severity            6
+  findings                  11
+  finding                   label.identity: course label, severity 0
+  finding                   label.monoculture: course label, severity 0
+  finding                   vintage.aged: course vintage, severity 0
+  finding                   vintage.declared: course vintage, severity 0
+  finding                   abandonment.suspiciously_clean: course nose, severity 0
+  finding                   nose.documented: course nose, severity 0
+  finding                   palate.body: course palate, severity 0
+  finding                   structure.no_lockfile: course structure, severity 2
+  finding                   finish.dormant: course finish, severity 2
+  finding                   finish.the_silence: course finish, severity 2
+  finding                   finish.history: course finish, severity 0
 
 Note: maximum indentation depth and longest function length are proxies for
 complexity. They are not cyclomatic complexity, and neither number should be

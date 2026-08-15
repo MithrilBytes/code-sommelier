@@ -11,6 +11,17 @@
     "worst_file_path": "src/itsdangerous/timed.py",
     "xxx": 0
   },
+  "coverage": {
+    "attributed_files": 18,
+    "authorship_measured": true,
+    "dependencies_measured": true,
+    "function_detector_files": 15,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 19,
+    "structural_scan_complete": true,
+    "truncated_files": 0
+  },
   "dropped": [],
   "git": {
     "author_count": 44,
@@ -50,6 +61,73 @@
   },
   "palate": {
     "average_lines": 93.8421,
+    "by_language": [
+      {
+        "file_count": 15,
+        "function_detector_ran": true,
+        "largest_file_lines": 404,
+        "largest_file_path": "src/itsdangerous/serializer.py",
+        "line_count": 1712,
+        "longest_function_lines": 33,
+        "longest_function_name": "derive_key",
+        "longest_function_path": "src/itsdangerous/signer.py",
+        "max_indent_depth": 5,
+        "max_indent_path": "src/itsdangerous/timed.py",
+        "name": "Python"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 0,
+        "largest_file_path": null,
+        "line_count": 0,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 0,
+        "max_indent_path": null,
+        "name": ""
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 35,
+        "largest_file_path": "docs/make.bat",
+        "line_count": 35,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 0,
+        "max_indent_path": null,
+        "name": "Batchfile"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 19,
+        "largest_file_path": "docs/Makefile",
+        "line_count": 19,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "docs/Makefile",
+        "name": "Makefile"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 17,
+        "largest_file_path": ".devcontainer/on-create-command.sh",
+        "line_count": 17,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": ".devcontainer/on-create-command.sh",
+        "name": "Shell"
+      }
+    ],
     "inventory": "git",
     "largest_file_lines": 404,
     "largest_file_path": "src/itsdangerous/serializer.py",

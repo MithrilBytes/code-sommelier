@@ -8,6 +8,7 @@ not exist or cannot be read at all.
 
 from __future__ import annotations
 
+import codecs
 import json
 import os
 import re
@@ -17,7 +18,7 @@ import threading
 import time
 import tomllib
 from collections import Counter, deque
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -29,6 +30,21 @@ _BANG: Final[str] = chr(33)
 
 MAX_READ_BYTES: Final[int] = 65536
 BINARY_SNIFF_BYTES: Final[int] = 8192
+STREAM_CHUNK_BYTES: Final[int] = 65536
+
+# Lines and markers are counted over the whole file. The structural analysis,
+# which is where the cost is, stops here and says so through Coverage rather
+# than reporting a partial number as though it were the file's.
+STRUCTURAL_SCAN_CHARS: Final[int] = 65536
+
+# A minified bundle can be one line of several megabytes. The line still
+# counts once; only the text handed to the analysis is bounded, so memory
+# stays a function of this constant rather than of the largest file present.
+MAX_LINE_CHARS: Final[int] = 1 << 20
+
+# Every separator str.splitlines() breaks on. Kept in step with it on purpose:
+# the streamed count has to agree with the whole-file count it replaced.
+_LINE_BREAKS: Final[str] = "\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029"
 SOURCE_SAMPLE_LIMIT: Final[int] = 5000
 LARGE_BINARY_BYTES: Final[int] = 5 * 1024 * 1024
 BINARY_CHECK_BYTES: Final[int] = 1024 * 1024
@@ -147,6 +163,38 @@ class NoseMetrics:
 
 
 @dataclass(frozen=True)
+class LanguagePalate:
+    """One language's share of the palate, measured over the files scanned.
+
+    The repository wide scalars on PalateMetrics answer "how deep does this
+    tree nest", which is a question about a tree that may hold four languages
+    with four different answers. These answer it one language at a time, so a
+    depth of nine in Python and a depth of two in Go stay distinguishable.
+    """
+
+    name: str
+    """The language, or the empty string for the unattributed bucket."""
+
+    file_count: int
+    """Files of this language the scan actually read."""
+
+    line_count: int
+    max_indent_depth: int
+    max_indent_path: str | None
+    largest_file_lines: int
+    largest_file_path: str | None
+    longest_function_lines: int
+    longest_function_name: str | None
+    longest_function_path: str | None
+    function_detector_ran: bool
+    """Whether a function detector exists for this language and ran.
+
+    False makes longest_function_lines of zero readable as "not measured"
+    rather than as "the longest function here is nothing".
+    """
+
+
+@dataclass(frozen=True)
 class PalateMetrics:
     source_file_count: int
     total_file_count: int
@@ -166,6 +214,12 @@ class PalateMetrics:
 
     Printed by --sober and carried in --json so a reader can tell whether the
     counts were filtered by git or taken straight off the disk.
+    """
+
+    by_language: tuple[LanguagePalate, ...]
+    """The same measurements split by language, unattributed files included.
+
+    Ordered by file count and then by name, so the tuple is stable.
     """
 
 
@@ -231,6 +285,61 @@ class DroppedAnalyzer:
 
 
 @dataclass(frozen=True)
+class Coverage:
+    """What was measured, stated separately from what the measurements say.
+
+    Zero is a number and absence is not. Without this record the two are the
+    same value: a repository with no function detector for its language and a
+    repository whose longest function is nothing both report zero, and every
+    layer above has to guess which it is holding. Each field below answers
+    one question, and answers it about the run that produced this record.
+    """
+
+    lines_complete: bool
+    """Every text file in the source set was counted to its last line.
+
+    False when a read stopped at the budget, and false when the barrel sample
+    or the budget meant some files were never opened at all. A binary file is
+    not counted against it, having no lines to miss.
+    """
+
+    truncated_files: int
+    """Files whose read stopped early, so their line count is a floor."""
+
+    structural_scan_complete: bool
+    """Every line that was counted was also analysed, all the way through.
+
+    False when a file ran past the structural cap, so its nesting depth and
+    function length describe its head rather than the file. False also when
+    lines_complete is false, since a file that was never read was never
+    analysed either.
+    """
+
+    function_detector_files: int
+    """Files a function length detector actually ran on."""
+
+    attributed_files: int
+    """Source files whose name or extension identified a language."""
+
+    source_files: int
+    """Source files found, attributed or not. The denominator for the above."""
+
+    history_complete: bool
+    """git answered, the repository has commits, and the clone is not shallow.
+
+    A shallow clone reports a first commit that is not the first commit, so
+    age, gaps and commit counts measured over it describe the clone rather
+    than the project.
+    """
+
+    authorship_measured: bool
+    """At least one author was counted, so the bus factor rests on evidence."""
+
+    dependencies_measured: bool
+    """A dependency manifest was found, so a count of zero means zero."""
+
+
+@dataclass(frozen=True)
 class RepoMetrics:
     path: str
     name: str
@@ -240,6 +349,7 @@ class RepoMetrics:
     terroir: TerroirMetrics
     nose: NoseMetrics
     palate: PalateMetrics
+    coverage: Coverage
     structure: StructureMetrics
     abandonment: AbandonmentMetrics
     sediment: SedimentMetrics
@@ -925,6 +1035,42 @@ class _FileAnalysis:
     xxx: int
     debug_prints: int
     commented_code: int
+    complete: bool
+    """The read reached the end of the file, so `lines` is the file's length."""
+
+    structural_complete: bool
+    """The structural cap was not reached, so depth and length cover it all."""
+
+    function_detector_ran: bool
+    """A detector exists for this language, so zero means zero."""
+
+
+@dataclass
+class _ReadState:
+    """How much of one file reached the analysis. Written by the reader."""
+
+    complete: bool = False
+    """The byte stream was drained, so every line of the file was counted."""
+
+    truncated_line: bool = False
+    """A line ran past MAX_LINE_CHARS and its tail was dropped."""
+
+
+@dataclass
+class _LanguageTally:
+    """One language's running totals while the scan walks the file list."""
+
+    name: str
+    file_count: int = 0
+    line_count: int = 0
+    max_indent_depth: int = 0
+    max_indent_path: str | None = None
+    largest_file_lines: int = 0
+    largest_file_path: str | None = None
+    longest_function_lines: int = 0
+    longest_function_name: str | None = None
+    longest_function_path: str | None = None
+    function_detector_ran: bool = False
 
 
 @dataclass(frozen=True)
@@ -933,6 +1079,11 @@ class _ScanResult:
     abandonment: AbandonmentMetrics
     lines_by_language: Mapping[str, int]
     truncated: bool
+    lines_complete: bool
+    truncated_files: int
+    structural_scan_complete: bool
+    function_detector_files: int
+    attributed_files: int
 
 
 def collect(path: Path, *, budget_seconds: float = 10.0) -> RepoMetrics:
@@ -981,6 +1132,20 @@ def collect(path: Path, *, budget_seconds: float = 10.0) -> RepoMetrics:
         dropped.append(DroppedAnalyzer(name="palate", reason="exceeded time budget"))
 
     terroir = _terroir(resolved, source_records, scan.lines_by_language, rel_paths, by_rel)
+    # A walk that stopped early leaves files nobody counted, which is the
+    # same gap as a file nobody finished reading, arriving one level up.
+    walked_all = not walk.truncated
+    coverage = Coverage(
+        lines_complete=scan.lines_complete and walked_all,
+        truncated_files=scan.truncated_files,
+        structural_scan_complete=scan.structural_scan_complete and walked_all,
+        function_detector_files=scan.function_detector_files,
+        attributed_files=scan.attributed_files,
+        source_files=scan.palate.source_file_count,
+        history_complete=git.is_repo and git.has_commits and not git.shallow,
+        authorship_measured=git.author_count > 0,
+        dependencies_measured=bool(structure.manifests),
+    )
 
     is_empty = scan.palate.source_file_count == 0 and not git.has_commits
     return RepoMetrics(
@@ -992,6 +1157,7 @@ def collect(path: Path, *, budget_seconds: float = 10.0) -> RepoMetrics:
         terroir=terroir,
         nose=nose,
         palate=scan.palate,
+        coverage=coverage,
         structure=structure,
         abandonment=scan.abandonment,
         sediment=sediment,
@@ -1246,6 +1412,57 @@ def _read_text(path: Path, limit: int = MAX_READ_BYTES) -> str | None:
     except OSError:
         return None
     return (head + rest).decode("utf-8", errors="replace")
+
+
+def _decoded(chunks: Iterable[bytes]) -> Iterator[str]:
+    """Decode a byte stream as UTF-8, replacing what is not.
+
+    Incremental, so a character straddling a chunk boundary decodes as the
+    character it is rather than as two replacements.
+    """
+    decoder = codecs.getincrementaldecoder("utf-8")("replace")
+    for chunk in chunks:
+        text = decoder.decode(chunk)
+        if text:
+            yield text
+    tail = decoder.decode(b"", True)
+    if tail:
+        yield tail
+
+
+def _split_lines(chunks: Iterable[str], state: _ReadState) -> Iterator[str]:
+    """Split a text stream into lines exactly as str.splitlines() would.
+
+    The last piece of every chunk is held back, because the chunk boundary
+    may sit inside a line, and a carriage return at the end of one chunk may
+    turn out to be the first half of a line break in the next.
+
+    Beyond MAX_LINE_CHARS the rest of an unbroken line is dropped rather than
+    accumulated, which is what keeps a minified bundle from being held whole
+    in memory. The line is still counted once, so the count stays exact, and
+    the state records that some text went unread so nothing downstream claims
+    to have seen the whole file.
+    """
+    carry = ""
+    skipping = False
+    for chunk in chunks:
+        pieces = (carry + chunk).splitlines(keepends=True)
+        if not pieces:
+            continue
+        carry = pieces.pop()
+        for piece in pieces:
+            if skipping:
+                skipping = False
+                continue
+            yield piece.rstrip(_LINE_BREAKS)
+        if len(carry) > MAX_LINE_CHARS and carry.rstrip(_LINE_BREAKS) == carry:
+            state.truncated_line = True
+            if not skipping:
+                yield carry[:MAX_LINE_CHARS]
+                skipping = True
+            carry = ""
+    if carry and not skipping:
+        yield carry.rstrip(_LINE_BREAKS)
 
 
 def _looks_binary(path: Path) -> bool:
@@ -2050,21 +2267,27 @@ def _scan(
     commented_code = 0
     worst_path: str | None = None
     worst_count = 0
-    lines_by_language: Counter[str] = Counter()
+    tallies: dict[str, _LanguageTally] = {}
+    truncated_files = 0
+    detector_files = 0
+    structural_complete = True
     truncated = False
 
     for index, record in enumerate(selected):
         if index % 32 == 0 and budget.expired():
             truncated = True
             break
-        text = _read_text(_to_path(root, record.rel))
-        if text is None:
+        analysis = _analyse_file(_to_path(root, record.rel), record.language, budget)
+        if analysis is None:
             continue
         scanned += 1
-        analysis = _analyse_text(text, record.language)
+        if not analysis.complete:
+            truncated_files += 1
+        if not analysis.structural_complete:
+            structural_complete = False
+        if analysis.function_detector_ran:
+            detector_files += 1
         total_lines += analysis.lines
-        if record.language is not None:
-            lines_by_language[record.language] += analysis.lines
         if analysis.lines > largest_lines:
             largest_lines = analysis.lines
             largest_path = record.rel
@@ -2085,10 +2308,15 @@ def _scan(
         if markers > worst_count:
             worst_count = markers
             worst_path = record.rel
+        _tally(tallies, record, analysis)
 
     source_count = len(source_records)
+    attributed = sum(1 for record in source_records if record.language is not None)
     marker_total = todo + fixme + hack + xxx
     per_kloc = marker_total / (total_lines / 1000.0) if total_lines else 0.0
+    # Files nobody opened are as absent as files that were cut short, and the
+    # barrel sample skips them by design rather than by accident.
+    lines_complete = truncated_files == 0 and not sampled and not truncated
 
     palate = PalateMetrics(
         source_file_count=source_count,
@@ -2108,6 +2336,7 @@ def _scan(
         sampled=sampled,
         scanned_file_count=scanned,
         inventory=inventory,
+        by_language=_language_palates(tallies),
     )
     abandonment = AbandonmentMetrics(
         todo=todo,
@@ -2124,8 +2353,68 @@ def _scan(
     return _ScanResult(
         palate=palate,
         abandonment=abandonment,
-        lines_by_language=dict(lines_by_language),
+        lines_by_language={
+            name: tally.line_count for name, tally in tallies.items() if name
+        },
         truncated=truncated,
+        lines_complete=lines_complete,
+        truncated_files=truncated_files,
+        structural_scan_complete=structural_complete and lines_complete,
+        function_detector_files=detector_files,
+        attributed_files=attributed,
+    )
+
+
+def _tally(
+    tallies: dict[str, _LanguageTally], record: _FileRecord, analysis: _FileAnalysis
+) -> None:
+    """Fold one file into its language's running totals.
+
+    Unattributed files go into a bucket of their own rather than being
+    dropped, because a repository can be nothing but unattributed files and
+    that fact is the finding.
+    """
+    name = record.language or ""
+    tally = tallies.get(name)
+    if tally is None:
+        tally = _LanguageTally(name=name)
+        tallies[name] = tally
+    tally.file_count += 1
+    tally.line_count += analysis.lines
+    if analysis.function_detector_ran:
+        tally.function_detector_ran = True
+    if analysis.lines > tally.largest_file_lines:
+        tally.largest_file_lines = analysis.lines
+        tally.largest_file_path = record.rel
+    if analysis.max_depth > tally.max_indent_depth:
+        tally.max_indent_depth = analysis.max_depth
+        tally.max_indent_path = record.rel
+    if analysis.function_lines > tally.longest_function_lines:
+        tally.longest_function_lines = analysis.function_lines
+        tally.longest_function_name = analysis.function_name
+        tally.longest_function_path = record.rel
+
+
+def _language_palates(
+    tallies: Mapping[str, _LanguageTally]
+) -> tuple[LanguagePalate, ...]:
+    return tuple(
+        LanguagePalate(
+            name=tally.name,
+            file_count=tally.file_count,
+            line_count=tally.line_count,
+            max_indent_depth=tally.max_indent_depth,
+            max_indent_path=tally.max_indent_path,
+            largest_file_lines=tally.largest_file_lines,
+            largest_file_path=tally.largest_file_path,
+            longest_function_lines=tally.longest_function_lines,
+            longest_function_name=tally.longest_function_name,
+            longest_function_path=tally.longest_function_path,
+            function_detector_ran=tally.function_detector_ran,
+        )
+        for tally in sorted(
+            tallies.values(), key=lambda item: (-item.file_count, item.name)
+        )
     )
 
 
@@ -2209,18 +2498,68 @@ def _looks_like_code(comment: str) -> bool:
     return _CODE_SHAPE_RE.search(stripped) is not None
 
 
-def _analyse_text(text: str, language: str | None) -> _FileAnalysis:
+def _analyse_file(
+    path: Path, language: str | None, budget: _Budget
+) -> _FileAnalysis | None:
+    """Stream one file, or report None for binary and unreadable.
+
+    The file is read to its end, in chunks, so the line and marker counts
+    describe the file rather than its first 64 KiB. Only the structural
+    analysis is capped, and _FileAnalysis says when that cap was reached.
+    """
+    state = _ReadState()
+    try:
+        with path.open("rb") as handle:
+            head = handle.read(BINARY_SNIFF_BYTES)
+            if b"\x00" in head:
+                return None
+
+            def chunks() -> Iterator[bytes]:
+                yield head
+                while True:
+                    block = handle.read(STREAM_CHUNK_BYTES)
+                    if not block:
+                        break
+                    yield block
+                    # Only consulted once a whole chunk has been read, so a
+                    # file that fits inside the sniff window is never called
+                    # truncated by a budget that had already expired.
+                    if budget.expired():
+                        return
+                state.complete = True
+
+            return _analyse_lines(
+                _split_lines(_decoded(chunks()), state), language, state
+            )
+    except OSError:
+        return None
+
+
+def _analyse_lines(
+    lines: Iterable[str], language: str | None, state: _ReadState
+) -> _FileAnalysis:
+    """Count one file's lines and markers, and analyse the head of it.
+
+    Markers, debug prints and commented out code are counted on every line.
+    Indentation depth and function length need every line held at once and
+    cost accordingly, so they see the first STRUCTURAL_SCAN_CHARS characters
+    and the result records whether that was all of them.
+    """
     tokens = _comment_tokens_for(language)
-    raw_lines = text.splitlines()
+    family = _FUNCTION_FAMILY.get(language or "", "")
     code_lines: list[str] = []
+    scans: list[tuple[int, int]] = []
+    retained = 0
+    structural_complete = True
     terminator: str | None = None
+    count = 0
     todo = fixme = hack = xxx = 0
     debug_prints = 0
     commented_code = 0
 
-    for line in raw_lines:
+    for line in lines:
+        count += 1
         code, comment, terminator = _split_line(line, terminator, tokens)
-        code_lines.append(code)
         if comment:
             for marker in _MARKER_RE.findall(comment):
                 if marker == "TODO":
@@ -2235,14 +2574,21 @@ def _analyse_text(text: str, language: str | None) -> _FileAnalysis:
                 commented_code += 1
         if code:
             debug_prints += len(_DEBUG_PRINT_RE.findall(code))
+        if retained < STRUCTURAL_SCAN_CHARS:
+            code_lines.append(code)
+            scans.append(_delta_scan(code))
+            # The terminator the split removed is worth one character. The
+            # cap is a budget, not a measurement, so an approximation of the
+            # original file offset is what it needs.
+            retained += len(line) + 1
+        else:
+            structural_complete = False
 
-    scans = [_delta_scan(code) for code in code_lines]
     depth = _indent_depth(code_lines, scans)
-    family = _FUNCTION_FAMILY.get(language or "", "")
     function_lines, function_name = _longest_function(code_lines, scans, family)
 
     return _FileAnalysis(
-        lines=len(raw_lines),
+        lines=count,
         max_depth=depth,
         function_lines=function_lines,
         function_name=function_name,
@@ -2252,6 +2598,11 @@ def _analyse_text(text: str, language: str | None) -> _FileAnalysis:
         xxx=xxx,
         debug_prints=debug_prints,
         commented_code=commented_code,
+        complete=state.complete,
+        structural_complete=(
+            structural_complete and state.complete and not state.truncated_line
+        ),
+        function_detector_ran=bool(family),
     )
 
 

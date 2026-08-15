@@ -14,8 +14,10 @@ from collections.abc import Mapping, Sequence
 from typing import Any, Final
 
 from sommelier.collect import (
+    Coverage,
     DependencyManifest,
     DroppedAnalyzer,
+    LanguagePalate,
     LanguageShare,
     RepoMetrics,
     SedimentItem,
@@ -151,6 +153,7 @@ def _sober_sections(metrics: RepoMetrics, judgement: Judgement) -> tuple[_Sectio
     terroir = metrics.terroir
     nose = metrics.nose
     palate = metrics.palate
+    coverage = metrics.coverage
     structure = metrics.structure
     abandonment = metrics.abandonment
     sediment = metrics.sediment
@@ -230,6 +233,24 @@ def _sober_sections(metrics: RepoMetrics, judgement: Judgement) -> tuple[_Sectio
             ),
         ),
         _Section(
+            "Coverage",
+            (
+                ("line counts complete", _yes_no(coverage.lines_complete)),
+                ("truncated files", _count(coverage.truncated_files)),
+                ("structural scan complete", _yes_no(coverage.structural_scan_complete)),
+                ("files with a detector", _count(coverage.function_detector_files)),
+                ("attributed files", _count(coverage.attributed_files)),
+                ("unattributed files", _count(_unattributed(coverage))),
+                ("history complete", _yes_no(coverage.history_complete)),
+                ("authorship measured", _yes_no(coverage.authorship_measured)),
+                ("dependencies measured", _yes_no(coverage.dependencies_measured)),
+            ),
+        ),
+        _Section(
+            "Palate by language",
+            _by_language_rows(palate.by_language),
+        ),
+        _Section(
             "Dependencies",
             (
                 ("manifests", _count(len(structure.manifests))),
@@ -302,6 +323,57 @@ def _language_rows(languages: Sequence[LanguageShare]) -> tuple[tuple[str, str],
         )
         for language in languages
     )
+
+
+def _unattributed(coverage: Coverage) -> int:
+    return max(0, coverage.source_files - coverage.attributed_files)
+
+
+def _by_language_rows(
+    languages: Sequence[LanguagePalate],
+) -> tuple[tuple[str, str], ...]:
+    """Four rows per language, so a per language number is never a repo number.
+
+    The repository wide scalars above answer with one number for a tree that
+    may hold four languages. These say which language each number came from,
+    and say plainly where no detector ran rather than printing a zero.
+    """
+    if not languages:
+        return (("nothing measured", "no source files were read"),)
+    rows: list[tuple[str, str]] = []
+    for language in languages:
+        label = language.name if language.name else "unattributed"
+        rows.append(
+            (
+                label,
+                f"{_count(language.file_count)} files, "
+                f"{_count(language.line_count)} lines",
+            )
+        )
+        rows.append(
+            (
+                f"{label} largest file",
+                f"{_text(language.largest_file_path)}, "
+                f"{_count(language.largest_file_lines)} lines",
+            )
+        )
+        rows.append(
+            (
+                f"{label} max indent",
+                f"depth {_count(language.max_indent_depth)}, "
+                f"{_text(language.max_indent_path)}",
+            )
+        )
+        if language.function_detector_ran:
+            longest = (
+                f"{_text(language.longest_function_name)}, "
+                f"{_count(language.longest_function_lines)} lines, "
+                f"{_text(language.longest_function_path)}"
+            )
+        else:
+            longest = "not measured, no detector for this language"
+        rows.append((f"{label} longest function", longest))
+    return tuple(rows)
 
 
 def _manifest_row(manifest: DependencyManifest) -> tuple[str, str]:

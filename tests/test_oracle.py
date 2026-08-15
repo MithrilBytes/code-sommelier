@@ -10,10 +10,18 @@ Where sommelier's definition is deliberate rather than incidental, the oracle
 matches it on purpose and says so. Three rules matter:
 
 * line counts use str.splitlines(), which counts a final line with no trailing
-  newline and splits on \\r and \\f as well as \\n. The fixtures here are written
-  with ordinary trailing newlines and no exotic separators, so wc -l and
-  splitlines() agree and the oracle stays honest.
-* every file is read to a 64 KiB cap. The fixtures here are far smaller.
+  newline and splits on \\r and \\f as well as \\n. Most fixtures here are
+  written with ordinary trailing newlines and no exotic separators, so wc -l
+  and splitlines() agree and the oracle stays honest. Where a fixture is built
+  from exotic separators on purpose, splitlines() alone is the oracle and wc is
+  not consulted, because wc counts newline bytes rather than lines.
+* lines and markers are counted over the whole file, at any size. This used to
+  read "every file is read to a 64 KiB cap, and the fixtures here are far
+  smaller", which is how the cap survived: no fixture in this module was large
+  enough to notice it. LargeFileOracleTest, ChunkSeamOracleTest and
+  CorpusLineCountOracleTest are the fixtures that notice. The structural
+  analysis still stops at a cap and records that it stopped, so nesting depth
+  and function length are not compared against a whole-file oracle here.
 * over SOURCE_SAMPLE_LIMIT files the scan switches to a stratified sample and
   the scan-derived numbers describe the sample, not the repository. Every test
   asserts the sample and budget guards before comparing anything.
@@ -22,6 +30,7 @@ matches it on purpose and says so. Three rules matter:
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 import unittest
 from collections import Counter
@@ -29,9 +38,15 @@ from datetime import date
 from pathlib import Path
 from typing import Sequence
 
-from sommelier.collect import RepoMetrics, collect
+from sommelier.collect import (
+    BINARY_SNIFF_BYTES,
+    MAX_READ_BYTES,
+    STREAM_CHUNK_BYTES,
+    RepoMetrics,
+    collect,
+)
 
-from tests import fixtures
+from tests import corpus, fixtures
 
 # Generous enough that the budget never fires on a loaded machine. A dropped
 # analyzer would shrink the metrics and the oracle would "disagree" about
@@ -39,6 +54,23 @@ from tests import fixtures
 ORACLE_BUDGET_SECONDS = 120.0
 
 SOURCE_SUFFIXES = (".py", ".js", ".go", ".rb")
+
+# The reader takes the first BINARY_SNIFF_BYTES to decide whether the file is
+# binary, then STREAM_CHUNK_BYTES at a time. Those two offsets are the seams,
+# and a fixture that never reaches one cannot say anything about them.
+SEAM_OFFSETS = (BINARY_SNIFF_BYTES, BINARY_SNIFF_BYTES + STREAM_CHUNK_BYTES)
+
+LARGE_FILE_LINES = 4000
+LARGE_FILE_NAME = "big.py"
+
+
+def large_python_source(lines: int) -> str:
+    """A file of exactly `lines` lines, wide enough to outgrow the read cap."""
+    body = [
+        f"CONSTANT_{index} = {index}  # padding, so the file outgrows the cap"
+        for index in range(lines)
+    ]
+    return "\n".join(body) + "\n"
 
 
 def git_lines(root: Path, args: Sequence[str]) -> list[str]:
@@ -306,6 +338,257 @@ class NeglectedRepoOracleTest(OracleCase):
     def test_commit_count_matches_rev_list(self) -> None:
         expected = int(git_lines(self.root, ["rev-list", "--count", "HEAD"])[0])
         self.assertEqual(self.metrics.git.commit_count, expected)
+
+
+class LargeFileOracleTest(OracleCase):
+    """A file past the read cap, counted by a reader that has no cap.
+
+    This is the case the module could not reach. Every fixture above fits
+    inside a single read, so a truncated count and a complete one are the
+    same number and the oracle agreed with the defect. On psf/requests the
+    difference was 1,850 against 3,094, a 40 percent undercount printed as
+    the largest file with no mark on it.
+
+    The oracle is the file itself, read once in one piece and split by
+    CPython, which knows nothing about chunks, caps or budgets.
+    """
+
+    def setUp(self) -> None:
+        self.fixture = fixtures.Fixture("large-file")
+        self.addCleanup(self.fixture.cleanup)
+        self.root = self.fixture.path
+        fixtures.write_tree(
+            self.root,
+            {
+                LARGE_FILE_NAME: large_python_source(LARGE_FILE_LINES),
+                "small.py": "value = 1\n",
+            },
+        )
+        self.big = self.root / LARGE_FILE_NAME
+        self.metrics = self.measure(self.root)
+
+    def independent_count(self) -> int:
+        """The whole file, in one piece, split by somebody else's code."""
+        return len(self.big.read_text(encoding="utf-8").splitlines())
+
+    def test_the_fixture_reaches_past_the_cap_that_used_to_truncate(self) -> None:
+        """Without this the test could pass on a file the cap never touched."""
+        payload = self.big.read_bytes()
+        self.assertGreater(len(payload), MAX_READ_BYTES * 2)
+        truncated = len(
+            payload[:MAX_READ_BYTES].decode("utf-8", errors="replace").splitlines()
+        )
+        self.assertLess(
+            truncated,
+            self.independent_count(),
+            "a capped read would report the same number, so nothing is proved",
+        )
+
+    def test_largest_file_lines_matches_an_independent_count(self) -> None:
+        self.assertEqual(self.metrics.palate.largest_file_path, LARGE_FILE_NAME)
+        self.assertEqual(
+            self.metrics.palate.largest_file_lines, self.independent_count()
+        )
+        self.assertEqual(self.metrics.palate.largest_file_lines, LARGE_FILE_LINES)
+
+    def test_total_lines_match_an_independent_count(self) -> None:
+        expected = sum(
+            len((self.root / name).read_text(encoding="utf-8").splitlines())
+            for name in (LARGE_FILE_NAME, "small.py")
+        )
+        self.assertEqual(self.metrics.palate.total_lines, expected)
+
+    def test_the_count_also_matches_wc(self) -> None:
+        # Second oracle, different tool. Sound here because the fixture ends
+        # every line with a newline and holds no exotic separator.
+        if shutil.which("wc") is None:
+            self.skipTest("wc is not available on this machine")
+        payload = self.big.read_bytes()
+        self.assertTrue(payload.endswith(b"\n"))
+        self.assertEqual(payload.count(b"\n"), self.independent_count())
+        proc = subprocess.run(
+            ["wc", "-l", LARGE_FILE_NAME],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=60,
+        )
+        self.assertEqual(
+            self.metrics.palate.largest_file_lines, int(proc.stdout.split()[0])
+        )
+
+    def test_the_read_is_recorded_as_complete_and_the_analysis_is_not(self) -> None:
+        """The structural cap survives. Saying nothing about it did not."""
+        coverage = self.metrics.coverage
+        self.assertTrue(coverage.lines_complete)
+        self.assertEqual(coverage.truncated_files, 0)
+        self.assertFalse(coverage.structural_scan_complete)
+
+
+class ChunkSeamOracleTest(OracleCase):
+    """The seams between reads, where a streamed count can gain or lose a line.
+
+    A seam can fall inside a line, between a carriage return and the newline
+    that completes it, or inside a multi byte character. None of those is
+    reachable by a fixture that fits in one read, and each is a place where
+    the reassembly can quietly invent a line or drop one. The oracle is
+    str.splitlines() over the whole payload, which is the definition the
+    streamed splitter is written to reproduce.
+    """
+
+    def counted(self, payload: bytes) -> int:
+        """What collect reports for one file holding exactly these bytes."""
+        with fixtures.Fixture("seam") as fixture:
+            (fixture.path / "body.py").write_bytes(payload)
+            metrics = self.measure(fixture.path)
+        return metrics.palate.largest_file_lines
+
+    def expected(self, payload: bytes) -> int:
+        """What CPython says, splitting the whole payload in one piece."""
+        return len(payload.decode("utf-8", errors="replace").splitlines())
+
+    def payload_across(self, seam: int, marker: bytes, *, before: int = 1) -> bytes:
+        """Bytes whose `marker` starts `before` bytes ahead of `seam`.
+
+        The lead is plain ASCII lines, so a byte offset and a character
+        offset are the same number and the arithmetic stays readable.
+        """
+        filler = b"value = 1\n"
+        start = seam - before
+        lead = filler * (start // len(filler))
+        pad = start - len(lead)
+        if pad:
+            lead += b"#" * (pad - 1) + b"\n"
+        payload = lead + marker + filler * 400
+        self.assertEqual(
+            payload[start : start + len(marker)],
+            marker,
+            "the fixture does not put the marker where the test claims",
+        )
+        return payload
+
+    def test_a_carriage_return_and_its_newline_land_in_different_chunks(self) -> None:
+        for seam in SEAM_OFFSETS:
+            with self.subTest(seam=seam):
+                payload = self.payload_across(seam, b"\r\n")
+                self.assertEqual(payload[seam - 1 : seam + 1], b"\r\n")
+                self.assertEqual(self.counted(payload), self.expected(payload))
+
+    def test_a_carriage_return_alone_ends_the_chunk(self) -> None:
+        """A lone CR is a line break, and the next chunk must not undo it."""
+        for seam in SEAM_OFFSETS:
+            with self.subTest(seam=seam):
+                payload = self.payload_across(seam, b"\rvalue = 2\n")
+                self.assertEqual(self.counted(payload), self.expected(payload))
+
+    def test_a_multi_byte_character_straddles_a_seam(self) -> None:
+        # Four bytes in UTF-8, from a range no house rule bans.
+        glyph = chr(0x10437).encode("utf-8")
+        self.assertEqual(len(glyph), 4)
+        for before in (1, 2, 3):
+            for seam in SEAM_OFFSETS:
+                with self.subTest(before=before, seam=seam):
+                    payload = self.payload_across(seam, glyph + b"\n", before=before)
+                    self.assertGreaterEqual(payload[seam], 0x80)
+                    self.assertLess(payload[seam], 0xC0)
+                    self.assertEqual(self.counted(payload), self.expected(payload))
+
+    def test_exotic_separators_and_a_missing_final_newline(self) -> None:
+        """splitlines() breaks on more than the newline, and so must the stream.
+
+        wc is not consulted here on purpose: it counts newline bytes, and
+        this payload is mostly separators that are not one.
+        """
+        separators = (0x0A, 0x0B, 0x0C, 0x0D, 0x1C, 0x1D, 0x1E, 0x85, 0x2028, 0x2029)
+        block = "".join(
+            f"value {index}{chr(point)}" for index, point in enumerate(separators)
+        )
+        payload = (block * 1200 + "tail with no final newline").encode("utf-8")
+        self.assertGreater(len(payload), SEAM_OFFSETS[-1])
+        self.assertEqual(self.counted(payload), self.expected(payload))
+
+
+class CorpusLineCountOracleTest(OracleCase):
+    """The pinned corpus, recounted with a reader that shares no code.
+
+    A synthetic fixture holds what somebody thought to put in it. These are
+    real files: a 3,094 line test module, a quarter megabyte of generated
+    documentation, a 2,878 line Rust suite. Three of the ten are longer than
+    a single read, which is why three of the ten used to be reported wrong.
+
+    Skips without the cache, which is populated by hand:
+
+        python3 -m tests.corpus --sync
+    """
+
+    def setUp(self) -> None:
+        # Reading the cache asks git which commit each clone sits on.
+        fixtures.require_git()
+        self.cached = [
+            entry
+            for entry in corpus.load_manifest()
+            if corpus.cached_commit(entry) is not None
+        ]
+        if not self.cached:
+            self.skipTest(
+                "corpus cache is empty; run `python3 -m tests.corpus --sync`"
+            )
+
+    def test_largest_file_lines_matches_an_independent_count(self) -> None:
+        past_the_cap = 0
+        for entry in self.cached:
+            with self.subTest(entry.slug):
+                metrics = self.measure(entry.path)
+                rel = metrics.palate.largest_file_path
+                self.assertIsNotNone(rel, f"{entry.slug} reports no largest file")
+                assert rel is not None  # narrowed for mypy; asserted above
+                payload = entry.path.joinpath(*rel.split("/")).read_bytes()
+                expected = len(
+                    payload.decode("utf-8", errors="replace").splitlines()
+                )
+                self.assertEqual(
+                    metrics.palate.largest_file_lines,
+                    expected,
+                    f"{entry.slug} says {rel} is "
+                    f"{metrics.palate.largest_file_lines} lines, and it is "
+                    f"{expected}",
+                )
+                if payload.endswith(b"\n") and payload.count(b"\n") == expected:
+                    self.assert_wc_agrees(entry.path, rel, expected)
+                if len(payload) <= MAX_READ_BYTES:
+                    continue
+                past_the_cap += 1
+                truncated = len(
+                    payload[:MAX_READ_BYTES]
+                    .decode("utf-8", errors="replace")
+                    .splitlines()
+                )
+                self.assertNotEqual(
+                    metrics.palate.largest_file_lines,
+                    truncated,
+                    f"{entry.slug} still reports the capped count for {rel}",
+                )
+        self.assertGreater(
+            past_the_cap,
+            0,
+            "no cached repository has a largest file past the read cap, so "
+            "this test cannot show that the cap is gone",
+        )
+
+    def assert_wc_agrees(self, root: Path, rel: str, expected: int) -> None:
+        """Second oracle, and a different tool, where wc -l is comparable."""
+        if shutil.which("wc") is None:
+            return
+        proc = subprocess.run(
+            ["wc", "-l", rel],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=60,
+        )
+        self.assertEqual(int(proc.stdout.split()[0]), expected)
 
 
 if __name__ == "__main__":

@@ -21,9 +21,11 @@ from typing import Final
 
 from sommelier.collect import (
     AbandonmentMetrics,
+    Coverage,
     DependencyManifest,
     DroppedAnalyzer,
     GitMetrics,
+    LanguagePalate,
     LanguageShare,
     NoseMetrics,
     PalateMetrics,
@@ -179,6 +181,73 @@ def _default_sediment() -> SedimentMetrics:
     )
 
 
+def _default_by_language(
+    *,
+    primary_language: str | None,
+    file_count: int,
+    line_count: int,
+    max_indent_depth: int,
+    max_indent_path: str | None,
+    largest_file_lines: int,
+    largest_file_path: str | None,
+    longest_function_lines: int,
+    longest_function_name: str | None,
+    longest_function_path: str | None,
+) -> tuple[LanguagePalate, ...]:
+    """One bucket holding everything, which is what a one language repo is.
+
+    A caller that cares about the split passes its own tuple. This default
+    only has to agree with the repository wide scalars beside it.
+    """
+    if primary_language is None or file_count <= 0:
+        return ()
+    return (
+        LanguagePalate(
+            name=primary_language,
+            file_count=file_count,
+            line_count=line_count,
+            max_indent_depth=max_indent_depth,
+            max_indent_path=max_indent_path,
+            largest_file_lines=largest_file_lines,
+            largest_file_path=largest_file_path,
+            longest_function_lines=longest_function_lines,
+            longest_function_name=longest_function_name,
+            longest_function_path=longest_function_path,
+            function_detector_ran=longest_function_lines > 0,
+        ),
+    )
+
+
+def _default_coverage(
+    *,
+    source_file_count: int,
+    by_language: tuple[LanguagePalate, ...],
+    git: GitMetrics | None,
+    structure: StructureMetrics | None,
+) -> Coverage:
+    """A complete measurement, which is what the other defaults describe."""
+    resolved_git = _default_git() if git is None else git
+    resolved_structure = _default_structure() if structure is None else structure
+    attributed = sum(item.file_count for item in by_language if item.name)
+    return Coverage(
+        lines_complete=True,
+        truncated_files=0,
+        structural_scan_complete=True,
+        function_detector_files=sum(
+            item.file_count for item in by_language if item.function_detector_ran
+        ),
+        attributed_files=attributed,
+        source_files=source_file_count,
+        history_complete=(
+            resolved_git.is_repo
+            and resolved_git.has_commits
+            and not resolved_git.shallow
+        ),
+        authorship_measured=resolved_git.author_count > 0,
+        dependencies_measured=bool(resolved_structure.manifests),
+    )
+
+
 def synthetic_metrics(
     *,
     name: str = "cellar-book",
@@ -201,6 +270,8 @@ def synthetic_metrics(
     longest_function_path: str | None = "src/core.py",
     sampled: bool = False,
     scanned_file_count: int | None = None,
+    by_language: tuple[LanguagePalate, ...] | None = None,
+    coverage: Coverage | None = None,
     git: GitMetrics | None = None,
     nose: NoseMetrics | None = None,
     structure: StructureMetrics | None = None,
@@ -237,6 +308,22 @@ def synthetic_metrics(
         if average_lines is None
         else average_lines
     )
+    resolved_by_language = (
+        _default_by_language(
+            primary_language=primary_language,
+            file_count=source_file_count,
+            line_count=total_lines,
+            max_indent_depth=max_indent_depth,
+            max_indent_path=max_indent_path,
+            largest_file_lines=largest_file_lines,
+            largest_file_path=largest_file_path,
+            longest_function_lines=longest_function_lines,
+            longest_function_name=longest_function_name,
+            longest_function_path=longest_function_path,
+        )
+        if by_language is None
+        else by_language
+    )
     palate = PalateMetrics(
         source_file_count=source_file_count,
         total_file_count=resolved_total_files,
@@ -252,6 +339,17 @@ def synthetic_metrics(
         sampled=sampled,
         inventory="git",
         scanned_file_count=resolved_scanned,
+        by_language=resolved_by_language,
+    )
+    resolved_coverage = (
+        _default_coverage(
+            source_file_count=source_file_count,
+            by_language=resolved_by_language,
+            git=git,
+            structure=structure,
+        )
+        if coverage is None
+        else coverage
     )
     return RepoMetrics(
         path=f"/synthetic/{name}" if path is None else path,
@@ -266,6 +364,7 @@ def synthetic_metrics(
         ),
         nose=_default_nose() if nose is None else nose,
         palate=palate,
+        coverage=resolved_coverage,
         structure=_default_structure() if structure is None else structure,
         abandonment=_default_abandonment() if abandonment is None else abandonment,
         sediment=_default_sediment() if sediment is None else sediment,
@@ -869,6 +968,8 @@ _ZZZ_FILES: Final[dict[str, str]] = {
     "markup.zzz": f"value 1\n{_MARKUP_OPEN} TODO: markup marker -->\nvalue 2\n",
     "others.zzz": "value 1\n# FIXME: broken\n// HACK: propped up\n/* XXX: unreviewed */\nvalue 2\n",
 }
+
+UNKNOWN_FILE_COUNT: Final[int] = len(_ZZZ_FILES)
 
 
 def unknown_language_repo() -> Fixture:

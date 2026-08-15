@@ -11,6 +11,17 @@
     "worst_file_path": "Rails.gitignore",
     "xxx": 0
   },
+  "coverage": {
+    "attributed_files": 0,
+    "authorship_measured": true,
+    "dependencies_measured": false,
+    "function_detector_files": 0,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 309,
+    "structural_scan_complete": true,
+    "truncated_files": 0
+  },
   "dropped": [],
   "git": {
     "author_count": 1656,
@@ -50,6 +61,21 @@
   },
   "palate": {
     "average_lines": 28.6408,
+    "by_language": [
+      {
+        "file_count": 309,
+        "function_detector_ran": false,
+        "largest_file_lines": 705,
+        "largest_file_path": "Joomla.gitignore",
+        "line_count": 8850,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 0,
+        "max_indent_path": null,
+        "name": ""
+      }
+    ],
     "inventory": "git",
     "largest_file_lines": 705,
     "largest_file_path": "Joomla.gitignore",

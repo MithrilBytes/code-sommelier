@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import tempfile
 import unittest
 from datetime import date
@@ -11,6 +12,8 @@ from typing import ClassVar
 from unittest import mock
 
 from sommelier.collect import (
+    BINARY_SNIFF_BYTES,
+    LanguagePalate,
     RepoMetrics,
     TastingError,
     _FileRecord,
@@ -110,6 +113,77 @@ def assert_full_metrics(case: unittest.TestCase, metrics: RepoMetrics) -> None:
     case.assertIsInstance(palate.sampled, bool)
     case.assertIsInstance(palate.scanned_file_count, int)
     case.assertLessEqual(palate.source_file_count, palate.total_file_count)
+
+    case.assertIsInstance(palate.by_language, tuple)
+    for language_palate in palate.by_language:
+        case.assertIsInstance(language_palate.name, str)
+        case.assertIsInstance(language_palate.file_count, int)
+        case.assertIsInstance(language_palate.line_count, int)
+        case.assertIsInstance(language_palate.max_indent_depth, int)
+        case.assertIsInstance(language_palate.largest_file_lines, int)
+        case.assertIsInstance(language_palate.longest_function_lines, int)
+        case.assertIsInstance(language_palate.function_detector_ran, bool)
+        _assert_relative_posix(case, language_palate.max_indent_path)
+        _assert_relative_posix(case, language_palate.largest_file_path)
+        _assert_relative_posix(case, language_palate.longest_function_path)
+        _assert_optional_str(case, language_palate.longest_function_name)
+    case.assertEqual(
+        list(palate.by_language),
+        sorted(palate.by_language, key=lambda item: (-item.file_count, item.name)),
+    )
+    case.assertEqual(
+        len({item.name for item in palate.by_language}),
+        len(palate.by_language),
+        "a language may appear once",
+    )
+    # The split has to add back up to the whole, or one of the two is wrong.
+    case.assertEqual(
+        sum(item.file_count for item in palate.by_language),
+        palate.scanned_file_count,
+    )
+    case.assertEqual(
+        sum(item.line_count for item in palate.by_language),
+        palate.total_lines,
+    )
+    case.assertEqual(
+        max((item.largest_file_lines for item in palate.by_language), default=0),
+        palate.largest_file_lines,
+    )
+    case.assertEqual(
+        max((item.max_indent_depth for item in palate.by_language), default=0),
+        palate.max_indent_depth,
+    )
+    case.assertEqual(
+        max((item.longest_function_lines for item in palate.by_language), default=0),
+        palate.longest_function_lines,
+    )
+
+    coverage = metrics.coverage
+    case.assertIsInstance(coverage.lines_complete, bool)
+    case.assertIsInstance(coverage.truncated_files, int)
+    case.assertIsInstance(coverage.structural_scan_complete, bool)
+    case.assertIsInstance(coverage.function_detector_files, int)
+    case.assertIsInstance(coverage.attributed_files, int)
+    case.assertIsInstance(coverage.source_files, int)
+    case.assertIsInstance(coverage.history_complete, bool)
+    case.assertIsInstance(coverage.authorship_measured, bool)
+    case.assertIsInstance(coverage.dependencies_measured, bool)
+    case.assertGreaterEqual(coverage.truncated_files, 0)
+    case.assertEqual(coverage.source_files, palate.source_file_count)
+    case.assertLessEqual(coverage.attributed_files, coverage.source_files)
+    case.assertLessEqual(coverage.function_detector_files, palate.scanned_file_count)
+    case.assertEqual(
+        coverage.function_detector_files,
+        sum(
+            item.file_count
+            for item in palate.by_language
+            if item.function_detector_ran
+        ),
+    )
+    if coverage.truncated_files > 0:
+        case.assertFalse(coverage.lines_complete)
+    if not coverage.lines_complete:
+        case.assertFalse(coverage.structural_scan_complete)
 
     structure = metrics.structure
     case.assertIsInstance(structure.manifests, tuple)
@@ -872,6 +946,447 @@ class DeepAndLongRepoTest(unittest.TestCase):
 
     def test_largest_file_is_the_long_one(self) -> None:
         self.assertEqual(self.metrics.palate.largest_file_path, fixtures.LONG_PATH)
+
+
+class WholeFileCountTest(unittest.TestCase):
+    """Lines and markers are counted over the whole file, not its first 64 KiB.
+
+    The tool used to read every file to a cap and then report the resulting
+    count as the file's length. psf/requests tests/test_requests.py is 3,094
+    lines and was reported as 1,850 under the metric the card calls the
+    largest file. A number that is 40 percent short is worse than no number,
+    because nothing marked it as short.
+    """
+
+    LINES: ClassVar[int] = 4000
+    MARKER_LINE: ClassVar[int] = 3900
+
+    def _long_file(self) -> str:
+        lines = []
+        for index in range(self.LINES):
+            if index == self.MARKER_LINE:
+                lines.append("# TODO: this marker sits far past the read cap")
+            else:
+                lines.append(f"value_{index} = {index}  # padding to make bytes")
+        return "\n".join(lines) + "\n"
+
+    def setUp(self) -> None:
+        self.fixture = fixtures.Fixture("longfile")
+        self.addCleanup(self.fixture.cleanup)
+        body = self._long_file()
+        # The point of the fixture is that it is comfortably over the cap.
+        self.assertGreater(len(body.encode("utf-8")), 65536 * 2)
+        fixtures.write_tree(self.fixture.path, {"big.py": body, "small.py": "x = 1\n"})
+        self.metrics = collect(self.fixture.path, budget_seconds=60.0)
+
+    def test_returns_a_full_repo_metrics(self) -> None:
+        assert_full_metrics(self, self.metrics)
+
+    def test_the_whole_file_is_counted(self) -> None:
+        palate = self.metrics.palate
+        self.assertEqual(palate.largest_file_path, "big.py")
+        self.assertEqual(palate.largest_file_lines, self.LINES)
+        self.assertEqual(palate.total_lines, self.LINES + 1)
+
+    def test_a_marker_past_the_cap_is_found(self) -> None:
+        self.assertEqual(self.metrics.abandonment.todo, 1)
+        self.assertEqual(self.metrics.abandonment.worst_file_path, "big.py")
+
+    def test_the_line_count_is_complete_and_says_so(self) -> None:
+        coverage = self.metrics.coverage
+        self.assertTrue(coverage.lines_complete)
+        self.assertEqual(coverage.truncated_files, 0)
+
+    def test_the_structural_cap_is_recorded_rather_than_hidden(self) -> None:
+        """The expensive analysis still stops. Stopping quietly is the defect."""
+        self.assertFalse(self.metrics.coverage.structural_scan_complete)
+
+
+class NotMeasuredTest(unittest.TestCase):
+    """Zero and "no detector for this language" must not be the same reading."""
+
+    def test_a_language_without_a_detector_says_so(self) -> None:
+        with fixtures.Fixture("nodetector") as fixture:
+            fixtures.write_tree(
+                fixture.path,
+                {
+                    "site.css": "body { color: red; }\n.wide { width: 100%; }\n",
+                    "query.sql": "select 1;\nselect 2;\n",
+                },
+            )
+            metrics = collect(fixture.path)
+        assert_full_metrics(self, metrics)
+        self.assertEqual(metrics.palate.longest_function_lines, 0)
+        self.assertEqual(metrics.coverage.function_detector_files, 0)
+        for language in metrics.palate.by_language:
+            self.assertFalse(language.function_detector_ran, language.name)
+            self.assertEqual(language.longest_function_lines, 0)
+
+    def test_a_language_with_a_detector_is_distinguishable(self) -> None:
+        with fixtures.Fixture("detector") as fixture:
+            fixtures.write_tree(
+                fixture.path,
+                {"a.py": "def one() -> int:\n    return 1\n", "b.css": "a { b: c; }\n"},
+            )
+            metrics = collect(fixture.path)
+        assert_full_metrics(self, metrics)
+        by_name = {item.name: item for item in metrics.palate.by_language}
+        self.assertTrue(by_name["Python"].function_detector_ran)
+        self.assertFalse(by_name["CSS"].function_detector_ran)
+        self.assertEqual(metrics.coverage.function_detector_files, 1)
+
+
+class ReadSeamTest(unittest.TestCase):
+    """A file arrives in chunks, and a line can sit across the join.
+
+    The reader hands the analysis lines rather than bytes, so every join is
+    somewhere one line can become two, or a word can be cut in half and stop
+    matching. A TODO with its letters in two different reads is the case no
+    fixture small enough to fit in a single read can ever reach.
+    """
+
+    FILLER: ClassVar[str] = "value = 1\n"
+    MARKER: ClassVar[str] = "# TODO: a marker written across the join\n"
+
+    def payload_with_a_split_marker(self, letters_before: int) -> bytes:
+        """One file whose TODO has `letters_before` letters in the first read."""
+        start = BINARY_SNIFF_BYTES - letters_before - self.MARKER.index("TODO")
+        lead = self.FILLER * (start // len(self.FILLER))
+        pad = start - len(lead)
+        if pad:
+            lead += "#" * (pad - 1) + "\n"
+        payload = (lead + self.MARKER + self.FILLER * 200).encode("utf-8")
+        # Without this the test could pass on a file that never straddles.
+        self.assertEqual(
+            payload[BINARY_SNIFF_BYTES - letters_before :][:4],
+            b"TODO",
+            "the fixture does not split the marker where the test claims",
+        )
+        return payload
+
+    def test_a_marker_split_across_the_join_is_counted_once(self) -> None:
+        for letters_before in (1, 2, 3):
+            with self.subTest(letters_before=letters_before):
+                payload = self.payload_with_a_split_marker(letters_before)
+                with fixtures.Fixture("seam") as fixture:
+                    (fixture.path / "body.py").write_bytes(payload)
+                    metrics = collect(fixture.path, budget_seconds=60.0)
+                self.assertEqual(metrics.abandonment.todo, 1)
+                self.assertEqual(metrics.abandonment.worst_file_path, "body.py")
+                self.assertEqual(
+                    metrics.palate.largest_file_lines,
+                    len(payload.decode("utf-8").splitlines()),
+                )
+
+
+class FunctionDetectorCoverageTest(unittest.TestCase):
+    """Zero and "nobody looked" are two readings of the same number.
+
+    52 of the 78 known languages have no function detector, so
+    longest_function_lines of zero means either that the longest function in
+    this repository is short or that nothing ever measured one. A score
+    computed over the second reading is not a score, and until the detector
+    could say which one it was holding, judge had no way to ask.
+    """
+
+    def measure(self, files: dict[str, str]) -> RepoMetrics:
+        with fixtures.Fixture("detector") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            return collect(fixture.path, budget_seconds=60.0)
+
+    def test_a_language_without_a_detector_reports_not_measured(self) -> None:
+        metrics = self.measure(
+            {
+                "site.css": "body { color: red; }\n.wide { width: 100%; }\n",
+                "report.sql": "select name\nfrom bottles\nwhere year > 2010;\n",
+            }
+        )
+        assert_full_metrics(self, metrics)
+        self.assertEqual(metrics.palate.longest_function_lines, 0)
+        self.assertIsNone(metrics.palate.longest_function_name)
+        self.assertIsNone(metrics.palate.longest_function_path)
+        self.assertEqual(metrics.coverage.function_detector_files, 0)
+        self.assertEqual(
+            {
+                item.name: item.function_detector_ran
+                for item in metrics.palate.by_language
+            },
+            {"CSS": False, "SQL": False},
+        )
+
+    def test_short_functions_report_a_detector_that_ran(self) -> None:
+        metrics = self.measure(
+            {
+                "cellar.py": "def pour(bottle):\n    return bottle\n",
+                "cellar.rb": "def pour(bottle)\n  bottle\nend\n",
+            }
+        )
+        assert_full_metrics(self, metrics)
+        self.assertEqual(metrics.coverage.function_detector_files, 2)
+        self.assertEqual(
+            {
+                item.name: item.function_detector_ran
+                for item in metrics.palate.by_language
+            },
+            {"Python": True, "Ruby": True},
+        )
+        self.assertGreater(metrics.palate.longest_function_lines, 0)
+        self.assertLess(metrics.palate.longest_function_lines, 5)
+
+    def test_a_measured_zero_is_distinguishable_from_an_unmeasured_one(self) -> None:
+        """Same scalar, two different facts. This is the whole defect."""
+        measured = self.measure({"constants.py": "ALPHA = 1\nBETA = 2\n"})
+        unmeasured = self.measure({"theme.css": "body { color: red; }\n"})
+        self.assertEqual(measured.palate.longest_function_lines, 0)
+        self.assertEqual(unmeasured.palate.longest_function_lines, 0)
+        self.assertEqual(measured.coverage.function_detector_files, 1)
+        self.assertEqual(unmeasured.coverage.function_detector_files, 0)
+        self.assertTrue(measured.palate.by_language[0].function_detector_ran)
+        self.assertFalse(unmeasured.palate.by_language[0].function_detector_ran)
+
+
+class LanguageAttributionTest(unittest.TestCase):
+    """How much of the tree anyone recognised, stated as a fraction.
+
+    github/gitignore reports 309 source files with none of them attributed
+    to a language, and rbenv/rbenv took the corpus top score of 94 on a
+    repository where 6 files of 30 were recognised. Both numbers were
+    computed over files that no detector could read, and neither said so.
+    """
+
+    def test_an_unrecognised_tree_reports_none_attributed(self) -> None:
+        with fixtures.unknown_language_repo() as fixture:
+            metrics = collect(fixture.path, budget_seconds=60.0)
+        assert_full_metrics(self, metrics)
+        coverage = metrics.coverage
+        self.assertEqual(coverage.source_files, fixtures.UNKNOWN_FILE_COUNT)
+        self.assertEqual(coverage.attributed_files, 0)
+        self.assertGreater(
+            coverage.source_files,
+            0,
+            "no language recognised is not the same as no files found",
+        )
+        self.assertEqual(metrics.terroir.languages, ())
+        self.assertIsNone(metrics.terroir.primary_language)
+
+    def test_unattributed_files_still_get_a_bucket(self) -> None:
+        """A repository can be nothing but unattributed files, and that is data."""
+        with fixtures.unknown_language_repo() as fixture:
+            metrics = collect(fixture.path, budget_seconds=60.0)
+        self.assertEqual(len(metrics.palate.by_language), 1)
+        bucket = metrics.palate.by_language[0]
+        self.assertEqual(bucket.name, "")
+        self.assertEqual(bucket.file_count, fixtures.UNKNOWN_FILE_COUNT)
+        self.assertEqual(bucket.line_count, metrics.palate.total_lines)
+        self.assertEqual(bucket.largest_file_lines, metrics.palate.largest_file_lines)
+        self.assertFalse(bucket.function_detector_ran)
+
+    def test_a_partly_recognised_tree_reports_both_halves(self) -> None:
+        files = {"tool.py": "def run():\n    return 1\n"}
+        files.update({f"templates/t{index}.zzz": "value\n" for index in range(4)})
+        with fixtures.Fixture("partly-known") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            metrics = collect(fixture.path, budget_seconds=60.0)
+        assert_full_metrics(self, metrics)
+        coverage = metrics.coverage
+        self.assertEqual(coverage.source_files, 5)
+        self.assertEqual(coverage.attributed_files, 1)
+        buckets = {item.name: item.file_count for item in metrics.palate.by_language}
+        self.assertEqual(buckets, {"": 4, "Python": 1})
+        # The unattributed bucket is the whole difference, not a remainder
+        # that some other bucket quietly absorbed.
+        self.assertEqual(
+            coverage.source_files - coverage.attributed_files, buckets[""]
+        )
+
+
+def _nested_python(depth: int) -> str:
+    """A short Python file whose only notable property is how deep it nests."""
+    lines = ["def nested(flag: bool) -> int:", "    total = 0"]
+    for level in range(1, depth):
+        lines.append("    " * level + "if flag:")
+    lines.append("    " * depth + "total += 1")
+    lines.append("    return total")
+    return "\n".join(lines) + "\n"
+
+
+def _long_go(body_lines: int, name: str) -> str:
+    """A flat Go file whose only notable property is one very long function."""
+    lines = ["package main", "", f"func {name}() int {{", "\ttotal := 0"]
+    lines.extend(f"\ttotal += {index}" for index in range(body_lines))
+    lines.extend(["\treturn total", "}"])
+    return "\n".join(lines) + "\n"
+
+
+class LanguageSplitTest(unittest.TestCase):
+    """Two languages, two sets of numbers, and one repository wide view.
+
+    Nesting depth means one thing in Python and less in Go, which is why the
+    split exists. It is only worth having while it agrees with the scalars
+    beside it, so this fixture puts the deepest nesting in one language and
+    the longest function in the other. If the two views ever drift, the
+    repository wide maximum stops naming a file that holds it.
+    """
+
+    PYTHON_PATH: ClassVar[str] = "src/nested.py"
+    GO_PATH: ClassVar[str] = "src/accumulate.go"
+    PYTHON_DEPTH: ClassVar[int] = 8
+    GO_BODY_LINES: ClassVar[int] = 120
+    GO_FUNCTION_NAME: ClassVar[str] = "accumulate"
+
+    fixture: ClassVar[fixtures.Fixture]
+    metrics: ClassVar[RepoMetrics]
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.fixture = fixtures.Fixture("two-languages")
+        fixtures.write_tree(
+            cls.fixture.path,
+            {
+                cls.PYTHON_PATH: _nested_python(cls.PYTHON_DEPTH),
+                cls.GO_PATH: _long_go(cls.GO_BODY_LINES, cls.GO_FUNCTION_NAME),
+            },
+        )
+        cls.metrics = collect(cls.fixture.path, budget_seconds=60.0)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.fixture.cleanup()
+
+    def bucket(self, name: str) -> LanguagePalate:
+        found = [item for item in self.metrics.palate.by_language if item.name == name]
+        self.assertEqual(len(found), 1, f"expected exactly one {name} bucket")
+        return found[0]
+
+    def test_returns_a_full_repo_metrics(self) -> None:
+        assert_full_metrics(self, self.metrics)
+
+    def test_each_language_gets_its_own_entry(self) -> None:
+        palate = self.metrics.palate
+        self.assertEqual(
+            {item.name: item.file_count for item in palate.by_language},
+            {"Go": 1, "Python": 1},
+        )
+        self.assertEqual(
+            sum(item.line_count for item in palate.by_language), palate.total_lines
+        )
+        for item in palate.by_language:
+            self.assertTrue(item.function_detector_ran, item.name)
+
+    def test_the_two_languages_disagree_about_depth_and_length(self) -> None:
+        """Without this the maxima could come from one bucket and prove nothing."""
+        python = self.bucket("Python")
+        go = self.bucket("Go")
+        self.assertEqual(python.max_indent_depth, self.PYTHON_DEPTH)
+        self.assertLess(go.max_indent_depth, python.max_indent_depth)
+        self.assertGreaterEqual(go.longest_function_lines, self.GO_BODY_LINES)
+        self.assertLess(python.longest_function_lines, go.longest_function_lines)
+        self.assertGreater(go.largest_file_lines, python.largest_file_lines)
+
+    def test_the_repository_wide_scalars_are_the_maximum_across_buckets(self) -> None:
+        palate = self.metrics.palate
+        python = self.bucket("Python")
+        go = self.bucket("Go")
+
+        self.assertEqual(palate.max_indent_depth, python.max_indent_depth)
+        self.assertEqual(palate.max_indent_path, python.max_indent_path)
+        self.assertEqual(palate.max_indent_path, self.PYTHON_PATH)
+
+        self.assertEqual(palate.longest_function_lines, go.longest_function_lines)
+        self.assertEqual(palate.longest_function_name, go.longest_function_name)
+        self.assertEqual(palate.longest_function_path, go.longest_function_path)
+        self.assertEqual(palate.longest_function_name, self.GO_FUNCTION_NAME)
+
+        self.assertEqual(palate.largest_file_lines, go.largest_file_lines)
+        self.assertEqual(palate.largest_file_path, go.largest_file_path)
+        self.assertEqual(palate.largest_file_path, self.GO_PATH)
+
+
+class ShallowCloneTest(unittest.TestCase):
+    """A clone told to fetch one commit knows one commit, and must say so.
+
+    Measured on pallets/itsdangerous, a full clone scored 92 and
+    `git clone --depth 1` scored 93. Nothing was dropped and nothing was
+    flagged, so withholding the history paid a point. Coverage is where the
+    withholding becomes visible.
+    """
+
+    def test_a_shallow_clone_reports_an_incomplete_history(self) -> None:
+        fixtures.require_git()
+        with fixtures.healthy_python_repo() as source:
+            with fixtures.Fixture("shallow") as destination:
+                target = destination.path / "clone"
+                try:
+                    fixtures.run_git(
+                        [
+                            "clone",
+                            "--quiet",
+                            "--depth",
+                            "1",
+                            # A local path is copied whole and --depth is
+                            # ignored. Only file:// produces a real shallow
+                            # clone, so a plain path would test nothing.
+                            source.path.as_uri(),
+                            str(target),
+                        ],
+                        destination.path,
+                    )
+                except subprocess.CalledProcessError as error:
+                    self.fail(f"git clone --depth 1 failed: {error.stderr}")
+                full = collect(source.path)
+                shallow = collect(target)
+
+        assert_full_metrics(self, shallow)
+        self.assertTrue(shallow.git.shallow)
+        self.assertFalse(shallow.coverage.history_complete)
+        self.assertTrue(full.coverage.history_complete)
+
+        # Not merely a smaller history: a wrong one. The shallow clone dates
+        # the first commit to the day of the last, which is the falsehood the
+        # flag exists to mark.
+        self.assertEqual(shallow.git.commit_count, 1)
+        self.assertEqual(full.git.commit_count, fixtures.HEALTHY_COMMIT_COUNT)
+        self.assertEqual(full.git.first_commit_date, fixtures.HEALTHY_FIRST_DAY)
+        self.assertEqual(shallow.git.first_commit_date, fixtures.HEALTHY_LAST_DAY)
+
+        # Every file is present in both, so this is a gap in the history and
+        # nowhere else.
+        self.assertEqual(
+            shallow.palate.source_file_count, full.palate.source_file_count
+        )
+        self.assertEqual(shallow.palate.total_lines, full.palate.total_lines)
+        self.assertTrue(shallow.coverage.lines_complete)
+
+
+class CoverageAbsenceTest(unittest.TestCase):
+    """Each Coverage flag answers one question about the run that set it."""
+
+    def test_a_directory_without_git_measured_no_history(self) -> None:
+        with fixtures.bare_directory() as fixture:
+            metrics = collect(fixture.path)
+        self.assertFalse(metrics.coverage.history_complete)
+        self.assertFalse(metrics.coverage.authorship_measured)
+
+    def test_a_repository_without_commits_measured_no_history(self) -> None:
+        fixtures.require_git()
+        with fixtures.git_repo_without_commits() as fixture:
+            metrics = collect(fixture.path)
+        self.assertTrue(metrics.git.is_repo)
+        self.assertFalse(metrics.coverage.history_complete)
+        self.assertFalse(metrics.coverage.authorship_measured)
+
+    def test_dependencies_measured_follows_the_manifest(self) -> None:
+        """Zero declared dependencies is austere. No manifest is unmeasured."""
+        fixtures.require_git()
+        with fixtures.healthy_python_repo() as fixture:
+            declared = collect(fixture.path)
+        with fixtures.bare_directory() as fixture:
+            undeclared = collect(fixture.path)
+        self.assertTrue(declared.coverage.dependencies_measured)
+        self.assertTrue(declared.coverage.history_complete)
+        self.assertTrue(declared.coverage.authorship_measured)
+        self.assertFalse(undeclared.coverage.dependencies_measured)
+        self.assertEqual(undeclared.structure.manifests, ())
 
 
 class UnpourableTest(unittest.TestCase):

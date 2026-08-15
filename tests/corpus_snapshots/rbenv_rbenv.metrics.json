@@ -11,6 +11,17 @@
     "worst_file_path": null,
     "xxx": 0
   },
+  "coverage": {
+    "attributed_files": 6,
+    "authorship_measured": true,
+    "dependencies_measured": false,
+    "function_detector_files": 1,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 30,
+    "structural_scan_complete": true,
+    "truncated_files": 0
+  },
   "dropped": [],
   "git": {
     "author_count": 133,
@@ -50,6 +61,60 @@
   },
   "palate": {
     "average_lines": 73.9667,
+    "by_language": [
+      {
+        "file_count": 24,
+        "function_detector_ran": false,
+        "largest_file_lines": 164,
+        "largest_file_path": "test/init.bats",
+        "line_count": 2014,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 3,
+        "max_indent_path": "test/help.bats",
+        "name": ""
+      },
+      {
+        "file_count": 3,
+        "function_detector_ran": false,
+        "largest_file_lines": 131,
+        "largest_file_path": "test/test_helper.bash",
+        "line_count": 148,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 2,
+        "max_indent_path": "completions/rbenv.bash",
+        "name": "Shell"
+      },
+      {
+        "file_count": 2,
+        "function_detector_ran": false,
+        "largest_file_lines": 8,
+        "largest_file_path": "src/Makefile.in",
+        "line_count": 12,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "Makefile",
+        "name": "Makefile"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": true,
+        "largest_file_lines": 45,
+        "largest_file_path": "rbenv.d/exec/gem-rehash/rubygems_plugin.rb",
+        "line_count": 45,
+        "longest_function_lines": 17,
+        "longest_function_name": "install",
+        "longest_function_path": "rbenv.d/exec/gem-rehash/rubygems_plugin.rb",
+        "max_indent_depth": 5,
+        "max_indent_path": "rbenv.d/exec/gem-rehash/rubygems_plugin.rb",
+        "name": "Ruby"
+      }
+    ],
     "inventory": "git",
     "largest_file_lines": 164,
     "largest_file_path": "test/init.bats",

@@ -11,6 +11,17 @@
     "worst_file_path": null,
     "xxx": 0
   },
+  "coverage": {
+    "attributed_files": 8,
+    "authorship_measured": true,
+    "dependencies_measured": true,
+    "function_detector_files": 8,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 9,
+    "structural_scan_complete": true,
+    "truncated_files": 0
+  },
   "dropped": [],
   "git": {
     "author_count": 51,
@@ -50,6 +61,34 @@
   },
   "palate": {
     "average_lines": 184.2222,
+    "by_language": [
+      {
+        "file_count": 8,
+        "function_detector_ran": true,
+        "largest_file_lines": 864,
+        "largest_file_path": "envconfig_test.go",
+        "line_count": 1655,
+        "longest_function_lines": 132,
+        "longest_function_name": "TestProcess",
+        "longest_function_path": "envconfig_test.go",
+        "max_indent_depth": 6,
+        "max_indent_path": "envconfig.go",
+        "name": "Go"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 3,
+        "largest_file_path": "go.mod",
+        "line_count": 3,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 0,
+        "max_indent_path": null,
+        "name": ""
+      }
+    ],
     "inventory": "git",
     "largest_file_lines": 864,
     "largest_file_path": "envconfig_test.go",

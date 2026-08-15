@@ -19,7 +19,7 @@
         "language": "JavaScript",
         "name": "jashkenas_underscore",
         "source_file_count": "356",
-        "total_lines": "169,160"
+        "total_lines": "176,589"
       },
       "key": "label.identity",
       "severity": 0
@@ -53,16 +53,6 @@
     {
       "course": "nose",
       "facts": {
-        "debug_prints": "2",
-        "source_files": "356",
-        "total_lines": "169,160"
-      },
-      "key": "abandonment.suspiciously_clean",
-      "severity": 0
-    },
-    {
-      "course": "nose",
-      "facts": {
         "license_name": "MIT",
         "readme_lines": "34",
         "readme_path": "README.md"
@@ -82,9 +72,9 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "475.2",
-        "lines": "1,966",
-        "path": "underscore-esm.js"
+        "average_lines": "496.0",
+        "lines": "4,811",
+        "path": "docs/underscore-esm.html"
       },
       "key": "palate.cry_for_help",
       "severity": 3
@@ -102,10 +92,10 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "475.2",
+        "average_lines": "496.0",
         "depth": "9",
-        "largest_lines": "1,966",
-        "largest_path": "underscore-esm.js",
+        "largest_lines": "4,811",
+        "largest_path": "docs/underscore-esm.html",
         "source_files": "356"
       },
       "key": "palate.body",

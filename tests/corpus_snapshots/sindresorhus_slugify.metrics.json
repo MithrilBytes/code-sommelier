@@ -11,6 +11,17 @@
     "worst_file_path": null,
     "xxx": 0
   },
+  "coverage": {
+    "attributed_files": 4,
+    "authorship_measured": true,
+    "dependencies_measured": true,
+    "function_detector_files": 4,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 4,
+    "structural_scan_complete": true,
+    "truncated_files": 0
+  },
   "dropped": [],
   "git": {
     "author_count": 19,
@@ -50,6 +61,34 @@
   },
   "palate": {
     "average_lines": 172.25,
+    "by_language": [
+      {
+        "file_count": 3,
+        "function_detector_ran": true,
+        "largest_file_lines": 257,
+        "largest_file_path": "test.js",
+        "line_count": 403,
+        "longest_function_lines": 65,
+        "longest_function_name": "slugify",
+        "longest_function_path": "index.js",
+        "max_indent_depth": 4,
+        "max_indent_path": "index.js",
+        "name": "JavaScript"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": true,
+        "largest_file_lines": 286,
+        "largest_file_path": "index.d.ts",
+        "line_count": 286,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "index.d.ts",
+        "name": "TypeScript"
+      }
+    ],
     "inventory": "git",
     "largest_file_lines": 286,
     "largest_file_path": "index.d.ts",

@@ -11,6 +11,17 @@
     "worst_file_path": null,
     "xxx": 0
   },
+  "coverage": {
+    "attributed_files": 2,
+    "authorship_measured": true,
+    "dependencies_measured": false,
+    "function_detector_files": 1,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 2,
+    "structural_scan_complete": true,
+    "truncated_files": 0
+  },
   "dropped": [],
   "git": {
     "author_count": 8,
@@ -50,6 +61,34 @@
   },
   "palate": {
     "average_lines": 657.5,
+    "by_language": [
+      {
+        "file_count": 1,
+        "function_detector_ran": true,
+        "largest_file_lines": 1308,
+        "largest_file_path": "kilo.c",
+        "line_count": 1308,
+        "longest_function_lines": 943,
+        "longest_function_name": "is_separator",
+        "longest_function_path": "kilo.c",
+        "max_indent_depth": 6,
+        "max_indent_path": "kilo.c",
+        "name": "C"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 7,
+        "largest_file_path": "Makefile",
+        "line_count": 7,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "Makefile",
+        "name": "Makefile"
+      }
+    ],
     "inventory": "git",
     "largest_file_lines": 1308,
     "largest_file_path": "kilo.c",

@@ -1,15 +1,26 @@
 {
   "abandonment": {
     "commented_out_code_lines": 19,
-    "debug_print_count": 2,
+    "debug_print_count": 3,
     "fixme": 0,
     "hack": 0,
-    "per_kloc": 0.0,
-    "todo": 0,
-    "total": 0,
-    "worst_file_count": 0,
-    "worst_file_path": null,
+    "per_kloc": 0.0113,
+    "todo": 2,
+    "total": 2,
+    "worst_file_count": 2,
+    "worst_file_path": "index.html",
     "xxx": 0
+  },
+  "coverage": {
+    "attributed_files": 355,
+    "authorship_measured": true,
+    "dependencies_measured": true,
+    "function_detector_files": 189,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 356,
+    "structural_scan_complete": false,
+    "truncated_files": 0
   },
   "dropped": [],
   "git": {
@@ -49,10 +60,64 @@
     "readme_path": "README.md"
   },
   "palate": {
-    "average_lines": 475.1685,
+    "average_lines": 496.0365,
+    "by_language": [
+      {
+        "file_count": 189,
+        "function_detector_ran": true,
+        "largest_file_lines": 2296,
+        "largest_file_path": "underscore-node-f.cjs",
+        "line_count": 16160,
+        "longest_function_lines": 1891,
+        "longest_function_name": "anonymous",
+        "longest_function_path": "underscore.js",
+        "max_indent_depth": 8,
+        "max_indent_path": "modules/isTypedArray.js",
+        "name": "JavaScript"
+      },
+      {
+        "file_count": 164,
+        "function_detector_ran": false,
+        "largest_file_lines": 4811,
+        "largest_file_path": "docs/underscore-esm.html",
+        "line_count": 159428,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 9,
+        "max_indent_path": "docs/modules/_baseCreate.html",
+        "name": "HTML"
+      },
+      {
+        "file_count": 2,
+        "function_detector_ran": false,
+        "largest_file_lines": 518,
+        "largest_file_path": "docs/docco.css",
+        "line_count": 893,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 4,
+        "max_indent_path": "docs/docco.css",
+        "name": "CSS"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 108,
+        "largest_file_path": "docs/linked-esm.jst",
+        "line_count": 108,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 9,
+        "max_indent_path": "docs/linked-esm.jst",
+        "name": ""
+      }
+    ],
     "inventory": "git",
-    "largest_file_lines": 1966,
-    "largest_file_path": "underscore-esm.js",
+    "largest_file_lines": 4811,
+    "largest_file_path": "docs/underscore-esm.html",
     "longest_function_lines": 1891,
     "longest_function_name": "anonymous",
     "longest_function_path": "underscore.js",
@@ -62,7 +127,7 @@
     "scanned_file_count": 356,
     "source_file_count": 356,
     "total_file_count": 400,
-    "total_lines": 169160
+    "total_lines": 176589
   },
   "path": "<CACHE>",
   "sediment": {
@@ -117,13 +182,13 @@
     "languages": [
       {
         "file_count": 189,
-        "line_count": 15105,
+        "line_count": 16160,
         "name": "JavaScript",
         "share": 0.5324
       },
       {
         "file_count": 164,
-        "line_count": 153054,
+        "line_count": 159428,
         "name": "HTML",
         "share": 0.462
       },

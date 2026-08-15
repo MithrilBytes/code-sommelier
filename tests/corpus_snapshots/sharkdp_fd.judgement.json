@@ -19,7 +19,7 @@
         "language": "Rust",
         "name": "sharkdp_fd",
         "source_file_count": "32",
-        "total_lines": "8,841"
+        "total_lines": "9,191"
       },
       "key": "label.identity",
       "severity": 0
@@ -63,8 +63,8 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "276.3",
-        "lines": "2,528",
+        "average_lines": "287.2",
+        "lines": "2,878",
         "path": "tests/tests.rs"
       },
       "key": "palate.cry_for_help",
@@ -92,9 +92,9 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "276.3",
+        "average_lines": "287.2",
         "depth": "7",
-        "largest_lines": "2,528",
+        "largest_lines": "2,878",
         "largest_path": "tests/tests.rs",
         "source_files": "32"
       },

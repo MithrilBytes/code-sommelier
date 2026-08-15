@@ -1,15 +1,26 @@
 {
   "abandonment": {
-    "commented_out_code_lines": 3,
+    "commented_out_code_lines": 4,
     "debug_print_count": 3,
     "fixme": 1,
     "hack": 0,
-    "per_kloc": 1.3573,
+    "per_kloc": 1.3056,
     "todo": 11,
     "total": 12,
     "worst_file_count": 6,
     "worst_file_path": "tests/tests.rs",
     "xxx": 0
+  },
+  "coverage": {
+    "attributed_files": 31,
+    "authorship_measured": true,
+    "dependencies_measured": true,
+    "function_detector_files": 24,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 32,
+    "structural_scan_complete": false,
+    "truncated_files": 0
   },
   "dropped": [],
   "git": {
@@ -49,9 +60,89 @@
     "readme_path": "README.md"
   },
   "palate": {
-    "average_lines": 276.2812,
+    "average_lines": 287.2188,
+    "by_language": [
+      {
+        "file_count": 24,
+        "function_detector_ran": true,
+        "largest_file_lines": 2878,
+        "largest_file_path": "tests/tests.rs",
+        "line_count": 8281,
+        "longest_function_lines": 172,
+        "longest_function_name": "spawn_senders",
+        "longest_function_path": "src/walk.rs",
+        "max_indent_depth": 7,
+        "max_indent_path": "src/exec/mod.rs",
+        "name": "Rust"
+      },
+      {
+        "file_count": 4,
+        "function_detector_ran": false,
+        "largest_file_lines": 135,
+        "largest_file_path": "scripts/create-deb.sh",
+        "line_count": 229,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 2,
+        "max_indent_path": "scripts/create-deb.sh",
+        "name": "Shell"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 587,
+        "largest_file_path": "doc/fd.1",
+        "line_count": 587,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 4,
+        "max_indent_path": "doc/fd.1",
+        "name": ""
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 41,
+        "largest_file_path": "scripts/update-help.awk",
+        "line_count": 41,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 3,
+        "max_indent_path": "scripts/update-help.awk",
+        "name": "Awk"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 1,
+        "largest_file_path": "contrib/completion/fdfind.fish",
+        "line_count": 1,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 0,
+        "max_indent_path": null,
+        "name": "Fish"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 52,
+        "largest_file_path": "Makefile",
+        "line_count": 52,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "Makefile",
+        "name": "Makefile"
+      }
+    ],
     "inventory": "git",
-    "largest_file_lines": 2528,
+    "largest_file_lines": 2878,
     "largest_file_path": "tests/tests.rs",
     "longest_function_lines": 172,
     "longest_function_name": "spawn_senders",
@@ -62,7 +153,7 @@
     "scanned_file_count": 32,
     "source_file_count": 32,
     "total_file_count": 59,
-    "total_lines": 8841
+    "total_lines": 9191
   },
   "path": "<CACHE>",
   "sediment": {
@@ -109,7 +200,7 @@
     "languages": [
       {
         "file_count": 24,
-        "line_count": 7931,
+        "line_count": 8281,
         "name": "Rust",
         "share": 0.7742
       },

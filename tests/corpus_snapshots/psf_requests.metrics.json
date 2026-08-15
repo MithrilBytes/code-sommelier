@@ -4,12 +4,23 @@
     "debug_print_count": 6,
     "fixme": 0,
     "hack": 0,
-    "per_kloc": 0.9496,
+    "per_kloc": 0.8575,
     "todo": 7,
     "total": 11,
     "worst_file_count": 3,
     "worst_file_path": "src/requests/auth.py",
     "xxx": 4
+  },
+  "coverage": {
+    "attributed_files": 48,
+    "authorship_measured": true,
+    "dependencies_measured": true,
+    "function_detector_files": 37,
+    "history_complete": true,
+    "lines_complete": true,
+    "source_files": 58,
+    "structural_scan_complete": false,
+    "truncated_files": 0
   },
   "dropped": [],
   "git": {
@@ -49,9 +60,89 @@
     "readme_path": "README.md"
   },
   "palate": {
-    "average_lines": 199.7241,
+    "average_lines": 221.1724,
+    "by_language": [
+      {
+        "file_count": 37,
+        "function_detector_ran": true,
+        "largest_file_lines": 3094,
+        "largest_file_path": "tests/test_requests.py",
+        "line_count": 12032,
+        "longest_function_lines": 111,
+        "longest_function_name": "build_digest_header",
+        "longest_function_path": "src/requests/auth.py",
+        "max_indent_depth": 7,
+        "max_indent_path": "src/requests/cookies.py",
+        "name": "Python"
+      },
+      {
+        "file_count": 10,
+        "function_detector_ran": false,
+        "largest_file_lines": 31,
+        "largest_file_path": "tests/certs/valid/server/cert.cnf",
+        "line_count": 164,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 0,
+        "max_indent_path": null,
+        "name": ""
+      },
+      {
+        "file_count": 8,
+        "function_detector_ran": false,
+        "largest_file_lines": 216,
+        "largest_file_path": "docs/Makefile",
+        "line_count": 324,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "Makefile",
+        "name": "Makefile"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 263,
+        "largest_file_path": "docs/make.bat",
+        "line_count": 263,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 0,
+        "max_indent_path": null,
+        "name": "Batchfile"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 12,
+        "largest_file_path": "docs/_static/custom.css",
+        "line_count": 12,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 1,
+        "max_indent_path": "docs/_static/custom.css",
+        "name": "CSS"
+      },
+      {
+        "file_count": 1,
+        "function_detector_ran": false,
+        "largest_file_lines": 33,
+        "largest_file_path": "docs/_templates/sidebar.html",
+        "line_count": 33,
+        "longest_function_lines": 0,
+        "longest_function_name": null,
+        "longest_function_path": null,
+        "max_indent_depth": 2,
+        "max_indent_path": "docs/_templates/sidebar.html",
+        "name": "HTML"
+      }
+    ],
     "inventory": "git",
-    "largest_file_lines": 1850,
+    "largest_file_lines": 3094,
     "largest_file_path": "tests/test_requests.py",
     "longest_function_lines": 111,
     "longest_function_name": "build_digest_header",
@@ -62,7 +153,7 @@
     "scanned_file_count": 58,
     "source_file_count": 58,
     "total_file_count": 128,
-    "total_lines": 11584
+    "total_lines": 12828
   },
   "path": "<CACHE>",
   "sediment": {
@@ -112,7 +203,7 @@
     "languages": [
       {
         "file_count": 37,
-        "line_count": 10788,
+        "line_count": 12032,
         "name": "Python",
         "share": 0.7708
       },
