@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import ast
 import importlib
+import shutil
+import subprocess
 import sys
 import unittest
 from collections.abc import Iterable, Mapping, Sequence
@@ -284,6 +286,82 @@ class DependencyTests(unittest.TestCase):
             [],
             sorted(offences),
             "the package is standard library only:\n" + "\n".join(sorted(offences)),
+        )
+
+
+# Commit discipline is enforced from this commit forward. Earlier history
+# predates the rule and is not retroactively failed.
+COMMIT_BASELINE = "1df4949563282f1a39a48d72dabeee839a2a124d"
+
+ALLOWED_PREFIXES = ("add", "fix", "rm", "docs", "test", "perf")
+SUBJECT_LIMIT = 50
+
+
+def git_available() -> bool:
+    return shutil.which("git") is not None and (REPO_ROOT / ".git").exists()
+
+
+def commits_since_baseline() -> list[tuple[str, str]]:
+    """(sha, full message) for every commit after the baseline."""
+    probe = subprocess.run(
+        ["git", "cat-file", "-e", COMMIT_BASELINE],
+        cwd=REPO_ROOT, capture_output=True, text=True, check=False,
+    )
+    if probe.returncode != 0:
+        raise unittest.SkipTest("baseline commit is not present in this clone")
+    result = subprocess.run(
+        ["git", "log", f"{COMMIT_BASELINE}..HEAD", "--format=%H%x1f%B%x1e"],
+        cwd=REPO_ROOT, capture_output=True, text=True, check=False,
+    )
+    if result.returncode != 0:
+        raise unittest.SkipTest("git log failed")
+    commits: list[tuple[str, str]] = []
+    for record in result.stdout.split("\x1e"):
+        record = record.strip("\n")
+        if not record:
+            continue
+        sha, _, message = record.partition("\x1f")
+        commits.append((sha, message))
+    return commits
+
+
+class CommitMessageTests(unittest.TestCase):
+    """Subject line only. No bodies, no footers, no trailers, no essays."""
+
+    def setUp(self) -> None:
+        if not git_available():
+            self.skipTest("git is unavailable")
+
+    def test_commits_carry_a_subject_and_nothing_else(self) -> None:
+        offences: list[str] = []
+        for sha, message in commits_since_baseline():
+            lines = [line for line in message.splitlines() if line.strip()]
+            if len(lines) > 1:
+                offences.append(
+                    f"{sha[:9]} has {len(lines)} non-blank lines, expected 1: "
+                    f"{lines[0][:48]}"
+                )
+        self.assertEqual(
+            [], offences, "commit messages are one line:\n" + "\n".join(offences)
+        )
+
+    def test_subjects_obey_the_house_rules(self) -> None:
+        offences: list[str] = []
+        for sha, message in commits_since_baseline():
+            subject = message.splitlines()[0] if message.splitlines() else ""
+            label = f"{sha[:9]} {subject!r}"
+            if len(subject) > SUBJECT_LIMIT:
+                offences.append(f"{label} is {len(subject)} chars, limit {SUBJECT_LIMIT}")
+            if subject != subject.lower():
+                offences.append(f"{label} is not lower case")
+            if subject.endswith("."):
+                offences.append(f"{label} ends with a full stop")
+            if not subject.split(" ")[0] in ALLOWED_PREFIXES:
+                offences.append(
+                    f"{label} prefix is not one of {', '.join(ALLOWED_PREFIXES)}"
+                )
+        self.assertEqual(
+            [], offences, "commit subjects:\n" + "\n".join(offences)
         )
 
 

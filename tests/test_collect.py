@@ -461,6 +461,42 @@ class NeglectedJavaScriptRepoTest(unittest.TestCase):
         self.assertFalse(nose.has_tests)
 
 
+class ContainmentTest(unittest.TestCase):
+    """The tool tastes the path it is handed and nothing above it."""
+
+    def test_a_subdirectory_does_not_inherit_the_parent_history(self) -> None:
+        fixtures.require_git()
+        with fixtures.Fixture("parent") as fixture:
+            fixtures.write_tree(
+                fixture.path, {"a.py": "x = 1\n", "pkg/b.py": "y = 2\n"}
+            )
+            fixtures.git_init(fixture.path)
+            fixtures.git_commit(fixture.path, "add everything", day="2024-03-01")
+            root = collect(fixture.path)
+            inner = collect(fixture.path / "pkg")
+        self.assertTrue(root.git.is_repo)
+        self.assertGreater(root.git.commit_count, 0)
+        self.assertFalse(inner.git.is_repo)
+        self.assertEqual(inner.git.commit_count, 0)
+        self.assertEqual(inner.palate.source_file_count, 1)
+
+    def test_symlinks_out_of_the_tree_are_not_followed(self) -> None:
+        with fixtures.Fixture("linked") as fixture:
+            outside = fixture.path.parent / "outside"
+            outside.mkdir(exist_ok=True)
+            (outside / ".env").write_text("SECRET=1\n", encoding="utf-8")
+            (outside / "big.py").write_text("x = 1\n" * 500, encoding="utf-8")
+            fixtures.write_tree(fixture.path, {"a.py": "y = 1\n"})
+            try:
+                (fixture.path / "link_dir").symlink_to(outside)
+                (fixture.path / "link_file").symlink_to(outside / "big.py")
+            except OSError:
+                self.skipTest("symlinks unavailable")
+            metrics = collect(fixture.path)
+        self.assertEqual(metrics.palate.source_file_count, 1)
+        self.assertEqual(metrics.sediment.secret_file_count, 0)
+
+
 class FalsePositiveTest(unittest.TestCase):
     """Claims the card states with conviction had better be true.
 

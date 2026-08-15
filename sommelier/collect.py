@@ -1355,16 +1355,19 @@ _FIX_RE: Final[re.Pattern[str]] = re.compile(r"\bfix(e[sd])?\b", re.IGNORECASE)
 
 def _git(root: Path, budget: _Budget) -> tuple[GitMetrics, bool]:
     dot_git = root / ".git"
+    # The repository must be rooted at the path we were handed. git rev-parse
+    # walks up to a parent, so asking it first means tasting a subdirectory
+    # reports the enclosing project's history, which is somebody else's
+    # repository and was never offered for tasting.
+    if not _exists(dot_git):
+        return (_empty_git(False), False)
     if shutil.which("git") is None:
-        return (_empty_git(_exists(dot_git)), False)
+        return (_empty_git(True), False)
 
     timeout = min(GIT_CALL_TIMEOUT, max(0.5, budget.remaining()))
     code, output = _run_git(root, ["rev-parse", "--is-inside-work-tree"], timeout)
-    is_repo = code == 0 and output.strip() == "true"
-    if not is_repo:
-        is_repo = _exists(dot_git)
-    if not is_repo:
-        return (_empty_git(False), False)
+    if code != 0 or output.strip() != "true":
+        return (_empty_git(True), False)
 
     shallow = _exists(dot_git / "shallow")
     if not shallow:
