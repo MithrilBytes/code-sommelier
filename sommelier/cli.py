@@ -12,6 +12,7 @@ from pathlib import Path
 
 from sommelier.collect import collect
 from sommelier.judge import judge
+from sommelier.plan import compose
 from sommelier.render import render_card, render_json, render_sober
 from sommelier.voice import pour
 
@@ -52,7 +53,7 @@ def _taste(path_argument: str, *, as_json: bool, sober: bool, seed: int | None) 
     elif sober:
         output = render_sober(metrics, judgement)
     else:
-        output = render_card(pour(metrics, judgement, seed=seed))
+        output = render_card(pour(compose(metrics, judgement), seed=seed))
 
     print(output)
     return 0

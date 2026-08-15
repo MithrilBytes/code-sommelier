@@ -93,8 +93,16 @@
     {
       "course": "label",
       "facts": {
-        "path": ".npmrc",
-        "secret_files": "1"
+        "path": {
+          "measurement": "sediment.secret_path",
+          "unit": "path",
+          "value": ".npmrc"
+        },
+        "secret_files": {
+          "measurement": "sediment.secret_file_count",
+          "unit": "count",
+          "value": 1
+        }
       },
       "key": "label.secrets",
       "severity": 3
@@ -102,11 +110,31 @@
     {
       "course": "label",
       "facts": {
-        "file_count": "13",
-        "language": "JavaScript",
-        "name": "sindresorhus_slugify",
-        "source_file_count": "4",
-        "total_lines": "689"
+        "file_count": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 13
+        },
+        "language": {
+          "measurement": "terroir.primary_language",
+          "unit": "text",
+          "value": "JavaScript"
+        },
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "sindresorhus_slugify"
+        },
+        "source_file_count": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 4
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 689
+        }
       },
       "key": "label.identity",
       "severity": 0
@@ -114,11 +142,31 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "71",
-        "commits_phrase": "71 commits",
-        "first_date": "2018-04-18",
-        "first_year": "2018",
-        "years": "8"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 71
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 71
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2018-04-18"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2018
+        },
+        "years": {
+          "measurement": "git.age",
+          "unit": "years",
+          "value": 8.3176
+        }
       },
       "key": "vintage.aged",
       "severity": 0
@@ -126,13 +174,41 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "71",
-        "commits_phrase": "71 commits",
-        "first_date": "2018-04-18",
-        "first_year": "2018",
-        "last_date": "2025-09-11",
-        "last_year": "2025",
-        "years": "7.4"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 71
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 71
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2018-04-18"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2018
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-09-11"
+        },
+        "last_year": {
+          "measurement": "git.last_commit",
+          "unit": "year",
+          "value": 2025
+        },
+        "years": {
+          "measurement": "git.history_span",
+          "unit": "years",
+          "value": 7.4004
+        }
       },
       "key": "vintage.declared",
       "severity": 0
@@ -140,8 +216,16 @@
     {
       "course": "nose",
       "facts": {
-        "source_files": "4",
-        "total_lines": "689"
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 4
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 689
+        }
       },
       "key": "nose.no_tests",
       "severity": 2
@@ -149,9 +233,21 @@
     {
       "course": "nose",
       "facts": {
-        "debug_prints": "0",
-        "source_files": "4",
-        "total_lines": "689"
+        "debug_prints": {
+          "measurement": "abandonment.debug_print_count",
+          "unit": "count",
+          "value": 0
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 4
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 689
+        }
       },
       "key": "abandonment.suspiciously_clean",
       "severity": 0
@@ -159,11 +255,36 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "172.2",
-        "depth": "4",
-        "largest_lines": "286",
-        "largest_path": "index.d.ts",
-        "source_files": "4"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 172.25
+        },
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 4
+        },
+        "largest_lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 286
+        },
+        "largest_path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "index.d.ts"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 4
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 689
+        }
       },
       "key": "palate.body",
       "severity": 0
@@ -171,9 +292,21 @@
     {
       "course": "structure",
       "facts": {
-        "declared": "2",
-        "ecosystem": "javascript",
-        "manifest_path": "package.json"
+        "declared": {
+          "measurement": "structure.declared_count",
+          "unit": "count",
+          "value": 2
+        },
+        "ecosystem": {
+          "measurement": "structure.ecosystem",
+          "unit": "text",
+          "value": "javascript"
+        },
+        "manifest_path": {
+          "measurement": "structure.manifest_path",
+          "unit": "path",
+          "value": "package.json"
+        }
       },
       "key": "structure.no_lockfile",
       "severity": 2
@@ -181,9 +314,21 @@
     {
       "course": "finish",
       "facts": {
-        "gap_days": "848",
-        "gap_end": "2025-09-11",
-        "gap_start": "2023-05-17"
+        "gap_days": {
+          "measurement": "git.longest_gap_days",
+          "unit": "days",
+          "value": 848
+        },
+        "gap_end": {
+          "measurement": "git.longest_gap_end",
+          "unit": "date",
+          "value": "2025-09-11"
+        },
+        "gap_start": {
+          "measurement": "git.longest_gap_start",
+          "unit": "date",
+          "value": "2023-05-17"
+        }
       },
       "key": "finish.the_silence",
       "severity": 2
@@ -191,15 +336,51 @@
     {
       "course": "finish",
       "facts": {
-        "author_count": "19",
-        "authors_phrase": "19 authors",
-        "commit_count": "71",
-        "commits_phrase": "71 commits",
-        "fix_commits": "4",
-        "fix_percent": "6",
-        "fixes_phrase": "4 commits",
-        "last_date": "2025-09-11",
-        "subject": "3.0.0"
+        "author_count": {
+          "measurement": "git.author_count",
+          "unit": "count",
+          "value": 19
+        },
+        "authors_phrase": {
+          "measurement": "git.author_count",
+          "unit": "authors",
+          "value": 19
+        },
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 71
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 71
+        },
+        "fix_commits": {
+          "measurement": "git.fix_commit_count",
+          "unit": "count",
+          "value": 4
+        },
+        "fix_percent": {
+          "measurement": "git.fix_ratio",
+          "unit": "percent",
+          "value": 0.0563
+        },
+        "fixes_phrase": {
+          "measurement": "git.fix_commit_count",
+          "unit": "commits",
+          "value": 4
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-09-11"
+        },
+        "subject": {
+          "measurement": "git.last_commit_subject",
+          "unit": "text",
+          "value": "3.0.0"
+        }
       },
       "key": "finish.history",
       "severity": 0

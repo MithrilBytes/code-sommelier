@@ -1,18 +1,17 @@
 CODE SOMMELIER                                   tasting no. 42
 
-The label    unstarted, written in Python, across 1 files. That is the last
-             neutral sentence in this tasting. 100 percent Python. There is no
-             second opinion anywhere in this tree.
+The label    unstarted. 1 source files out of 2 on disk, 5 lines between them.
+             One language, 100 percent of it, and nothing in the tree to argue
+             with.
 Vintage      unstarted. Initialised, never committed, 2 files on disk. Somebody
              meant to start.
 Nose         unstarted has no .gitignore of any kind, not even a copied one.
              Everything it has ever produced by accident is a candidate for the
              permanent record, and across 2 files the record has been keeping.
              There is no test suite. The 1 files here have never been asked to
-             prove anything. There is no licence. Anyone who copies unstarted
-             is guessing, and so is anyone who does not.
-Palate       Average length 5.0 lines across 1 files, with main.py at 5 and
-             nesting down to depth 1.
+             prove anything. There is no licence file. Every use of this code
+             is a guess, including the ones made in good faith.
+Palate       5 lines, spread across 1 files.
 Structure    The dependencies are undeclared. 1 files in unstarted import
              whatever was on the machine that day.
 Finish       unstarted has a repository and no commits. The finish is short,

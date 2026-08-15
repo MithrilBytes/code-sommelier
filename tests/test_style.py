@@ -290,6 +290,117 @@ class CellarTests(unittest.TestCase):
         )
 
 
+# A measurement that counts part of something, and the word that has to be
+# in the sentence that prints it. A subset stated without its qualifier is
+# read as the whole: "45 commits came before it" put the count of commits
+# titled fix where a reader takes the length of the history, on a card whose
+# only defence is that its numbers are checkable.
+#
+# Both entries are counts of commits printed in the same noun as the count of
+# all commits, which is what makes the confusion invisible. Other subsets are
+# qualified by the grammar of the line that carries them, since a reader who
+# meets "{author} wrote {author_commits} of {commit_count} commits" is told
+# whose they are by the sentence itself. Adding to this table is a decision
+# about a specific line and is meant to be made one line at a time.
+#
+# The check reads the prose around the placeholder, not the placeholder,
+# because the fact is named `fixes_phrase` and would otherwise vouch for
+# itself.
+QUALIFIED_MEASUREMENTS: Mapping[str, str] = {
+    "git.fix_commit_count": "fix",
+    "git.fix_ratio": "fix",
+}
+
+# A phrase that asserts something the tool measured separately, and the fact
+# it depends on. "Nobody came back" is true of the inside of a gap and false
+# of the gap itself, which ended on a commit the tool can name: a form that
+# does not name gap_end may not claim the silence was never broken.
+GROUNDED_PHRASES: tuple[tuple[str, str, str], ...] = (
+    ("finish.the_silence", "came back", "gap_end"),
+)
+
+_PLACEHOLDER = re.compile(r"\{[a-z_]+\}")
+
+
+def _sentences(template: str) -> list[str]:
+    return re.split(r"(?<=\.)\s+", template)
+
+
+def measurements_by_key() -> Mapping[str, Mapping[str, str]]:
+    """Which measurement each fact name carries, per key, as judge binds it.
+
+    Read off real findings rather than a table, because the binding only
+    happens at the call site: `fixes_phrase` is `git.fix_commit_count` because
+    _judge_finish says so, and nothing upstream of that records it.
+    """
+    judge = load_module("sommelier.judge").judge
+    from tests.test_judge import spread
+
+    from tests.test_plan import whole_number_averages
+
+    found: dict[str, dict[str, str]] = {}
+    for _name, metrics in spread() + whole_number_averages():
+        for finding in judge(metrics).findings:
+            carried = found.setdefault(finding.key, {})
+            for name, fact in finding.facts.items():
+                carried.setdefault(name, fact.measurement)
+    return found
+
+
+class TruthfulnessTests(unittest.TestCase):
+    """Two ways a line can be false while citing a real number.
+
+    Every template already cites a measured fact, which test_templates_only_
+    cite_facts_that_exist proves. Neither of these was caught by that: the
+    number was real and the sentence around it was wrong about what it was.
+    """
+
+    def test_a_part_is_never_printed_as_though_it_were_the_whole(self) -> None:
+        carried = measurements_by_key()
+        offences: list[str] = []
+        for key, templates in sorted(cellar().items()):
+            names = carried.get(key)
+            if names is None:
+                continue
+            for index, template in enumerate(templates):
+                for name in sorted(placeholders(template)):
+                    word = QUALIFIED_MEASUREMENTS.get(names.get(name, ""))
+                    if word is None:
+                        continue
+                    for sentence in _sentences(template):
+                        if f"{{{name}}}" not in sentence:
+                            continue
+                        prose = _PLACEHOLDER.sub(" ", sentence).lower()
+                        if word not in prose:
+                            offences.append(
+                                f"{key}[{index}] prints {names[name]} in a "
+                                f"sentence that never says {word}: {sentence}"
+                            )
+        self.assertEqual(
+            [],
+            sorted(offences),
+            "a count of part of something is read as the whole unless the "
+            "sentence says which part:\n" + "\n".join(sorted(offences)),
+        )
+
+    def test_a_claim_names_the_fact_it_rests_on(self) -> None:
+        templates = cellar()
+        offences: list[str] = []
+        for key, phrase, required in GROUNDED_PHRASES:
+            for index, template in enumerate(templates.get(key, ())):
+                if phrase in template and f"{{{required}}}" not in template:
+                    offences.append(
+                        f"{key}[{index}] says {phrase!r} without naming "
+                        f"{required}: {template}"
+                    )
+        self.assertEqual(
+            [],
+            sorted(offences),
+            "a line may not assert what the fact beside it contradicts:\n"
+            + "\n".join(sorted(offences)),
+        )
+
+
 class RefusalTests(unittest.TestCase):
     """A refusal is a line the reader sees, so it lives under the same rules."""
 
@@ -351,6 +462,61 @@ class VerdictTests(unittest.TestCase):
             "a score is never printed without its denominator:\n"
             + "\n".join(offences),
         )
+
+
+# Data flows one way: collect, judge, plan, voice, render. lines.py is
+# material and sits under all of it. cli.py is the front door and stands
+# outside the chain, since assembling the pipeline is the whole of its job.
+LAYERS: tuple[str, ...] = (
+    "lines",
+    "collect",
+    "judge",
+    "plan",
+    "voice",
+    "render",
+)
+
+
+class LayerTests(unittest.TestCase):
+    """The direction of the arrows, enforced rather than described.
+
+    voice.py used to reach past judge into collect for a repository name, an
+    empty flag and a list of dropped analyzers. Three fields, and a backwards
+    edge that would have set hard the moment anything else needed one.
+    """
+
+    def test_no_module_imports_a_later_layer(self) -> None:
+        rank = {name: index for index, name in enumerate(LAYERS)}
+        offences: list[str] = []
+        for name in LAYERS:
+            path = PACKAGE_DIR / f"{name}.py"
+            self.assertTrue(path.is_file(), f"{relative(path)} is missing")
+            tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ImportFrom) and not node.level:
+                    parts = (node.module or "").split(".")
+                elif isinstance(node, ast.Import):
+                    parts = node.names[0].name.split(".")
+                else:
+                    continue
+                if len(parts) != 2 or parts[0] != "sommelier":
+                    continue
+                if rank.get(parts[1], -1) >= rank[name]:
+                    offences.append(
+                        f"{relative(path)}:{node.lineno} imports {parts[1]}, "
+                        f"which is not upstream of {name}"
+                    )
+        self.assertEqual(
+            [],
+            sorted(offences),
+            "data flows one way, " + ", ".join(LAYERS[1:]) + ":\n"
+            + "\n".join(sorted(offences)),
+        )
+
+    def test_voice_never_reads_a_measurement(self) -> None:
+        """Realisation is handed a plan, and cannot go back for the metrics."""
+        source = (PACKAGE_DIR / "voice.py").read_text(encoding="utf-8")
+        self.assertNotIn("collect", source)
 
 
 class DependencyTests(unittest.TestCase):
@@ -593,6 +759,7 @@ class NoIntelligenceTests(unittest.TestCase):
 
         from sommelier.collect import collect
         from sommelier.judge import judge
+        from sommelier.plan import compose
         from sommelier.render import render_card, render_json, render_sober
         from sommelier.voice import pour
 
@@ -611,7 +778,7 @@ class NoIntelligenceTests(unittest.TestCase):
                 )
                 metrics = collect(fixture.path)
                 judgement = judge(metrics)
-                card = render_card(pour(metrics, judgement))
+                card = render_card(pour(compose(metrics, judgement)))
                 render_json(metrics, judgement)
                 render_sober(metrics, judgement)
         self.assertTrue(card.splitlines())

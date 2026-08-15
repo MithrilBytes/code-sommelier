@@ -93,11 +93,31 @@
     {
       "course": "label",
       "facts": {
-        "dirs_phrase": "1 directory",
-        "total_files": "400",
-        "vendored_dirs": "1",
-        "vendored_files": "2",
-        "vendored_share": "0"
+        "dirs_phrase": {
+          "measurement": "sediment.vendored_dir_count",
+          "unit": "directories",
+          "value": 1
+        },
+        "total_files": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 400
+        },
+        "vendored_dirs": {
+          "measurement": "sediment.vendored_dir_count",
+          "unit": "count",
+          "value": 1
+        },
+        "vendored_files": {
+          "measurement": "sediment.vendored_file_count",
+          "unit": "count",
+          "value": 2
+        },
+        "vendored_share": {
+          "measurement": "sediment.vendored_share",
+          "unit": "percent",
+          "value": 0.005
+        }
       },
       "key": "label.vendored",
       "severity": 3
@@ -105,11 +125,31 @@
     {
       "course": "label",
       "facts": {
-        "file_count": "400",
-        "language": "JavaScript",
-        "name": "jashkenas_underscore",
-        "source_file_count": "356",
-        "total_lines": "176,589"
+        "file_count": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 400
+        },
+        "language": {
+          "measurement": "terroir.primary_language",
+          "unit": "text",
+          "value": "JavaScript"
+        },
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "jashkenas_underscore"
+        },
+        "source_file_count": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 356
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 176589
+        }
       },
       "key": "label.identity",
       "severity": 0
@@ -117,11 +157,31 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "2,892",
-        "commits_phrase": "2,892 commits",
-        "first_date": "2009-10-25",
-        "first_year": "2009",
-        "years": "16"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 2892
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 2892
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2009-10-25"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2009
+        },
+        "years": {
+          "measurement": "git.age",
+          "unit": "years",
+          "value": 16.7967
+        }
       },
       "key": "vintage.aged",
       "severity": 0
@@ -129,13 +189,41 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "2,892",
-        "commits_phrase": "2,892 commits",
-        "first_date": "2009-10-25",
-        "first_year": "2009",
-        "last_date": "2026-08-12",
-        "last_year": "2026",
-        "years": "16.8"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 2892
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 2892
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2009-10-25"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2009
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2026-08-12"
+        },
+        "last_year": {
+          "measurement": "git.last_commit",
+          "unit": "year",
+          "value": 2026
+        },
+        "years": {
+          "measurement": "git.history_span",
+          "unit": "years",
+          "value": 16.7967
+        }
       },
       "key": "vintage.declared",
       "severity": 0
@@ -143,9 +231,21 @@
     {
       "course": "nose",
       "facts": {
-        "license_name": "MIT",
-        "readme_lines": "34",
-        "readme_path": "README.md"
+        "license_name": {
+          "measurement": "nose.license_name",
+          "unit": "text",
+          "value": "MIT"
+        },
+        "readme_lines": {
+          "measurement": "nose.readme_lines",
+          "unit": "lines",
+          "value": 34
+        },
+        "readme_path": {
+          "measurement": "nose.readme_path",
+          "unit": "path",
+          "value": "README.md"
+        }
       },
       "key": "nose.documented",
       "severity": 0
@@ -153,8 +253,16 @@
     {
       "course": "palate",
       "facts": {
-        "depth": "9",
-        "path": "docs/linked-esm.jst"
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 9
+        },
+        "path": {
+          "measurement": "palate.max_indent_path",
+          "unit": "path",
+          "value": "docs/linked-esm.jst"
+        }
       },
       "key": "palate.abyssal",
       "severity": 3
@@ -162,9 +270,21 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "496.0",
-        "lines": "4,811",
-        "path": "docs/underscore-esm.html"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 496.0365
+        },
+        "lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 4811
+        },
+        "path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "docs/underscore-esm.html"
+        }
       },
       "key": "palate.cry_for_help",
       "severity": 3
@@ -172,9 +292,21 @@
     {
       "course": "palate",
       "facts": {
-        "lines": "1,891",
-        "name": "anonymous",
-        "path": "underscore.js"
+        "lines": {
+          "measurement": "palate.longest_function_lines",
+          "unit": "lines",
+          "value": 1891
+        },
+        "name": {
+          "measurement": "palate.longest_function_name",
+          "unit": "text",
+          "value": "anonymous"
+        },
+        "path": {
+          "measurement": "palate.longest_function_path",
+          "unit": "path",
+          "value": "underscore.js"
+        }
       },
       "key": "palate.long_function",
       "severity": 2
@@ -182,11 +314,36 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "496.0",
-        "depth": "9",
-        "largest_lines": "4,811",
-        "largest_path": "docs/underscore-esm.html",
-        "source_files": "356"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 496.0365
+        },
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 9
+        },
+        "largest_lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 4811
+        },
+        "largest_path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "docs/underscore-esm.html"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 356
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 176589
+        }
       },
       "key": "palate.body",
       "severity": 0
@@ -194,10 +351,26 @@
     {
       "course": "structure",
       "facts": {
-        "declared": "0",
-        "ecosystem": "javascript",
-        "manifest_path": "modules/package.json",
-        "source_files": "356"
+        "declared": {
+          "measurement": "structure.declared_count",
+          "unit": "count",
+          "value": 0
+        },
+        "ecosystem": {
+          "measurement": "structure.ecosystem",
+          "unit": "text",
+          "value": "javascript"
+        },
+        "manifest_path": {
+          "measurement": "structure.manifest_path",
+          "unit": "path",
+          "value": "modules/package.json"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 356
+        }
       },
       "key": "structure.austere",
       "severity": 0
@@ -205,9 +378,21 @@
     {
       "course": "finish",
       "facts": {
-        "gap_days": "342",
-        "gap_end": "2026-01-28",
-        "gap_start": "2025-02-20"
+        "gap_days": {
+          "measurement": "git.longest_gap_days",
+          "unit": "days",
+          "value": 342
+        },
+        "gap_end": {
+          "measurement": "git.longest_gap_end",
+          "unit": "date",
+          "value": "2026-01-28"
+        },
+        "gap_start": {
+          "measurement": "git.longest_gap_start",
+          "unit": "date",
+          "value": "2025-02-20"
+        }
       },
       "key": "finish.the_silence",
       "severity": 2
@@ -215,15 +400,51 @@
     {
       "course": "finish",
       "facts": {
-        "author_count": "336",
-        "authors_phrase": "336 authors",
-        "commit_count": "2,892",
-        "commits_phrase": "2,892 commits",
-        "fix_commits": "387",
-        "fix_percent": "13",
-        "fixes_phrase": "387 commits",
-        "last_date": "2026-08-12",
-        "subject": "Merge pull request #3022 from jgonggrijp/faster-isequal"
+        "author_count": {
+          "measurement": "git.author_count",
+          "unit": "count",
+          "value": 336
+        },
+        "authors_phrase": {
+          "measurement": "git.author_count",
+          "unit": "authors",
+          "value": 336
+        },
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 2892
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 2892
+        },
+        "fix_commits": {
+          "measurement": "git.fix_commit_count",
+          "unit": "count",
+          "value": 387
+        },
+        "fix_percent": {
+          "measurement": "git.fix_ratio",
+          "unit": "percent",
+          "value": 0.1338
+        },
+        "fixes_phrase": {
+          "measurement": "git.fix_commit_count",
+          "unit": "commits",
+          "value": 387
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2026-08-12"
+        },
+        "subject": {
+          "measurement": "git.last_commit_subject",
+          "unit": "text",
+          "value": "Merge pull request #3022 from jgonggrijp/faster-isequal"
+        }
       },
       "key": "finish.history",
       "severity": 0

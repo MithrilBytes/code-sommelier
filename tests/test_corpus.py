@@ -25,6 +25,7 @@ from unittest.mock import patch
 import sommelier.collect as collect_module
 from sommelier.collect import collect
 from sommelier.judge import BANDS, REFUSALS, judge
+from sommelier.plan import compose
 from sommelier.render import render_card
 from sommelier.voice import pour
 
@@ -177,7 +178,7 @@ class CorpusInvariantTest(unittest.TestCase):
                     metrics = collect(
                         entry.path, budget_seconds=corpus.CORPUS_BUDGET_SECONDS
                     )
-                card = render_card(pour(metrics, judge(metrics)))
+                card = render_card(pour(compose(metrics, judge(metrics))))
                 self.assertTrue(card.startswith("CODE SOMMELIER"))
                 for line in card.splitlines():
                     self.assertLessEqual(len(line), 79, f"{entry.slug}: {line!r}")

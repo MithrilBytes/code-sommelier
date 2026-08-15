@@ -1,19 +1,17 @@
 CODE SOMMELIER                                   tasting no. 58
 
-The label    nested-things, written in Python, across 2 files. That is the last
-             neutral sentence in this tasting. 100 percent of this is Python,
-             across 2 files. Commitment, of a sort.
+The label    nested-things. Python. 2 source files out of 3 on disk, and 218
+             lines between them. One language, 100 percent of it, and nothing
+             in the tree to argue with.
 Vintage      nested-things has no git directory. Not one of its 3 files has a
              date, an author, or a reason.
 Nose         nested-things has no .gitignore file. Every temporary thing among
              its 3 files is one careless git add away from being permanent. The
              sommelier has seen the consequences of this and would rather not
              discuss them. No tests anywhere. Confidence in 218 lines is being
-             sustained by memory alone. No licence file. Legally, nested-things
-             belongs to nobody and may be used by nobody, which is a bold
-             distribution strategy.
-Palate       2 files averaging 109.0 lines. The largest, src/long.py, runs to
-             205. Nesting reaches depth 10. Nesting reaches depth 10 in
+             sustained by memory alone. No licence of any kind. The terms are
+             whatever the next reader decides they are.
+Palate       2 files hold 218 lines between them. Nesting reaches depth 10 in
              src/deep.py. That is not control flow, that is sediment. The
              longest function, long_function in src/long.py, runs to 201 lines.
              It does not do one thing.

@@ -93,11 +93,31 @@
     {
       "course": "label",
       "facts": {
-        "file_count": "6",
-        "language": "C",
-        "name": "antirez_kilo",
-        "source_file_count": "2",
-        "total_lines": "1,315"
+        "file_count": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 6
+        },
+        "language": {
+          "measurement": "terroir.primary_language",
+          "unit": "text",
+          "value": "C"
+        },
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "antirez_kilo"
+        },
+        "source_file_count": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 2
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 1315
+        }
       },
       "key": "label.identity",
       "severity": 0
@@ -105,11 +125,31 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "20",
-        "commits_phrase": "20 commits",
-        "first_date": "2016-07-10",
-        "first_year": "2016",
-        "years": "10"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 20
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 20
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2016-07-10"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2016
+        },
+        "years": {
+          "measurement": "git.age",
+          "unit": "years",
+          "value": 10.089
+        }
       },
       "key": "vintage.aged",
       "severity": 0
@@ -117,13 +157,41 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "20",
-        "commits_phrase": "20 commits",
-        "first_date": "2016-07-10",
-        "first_year": "2016",
-        "last_date": "2025-01-04",
-        "last_year": "2025",
-        "years": "8.5"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 20
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 20
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2016-07-10"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2016
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-01-04"
+        },
+        "last_year": {
+          "measurement": "git.last_commit",
+          "unit": "year",
+          "value": 2025
+        },
+        "years": {
+          "measurement": "git.history_span",
+          "unit": "years",
+          "value": 8.4873
+        }
       },
       "key": "vintage.declared",
       "severity": 0
@@ -131,8 +199,16 @@
     {
       "course": "nose",
       "facts": {
-        "source_files": "2",
-        "total_lines": "1,315"
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 2
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 1315
+        }
       },
       "key": "nose.no_tests",
       "severity": 2
@@ -140,9 +216,21 @@
     {
       "course": "nose",
       "facts": {
-        "debug_prints": "0",
-        "source_files": "2",
-        "total_lines": "1,315"
+        "debug_prints": {
+          "measurement": "abandonment.debug_print_count",
+          "unit": "count",
+          "value": 0
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 2
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 1315
+        }
       },
       "key": "abandonment.suspiciously_clean",
       "severity": 0
@@ -150,9 +238,21 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "657.5",
-        "lines": "1,308",
-        "path": "kilo.c"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 657.5
+        },
+        "lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 1308
+        },
+        "path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "kilo.c"
+        }
       },
       "key": "palate.cry_for_help",
       "severity": 3
@@ -160,8 +260,16 @@
     {
       "course": "palate",
       "facts": {
-        "depth": "6",
-        "path": "kilo.c"
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 6
+        },
+        "path": {
+          "measurement": "palate.max_indent_path",
+          "unit": "path",
+          "value": "kilo.c"
+        }
       },
       "key": "palate.deep_nesting",
       "severity": 2
@@ -169,9 +277,21 @@
     {
       "course": "palate",
       "facts": {
-        "lines": "943",
-        "name": "is_separator",
-        "path": "kilo.c"
+        "lines": {
+          "measurement": "palate.longest_function_lines",
+          "unit": "lines",
+          "value": 943
+        },
+        "name": {
+          "measurement": "palate.longest_function_name",
+          "unit": "text",
+          "value": "is_separator"
+        },
+        "path": {
+          "measurement": "palate.longest_function_path",
+          "unit": "path",
+          "value": "kilo.c"
+        }
       },
       "key": "palate.long_function",
       "severity": 2
@@ -179,11 +299,36 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "657.5",
-        "depth": "6",
-        "largest_lines": "1,308",
-        "largest_path": "kilo.c",
-        "source_files": "2"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 657.5
+        },
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 6
+        },
+        "largest_lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 1308
+        },
+        "largest_path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "kilo.c"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 2
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 1315
+        }
       },
       "key": "palate.body",
       "severity": 0
@@ -191,8 +336,16 @@
     {
       "course": "structure",
       "facts": {
-        "name": "antirez_kilo",
-        "source_files": "2"
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "antirez_kilo"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 2
+        }
       },
       "key": "structure.undeclared",
       "severity": 1
@@ -200,9 +353,21 @@
     {
       "course": "finish",
       "facts": {
-        "days": "585",
-        "last_date": "2025-01-04",
-        "years": "1.6"
+        "days": {
+          "measurement": "git.days_since_last_commit",
+          "unit": "days",
+          "value": 585
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-01-04"
+        },
+        "years": {
+          "measurement": "git.days_since_last_commit",
+          "unit": "years",
+          "value": 1.6016
+        }
       },
       "key": "finish.dormant",
       "severity": 2
@@ -210,9 +375,21 @@
     {
       "course": "finish",
       "facts": {
-        "gap_days": "1,644",
-        "gap_end": "2025-01-04",
-        "gap_start": "2020-07-05"
+        "gap_days": {
+          "measurement": "git.longest_gap_days",
+          "unit": "days",
+          "value": 1644
+        },
+        "gap_end": {
+          "measurement": "git.longest_gap_end",
+          "unit": "date",
+          "value": "2025-01-04"
+        },
+        "gap_start": {
+          "measurement": "git.longest_gap_start",
+          "unit": "date",
+          "value": "2020-07-05"
+        }
       },
       "key": "finish.the_silence",
       "severity": 2
@@ -220,8 +397,16 @@
     {
       "course": "finish",
       "facts": {
-        "last_date": "2025-01-04",
-        "subject": "Fix function declaration missing void."
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-01-04"
+        },
+        "subject": {
+          "measurement": "git.last_commit_subject",
+          "unit": "text",
+          "value": "Fix function declaration missing void."
+        }
       },
       "key": "finish.abrupt",
       "severity": 1
@@ -229,15 +414,51 @@
     {
       "course": "finish",
       "facts": {
-        "author_count": "8",
-        "authors_phrase": "8 authors",
-        "commit_count": "20",
-        "commits_phrase": "20 commits",
-        "fix_commits": "5",
-        "fix_percent": "25",
-        "fixes_phrase": "5 commits",
-        "last_date": "2025-01-04",
-        "subject": "Fix function declaration missing void."
+        "author_count": {
+          "measurement": "git.author_count",
+          "unit": "count",
+          "value": 8
+        },
+        "authors_phrase": {
+          "measurement": "git.author_count",
+          "unit": "authors",
+          "value": 8
+        },
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 20
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 20
+        },
+        "fix_commits": {
+          "measurement": "git.fix_commit_count",
+          "unit": "count",
+          "value": 5
+        },
+        "fix_percent": {
+          "measurement": "git.fix_ratio",
+          "unit": "percent",
+          "value": 0.25
+        },
+        "fixes_phrase": {
+          "measurement": "git.fix_commit_count",
+          "unit": "commits",
+          "value": 5
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-01-04"
+        },
+        "subject": {
+          "measurement": "git.last_commit_subject",
+          "unit": "text",
+          "value": "Fix function declaration missing void."
+        }
       },
       "key": "finish.history",
       "severity": 0

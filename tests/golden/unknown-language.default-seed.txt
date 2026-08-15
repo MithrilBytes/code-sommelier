@@ -1,7 +1,7 @@
 CODE SOMMELIER                                   tasting no. 87
 
-The label    zzz-project, written in unknown, across 8 files. That is the last
-             neutral sentence in this tasting.
+The label    zzz-project. 8 source files out of 8 on disk, 26 lines between
+             them.
 Vintage      There is no repository here. zzz-project holds 8 files of entirely
              unknown provenance.
 Nose         There is no .gitignore. The sommelier would like a moment. A
@@ -15,8 +15,8 @@ Nose         There is no .gitignore. The sommelier would like a moment. A
              thousand lines. Every one was written by somebody who intended to
              come back. No README. The reader is expected to deduce 26 lines of
              intent from first principles.
-Palate       Average length 3.2 lines across 8 files, with others.zzz at 5 and
-             nesting down to depth 0.
+Palate       26 lines in 8 files, 3.2 to a file, the longest of them 5, nesting
+             to depth 0.
 Structure    No manifest of any kind. Whatever these 8 files need, they need it
              in secret.
 Finish       No history. The code claims to have always existed.

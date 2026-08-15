@@ -3,7 +3,9 @@
 Consumes a RepoMetrics record and returns a Judgement. Every numeric threshold
 this module applies lives in BANDS and is read back from there, so the bands can
 be retuned in one place. This module emits no reader facing prose: findings
-carry pre-formatted fact strings that lines.py templates substitute.
+carry typed facts, each one a measured value with the identity of the thing
+measured attached, and lines.py templates substitute them once plan.py has
+decided which of them are allowed to be said.
 
 The score has three layers, in this order.
 
@@ -310,11 +312,122 @@ _FIX_SUBJECT_RE: Final[re.Pattern[str]] = re.compile(
 
 
 @dataclass(frozen=True)
+class Unit:
+    """How a measured value is written down.
+
+    Precision is a property of the unit and not of the call site that happens
+    to produce the number. That is what stops one quantity being printed as
+    15.5 in one sentence and 15 in the next.
+    """
+
+    places: int
+    """Decimal places. Negative when the value is text rather than a number."""
+
+    scale: float = 1.0
+    """Applied before writing, so the stored value stays the raw measurement."""
+
+    singular: str = ""
+    """The noun the quantity takes when it is spoken with one. May be empty."""
+
+    plural: str = ""
+
+
+TEXT: Final[str] = "text"
+PATH: Final[str] = "path"
+DATE: Final[str] = "date"
+YEAR: Final[str] = "year"
+COUNT: Final[str] = "count"
+LINES: Final[str] = "lines"
+BYTES: Final[str] = "bytes"
+DAYS: Final[str] = "days"
+DEPTH: Final[str] = "depth"
+YEARS: Final[str] = "years"
+AVERAGE: Final[str] = "average"
+RATE: Final[str] = "rate"
+PERCENT: Final[str] = "percent"
+MEGABYTES: Final[str] = "megabytes"
+COMMITS: Final[str] = "commits"
+AUTHORS: Final[str] = "authors"
+DIRECTORIES: Final[str] = "directories"
+
+# The nouns below are grammatical agreement for a number, not material: one
+# commit is not "1 commits", and the card is read aloud. Everything a reader
+# would recognise as a sentence still lives in lines.py.
+UNITS: Final[Mapping[str, Unit]] = MappingProxyType(
+    {
+        TEXT: Unit(places=-1),
+        PATH: Unit(places=-1),
+        DATE: Unit(places=-1),
+        YEAR: Unit(places=-1),
+        COUNT: Unit(places=0),
+        LINES: Unit(places=0),
+        BYTES: Unit(places=0),
+        DAYS: Unit(places=0),
+        DEPTH: Unit(places=0),
+        YEARS: Unit(places=1),
+        AVERAGE: Unit(places=1),
+        RATE: Unit(places=1),
+        PERCENT: Unit(places=0, scale=100.0),
+        MEGABYTES: Unit(places=1, scale=1.0 / _BYTES_PER_MEGABYTE),
+        COMMITS: Unit(places=0, singular="commit", plural="commits"),
+        AUTHORS: Unit(places=0, singular="author", plural="authors"),
+        DIRECTORIES: Unit(places=0, singular="directory", plural="directories"),
+    }
+)
+
+
+@dataclass(frozen=True)
+class Fact:
+    """One measured value, still typed, with its identity attached.
+
+    `measurement` is the thing measured, named the same way wherever it is
+    cited. Two findings that carry the same measurement are saying the same
+    thing, whatever they call the fact locally, and the content plan uses that
+    to refuse to say it twice. `value` is the measurement itself, unformatted:
+    formatting is a realisation decision and is deferred to `written`.
+    """
+
+    measurement: str
+    value: int | float | str | None
+    unit: str
+
+    def reading(self) -> str:
+        """The bare value, as a reader would compare it against another.
+
+        The noun is left off on purpose. "22 authors" and "22 percent" are two
+        measurements in two units, and a reader who meets them in one breath
+        reads the same number twice. The unit is what makes them different
+        quantities and is exactly what does not stop them looking alike.
+        """
+        rule = UNITS.get(self.unit, UNITS[TEXT])
+        if self.value is None:
+            return _UNKNOWN
+        if rule.places < 0 or isinstance(self.value, str):
+            stripped = str(self.value).strip()
+            return stripped if stripped else _UNKNOWN
+        scaled = float(self.value) * rule.scale
+        if not math.isfinite(scaled):
+            return _UNKNOWN
+        if rule.places == 0:
+            return f"{round(scaled):,}"
+        return f"{scaled:,.{rule.places}f}"
+
+    def written(self) -> str:
+        """The value as a reader sees it, at the precision its unit fixes."""
+        rule = UNITS.get(self.unit, UNITS[TEXT])
+        reading = self.reading()
+        if not rule.singular or reading == _UNKNOWN or self.value is None:
+            return reading
+        scaled = float(self.value) * rule.scale
+        return f"{reading} {rule.singular if round(scaled) == 1 else rule.plural}"
+
+
+@dataclass(frozen=True)
 class Finding:
     key: str
     course: str
     severity: int
-    facts: Mapping[str, str]
+    facts: Mapping[str, Fact]
 
 
 @dataclass(frozen=True)
@@ -497,21 +610,31 @@ _SPECS: Final[Mapping[str, _Spec]] = MappingProxyType(
         ),
         "palate.deep_nesting": _Spec("palate", "body", 2, ("depth", "path")),
         "palate.abyssal": _Spec("palate", "body", 3, ("depth", "path")),
+        # depth is declared here because this is the finding that claims the
+        # tree does not indent. A line asserting a measurement it does not
+        # carry leaves the number to be stated by somebody else, which is how
+        # a course ends up opening on "Depth 0" and then saying it again in
+        # words.
         "palate.flat": _Spec(
             "palate",
             "body",
             1,
-            ("source_files", "total_lines", "largest_path", "largest_lines"),
+            ("source_files", "total_lines", "largest_path", "largest_lines", "depth"),
         ),
         "palate.long_function": _Spec("palate", "body", 2, ("name", "lines", "path")),
         "palate.sampled": _Spec("palate", "body", 0, ("scanned", "total")),
         "palate.empty": _Spec("palate", "body", 3, ("name", "total_files")),
+        # total_lines is here so the opening line of the course has something
+        # to say that no sharper finding is entitled to take from it. Every
+        # other measurement it can cite is also citable by cry_for_help,
+        # deep_nesting or thin, and those have more to add.
         "palate.body": _Spec(
             "palate",
             "body",
             0,
             (
                 "source_files",
+                "total_lines",
                 "average_lines",
                 "largest_path",
                 "largest_lines",
@@ -618,21 +741,96 @@ _COURSE_ORDER: Final[Mapping[str, int]] = MappingProxyType(
 )
 
 
+# Every quantity the tool can cite, and the unit it is written in. A
+# measurement appears here once, so its precision cannot differ between the
+# two findings that cite it. Where one quantity is deliberately spoken in a
+# second unit, the call site names that unit and the identity is unchanged:
+# that is how "1,644 days, which is 4.5 years" stays one measurement.
+MEASUREMENTS: Final[Mapping[str, str]] = MappingProxyType(
+    {
+        "repo.name": TEXT,
+        "terroir.primary_language": TEXT,
+        "terroir.top_language": TEXT,
+        "terroir.language_names": TEXT,
+        "terroir.significant_languages": COUNT,
+        "terroir.primary_share": PERCENT,
+        "terroir.top_language_share": PERCENT,
+        "terroir.top_language_files": COUNT,
+        "palate.total_file_count": COUNT,
+        "palate.source_file_count": COUNT,
+        "palate.scanned_file_count": COUNT,
+        "palate.total_lines": LINES,
+        "palate.average_lines": AVERAGE,
+        "palate.largest_file_path": PATH,
+        "palate.largest_file_lines": LINES,
+        "palate.max_indent_depth": DEPTH,
+        "palate.max_indent_path": PATH,
+        "palate.longest_function_name": TEXT,
+        "palate.longest_function_lines": LINES,
+        "palate.longest_function_path": PATH,
+        "nose.readme_path": PATH,
+        "nose.readme_lines": LINES,
+        "nose.readme_bytes": BYTES,
+        "nose.license_name": TEXT,
+        "sediment.vendored_file_count": COUNT,
+        "sediment.vendored_dir_count": COUNT,
+        "sediment.vendored_share": PERCENT,
+        "sediment.secret_file_count": COUNT,
+        "sediment.secret_path": PATH,
+        "sediment.os_cruft_count": COUNT,
+        "sediment.os_cruft_path": PATH,
+        "sediment.large_binary_count": COUNT,
+        "sediment.largest_binary_path": PATH,
+        "sediment.largest_binary_bytes": MEGABYTES,
+        "structure.ecosystem": TEXT,
+        "structure.declared_count": COUNT,
+        "structure.dev_count": COUNT,
+        "structure.locked_count": COUNT,
+        "structure.manifest_path": PATH,
+        "structure.lockfile_path": PATH,
+        "structure.drift_reason": TEXT,
+        "structure.threshold": COUNT,
+        "abandonment.total": COUNT,
+        "abandonment.per_kloc": RATE,
+        "abandonment.todo": COUNT,
+        "abandonment.fixme": COUNT,
+        "abandonment.hack": COUNT,
+        "abandonment.xxx": COUNT,
+        "abandonment.worst_file_path": PATH,
+        "abandonment.worst_file_count": COUNT,
+        "abandonment.debug_print_count": COUNT,
+        "git.commit_count": COUNT,
+        "git.first_commit": DATE,
+        "git.last_commit": DATE,
+        "git.history_span": YEARS,
+        "git.age": YEARS,
+        "git.days_since_last_commit": DAYS,
+        "git.fix_commit_count": COUNT,
+        "git.fix_ratio": PERCENT,
+        "git.last_commit_subject": TEXT,
+        "git.author_count": COUNT,
+        "git.authors_per_kloc": RATE,
+        "git.top_author_name": TEXT,
+        "git.top_author_commits": COUNT,
+        "git.top_author_share": PERCENT,
+        "git.longest_gap_days": DAYS,
+        "git.longest_gap_start": DATE,
+        "git.longest_gap_end": DATE,
+    }
+)
+
+
+def _m(measurement: str, value: int | float | str | None, unit: str = "") -> Fact:
+    """One fact: what was measured, what it read, and how it is written."""
+    return Fact(
+        measurement=measurement,
+        value=value,
+        unit=unit or MEASUREMENTS[measurement],
+    )
+
+
 def _number(value: int) -> str:
     return f"{value:,}"
-
-
-def _decimal(value: float) -> str:
-    return f"{value:.1f}"
-
-
-def _phrase(count: int, singular: str, plural: str) -> str:
-    """A count with its noun already agreed.
-
-    One commit is not "1 commits". The sommelier is read aloud, so the
-    agreement is settled here rather than left to the template.
-    """
-    return f"{_number(count)} {singular if count == 1 else plural}"
 
 
 def _percent(share: float) -> str:
@@ -641,21 +839,10 @@ def _percent(share: float) -> str:
     return str(round(share * 100))
 
 
-def _megabytes(size_bytes: int) -> str:
-    return f"{size_bytes / _BYTES_PER_MEGABYTE:.1f}"
-
-
 def _share(part: int, whole: int) -> float:
     if whole <= 0:
         return 0.0
     return part / whole
-
-
-def _text(value: str | None) -> str:
-    if value is None:
-        return _UNKNOWN
-    stripped = value.strip()
-    return stripped if stripped else _UNKNOWN
 
 
 def _parse_date(value: str | None) -> date | None:
@@ -705,9 +892,15 @@ def _read(metrics: RepoMetrics, *analyzers: str) -> bool:
     return not any(name in dropped for name in analyzers)
 
 
-def _finding(key: str, facts: Mapping[str, str]) -> Finding:
+def _finding(key: str, facts: Mapping[str, Fact]) -> Finding:
     spec = _SPECS[key]
-    populated = {name: facts.get(name, _UNKNOWN) for name in spec.facts}
+    # A declared fact the caller did not supply is still a fact, with no
+    # value and an identity nothing else can collide with. It reads as
+    # unknown and it never silently merges with a neighbour.
+    populated = {
+        name: facts.get(name, Fact(f"absent:{key}.{name}", None, TEXT))
+        for name in spec.facts
+    }
     return Finding(
         key=key,
         course=spec.course,
@@ -735,11 +928,13 @@ def _judge_label(metrics: RepoMetrics) -> list[Finding]:
         _finding(
             "label.identity",
             {
-                "name": metrics.name,
-                "language": _text(terroir.primary_language),
-                "file_count": _number(palate.total_file_count),
-                "source_file_count": _number(palate.source_file_count),
-                "total_lines": _number(palate.total_lines),
+                "name": _m("repo.name", metrics.name),
+                "language": _m("terroir.primary_language", terroir.primary_language),
+                "file_count": _m("palate.total_file_count", palate.total_file_count),
+                "source_file_count": _m(
+                    "palate.source_file_count", palate.source_file_count
+                ),
+                "total_lines": _m("palate.total_lines", palate.total_lines),
             },
         )
     ]
@@ -749,14 +944,23 @@ def _judge_label(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "label.vendored",
                 {
-                    "vendored_files": _number(sediment.vendored_file_count),
-                    "vendored_dirs": _number(sediment.vendored_dir_count),
-                    "total_files": _number(palate.total_file_count),
-                    "dirs_phrase": _phrase(
-                        sediment.vendored_dir_count, "directory", "directories"
+                    "vendored_files": _m(
+                        "sediment.vendored_file_count", sediment.vendored_file_count
                     ),
-                    "vendored_share": _percent(
-                        _share(sediment.vendored_file_count, palate.total_file_count)
+                    "vendored_dirs": _m(
+                        "sediment.vendored_dir_count", sediment.vendored_dir_count
+                    ),
+                    "total_files": _m(
+                        "palate.total_file_count", palate.total_file_count
+                    ),
+                    "dirs_phrase": _m(
+                        "sediment.vendored_dir_count",
+                        sediment.vendored_dir_count,
+                        DIRECTORIES,
+                    ),
+                    "vendored_share": _m(
+                        "sediment.vendored_share",
+                        _share(sediment.vendored_file_count, palate.total_file_count),
                     ),
                 },
             )
@@ -768,8 +972,13 @@ def _judge_label(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "label.secrets",
                 {
-                    "secret_files": _number(sediment.secret_file_count),
-                    "path": _text(secret.path if secret is not None else None),
+                    "secret_files": _m(
+                        "sediment.secret_file_count", sediment.secret_file_count
+                    ),
+                    "path": _m(
+                        "sediment.secret_path",
+                        secret.path if secret is not None else None,
+                    ),
                 },
             )
         )
@@ -780,8 +989,13 @@ def _judge_label(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "label.os_cruft",
                 {
-                    "cruft_files": _number(sediment.os_cruft_count),
-                    "path": _text(cruft.path if cruft is not None else None),
+                    "cruft_files": _m(
+                        "sediment.os_cruft_count", sediment.os_cruft_count
+                    ),
+                    "path": _m(
+                        "sediment.os_cruft_path",
+                        cruft.path if cruft is not None else None,
+                    ),
                 },
             )
         )
@@ -791,9 +1005,15 @@ def _judge_label(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "label.large_binary",
                 {
-                    "binary_count": _number(sediment.large_binary_count),
-                    "largest_path": _text(sediment.largest_binary_path),
-                    "largest_mb": _megabytes(sediment.largest_binary_bytes),
+                    "binary_count": _m(
+                        "sediment.large_binary_count", sediment.large_binary_count
+                    ),
+                    "largest_path": _m(
+                        "sediment.largest_binary_path", sediment.largest_binary_path
+                    ),
+                    "largest_mb": _m(
+                        "sediment.largest_binary_bytes", sediment.largest_binary_bytes
+                    ),
                 },
             )
         )
@@ -815,10 +1035,17 @@ def _judge_label(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "label.polyglot",
                     {
-                        "language_count": _number(len(significant)),
-                        "languages": ", ".join(lang.name for lang in significant),
-                        "primary": primary.name,
-                        "primary_share": _percent(primary.share),
+                        "language_count": _m(
+                            "terroir.significant_languages", len(significant)
+                        ),
+                        "languages": _m(
+                            "terroir.language_names",
+                            ", ".join(lang.name for lang in significant),
+                        ),
+                        "primary": _m("terroir.primary_language", primary.name),
+                        "primary_share": _m(
+                            "terroir.primary_share", primary.share
+                        ),
                     },
                 )
             )
@@ -828,9 +1055,11 @@ def _judge_label(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "label.monoculture",
                     {
-                        "language": top.name,
-                        "share": _percent(top.share),
-                        "file_count": _number(top.file_count),
+                        "language": _m("terroir.top_language", top.name),
+                        "share": _m("terroir.top_language_share", top.share),
+                        "file_count": _m(
+                            "terroir.top_language_files", top.file_count
+                        ),
                     },
                 )
             )
@@ -843,19 +1072,20 @@ def _judge_vintage(metrics: RepoMetrics) -> list[Finding]:
         return []
     git = metrics.git
     identity = {
-        "name": metrics.name,
-        "file_count": _number(metrics.palate.total_file_count),
+        "name": _m("repo.name", metrics.name),
+        "file_count": _m("palate.total_file_count", metrics.palate.total_file_count),
     }
     if not git.is_repo:
         return [_finding("vintage.no_history", identity)]
     if not git.has_commits:
         return [_finding("vintage.empty", identity)]
 
+    commits = _m("git.commit_count", git.commit_count)
+    commits_phrase = _m("git.commit_count", git.commit_count, COMMITS)
+
     findings: list[Finding] = []
     if git.shallow:
-        findings.append(
-            _finding("vintage.shallow", {"commit_count": _number(git.commit_count)})
-        )
+        findings.append(_finding("vintage.shallow", {"commit_count": commits}))
 
     reference = _reference_date(git)
     first = _parse_date(git.first_commit_date)
@@ -866,15 +1096,13 @@ def _judge_vintage(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "vintage.declared",
                 {
-                    "first_year": str(first.year),
-                    "last_year": str(last.year),
-                    "first_date": _text(git.first_commit_date),
-                    "last_date": _text(git.last_commit_date),
-                    "years": _decimal(max(span_years, 0.0)),
-                    "commit_count": _number(git.commit_count),
-                    "commits_phrase": _phrase(
-                        git.commit_count, "commit", "commits"
-                    ),
+                    "first_year": _m("git.first_commit", first.year, YEAR),
+                    "last_year": _m("git.last_commit", last.year, YEAR),
+                    "first_date": _m("git.first_commit", git.first_commit_date),
+                    "last_date": _m("git.last_commit", git.last_commit_date),
+                    "years": _m("git.history_span", max(span_years, 0.0)),
+                    "commit_count": commits,
+                    "commits_phrase": commits_phrase,
                 },
             )
         )
@@ -885,20 +1113,18 @@ def _judge_vintage(metrics: RepoMetrics) -> list[Finding]:
     age_days = (reference - first).days
     age_years = age_days / _DAYS_PER_YEAR
     first_year = (
-        str(git.first_commit_year) if git.first_commit_year is not None else str(first.year)
+        git.first_commit_year if git.first_commit_year is not None else first.year
     )
     if age_years >= _band_float("vintage_aged_years"):
         findings.append(
             _finding(
                 "vintage.aged",
                 {
-                    "first_year": first_year,
-                    "years": _number(int(age_years)),
-                    "first_date": _text(git.first_commit_date),
-                    "commit_count": _number(git.commit_count),
-                    "commits_phrase": _phrase(
-                        git.commit_count, "commit", "commits"
-                    ),
+                    "first_year": _m("git.first_commit", first_year, YEAR),
+                    "years": _m("git.age", max(age_years, 0.0)),
+                    "first_date": _m("git.first_commit", git.first_commit_date),
+                    "commit_count": commits,
+                    "commits_phrase": commits_phrase,
                 },
             )
         )
@@ -907,12 +1133,10 @@ def _judge_vintage(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "vintage.recent",
                 {
-                    "days": _number(max(age_days, 0)),
-                    "first_date": _text(git.first_commit_date),
-                    "commit_count": _number(git.commit_count),
-                    "commits_phrase": _phrase(
-                        git.commit_count, "commit", "commits"
-                    ),
+                    "days": _m("git.age", max(age_days, 0), DAYS),
+                    "first_date": _m("git.first_commit", git.first_commit_date),
+                    "commit_count": commits,
+                    "commits_phrase": commits_phrase,
                 },
             )
         )
@@ -926,14 +1150,18 @@ def _judge_nose(metrics: RepoMetrics) -> list[Finding]:
     palate = metrics.palate
     findings: list[Finding] = []
 
+    name = _m("repo.name", metrics.name)
+    source_files = _m("palate.source_file_count", palate.source_file_count)
+    total_lines = _m("palate.total_lines", palate.total_lines)
+
     if nose.readme_path is None:
         findings.append(
             _finding(
                 "nose.no_readme",
                 {
-                    "name": metrics.name,
-                    "source_files": _number(palate.source_file_count),
-                    "total_lines": _number(palate.total_lines),
+                    "name": name,
+                    "source_files": source_files,
+                    "total_lines": total_lines,
                 },
             )
         )
@@ -942,23 +1170,25 @@ def _judge_nose(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "nose.thin_readme",
                 {
-                    "readme_path": _text(nose.readme_path),
-                    "readme_lines": _number(nose.readme_lines),
-                    "readme_bytes": _number(nose.readme_bytes),
+                    "readme_path": _m("nose.readme_path", nose.readme_path),
+                    "readme_lines": _m("nose.readme_lines", nose.readme_lines),
+                    "readme_bytes": _m("nose.readme_bytes", nose.readme_bytes),
                 },
             )
         )
 
     if nose.license_path is None:
-        findings.append(_finding("nose.no_license", {"name": metrics.name}))
+        findings.append(_finding("nose.no_license", {"name": name}))
 
     if nose.gitignore_path is None:
         findings.append(
             _finding(
                 "nose.no_gitignore",
                 {
-                    "name": metrics.name,
-                    "total_files": _number(palate.total_file_count),
+                    "name": name,
+                    "total_files": _m(
+                        "palate.total_file_count", palate.total_file_count
+                    ),
                 },
             )
         )
@@ -967,10 +1197,7 @@ def _judge_nose(metrics: RepoMetrics) -> list[Finding]:
         findings.append(
             _finding(
                 "nose.no_tests",
-                {
-                    "source_files": _number(palate.source_file_count),
-                    "total_lines": _number(palate.total_lines),
-                },
+                {"source_files": source_files, "total_lines": total_lines},
             )
         )
 
@@ -979,8 +1206,11 @@ def _judge_nose(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "nose.debug_prints",
                 {
-                    "debug_prints": _number(metrics.abandonment.debug_print_count),
-                    "source_files": _number(palate.source_file_count),
+                    "debug_prints": _m(
+                        "abandonment.debug_print_count",
+                        metrics.abandonment.debug_print_count,
+                    ),
+                    "source_files": source_files,
                 },
             )
         )
@@ -996,10 +1226,10 @@ def _judge_nose(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "nose.exhaustive_readme",
                     {
-                        "readme_path": _text(nose.readme_path),
-                        "readme_lines": _number(nose.readme_lines),
-                        "readme_bytes": _number(nose.readme_bytes),
-                        "source_files": _number(palate.source_file_count),
+                        "readme_path": _m("nose.readme_path", nose.readme_path),
+                        "readme_lines": _m("nose.readme_lines", nose.readme_lines),
+                        "readme_bytes": _m("nose.readme_bytes", nose.readme_bytes),
+                        "source_files": source_files,
                     },
                 )
             )
@@ -1008,9 +1238,9 @@ def _judge_nose(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "nose.documented",
                     {
-                        "readme_path": _text(nose.readme_path),
-                        "readme_lines": _number(nose.readme_lines),
-                        "license_name": _text(nose.license_name),
+                        "readme_path": _m("nose.readme_path", nose.readme_path),
+                        "readme_lines": _m("nose.readme_lines", nose.readme_lines),
+                        "license_name": _m("nose.license_name", nose.license_name),
                     },
                 )
             )
@@ -1024,13 +1254,22 @@ def _judge_palate(metrics: RepoMetrics) -> list[Finding]:
     palate = metrics.palate
     findings: list[Finding] = []
 
+    source_files = _m("palate.source_file_count", palate.source_file_count)
+    total_lines = _m("palate.total_lines", palate.total_lines)
+    average_lines = _m("palate.average_lines", palate.average_lines)
+    largest_path = _m("palate.largest_file_path", palate.largest_file_path)
+    largest_lines = _m("palate.largest_file_lines", palate.largest_file_lines)
+    depth = _m("palate.max_indent_depth", palate.max_indent_depth)
+
     if palate.source_file_count <= 0:
         findings.append(
             _finding(
                 "palate.empty",
                 {
-                    "name": metrics.name,
-                    "total_files": _number(palate.total_file_count),
+                    "name": _m("repo.name", metrics.name),
+                    "total_files": _m(
+                        "palate.total_file_count", palate.total_file_count
+                    ),
                 },
             )
         )
@@ -1039,18 +1278,19 @@ def _judge_palate(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "palate.body",
                 {
-                    "source_files": _number(palate.source_file_count),
-                    "average_lines": _decimal(palate.average_lines),
-                    "largest_path": _text(palate.largest_file_path),
-                    "largest_lines": _number(palate.largest_file_lines),
-                    "depth": _number(palate.max_indent_depth),
+                    "source_files": source_files,
+                    "total_lines": total_lines,
+                    "average_lines": average_lines,
+                    "largest_path": largest_path,
+                    "largest_lines": largest_lines,
+                    "depth": depth,
                 },
             )
         )
         size_facts = {
-            "path": _text(palate.largest_file_path),
-            "lines": _number(palate.largest_file_lines),
-            "average_lines": _decimal(palate.average_lines),
+            "path": largest_path,
+            "lines": largest_lines,
+            "average_lines": average_lines,
         }
         if palate.largest_file_lines > _band_int("largest_file_cry_for_help"):
             findings.append(_finding("palate.cry_for_help", size_facts))
@@ -1066,16 +1306,16 @@ def _judge_palate(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "palate.thin",
                     {
-                        "source_files": _number(palate.source_file_count),
-                        "average_lines": _decimal(palate.average_lines),
-                        "total_lines": _number(palate.total_lines),
+                        "source_files": source_files,
+                        "average_lines": average_lines,
+                        "total_lines": total_lines,
                     },
                 )
             )
 
         nesting_facts = {
-            "depth": _number(palate.max_indent_depth),
-            "path": _text(palate.max_indent_path),
+            "depth": depth,
+            "path": _m("palate.max_indent_path", palate.max_indent_path),
         }
         if palate.max_indent_depth >= _band_int("indent_depth_abyssal"):
             findings.append(_finding("palate.abyssal", nesting_facts))
@@ -1090,10 +1330,11 @@ def _judge_palate(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "palate.flat",
                     {
-                        "source_files": _number(palate.source_file_count),
-                        "total_lines": _number(palate.total_lines),
-                        "largest_path": _text(palate.largest_file_path),
-                        "largest_lines": _number(palate.largest_file_lines),
+                        "source_files": source_files,
+                        "total_lines": total_lines,
+                        "largest_path": largest_path,
+                        "largest_lines": largest_lines,
+                        "depth": depth,
                     },
                 )
             )
@@ -1103,9 +1344,18 @@ def _judge_palate(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "palate.long_function",
                     {
-                        "name": _text(palate.longest_function_name),
-                        "lines": _number(palate.longest_function_lines),
-                        "path": _text(palate.longest_function_path),
+                        "name": _m(
+                            "palate.longest_function_name",
+                            palate.longest_function_name,
+                        ),
+                        "lines": _m(
+                            "palate.longest_function_lines",
+                            palate.longest_function_lines,
+                        ),
+                        "path": _m(
+                            "palate.longest_function_path",
+                            palate.longest_function_path,
+                        ),
                     },
                 )
             )
@@ -1115,8 +1365,10 @@ def _judge_palate(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "palate.sampled",
                 {
-                    "scanned": _number(palate.scanned_file_count),
-                    "total": _number(palate.source_file_count),
+                    "scanned": _m(
+                        "palate.scanned_file_count", palate.scanned_file_count
+                    ),
+                    "total": source_files,
                 },
             )
         )
@@ -1124,13 +1376,15 @@ def _judge_palate(metrics: RepoMetrics) -> list[Finding]:
     return findings
 
 
-def _dependency_facts(manifest: DependencyManifest, threshold: int) -> dict[str, str]:
+def _dependency_facts(
+    manifest: DependencyManifest, threshold: int
+) -> dict[str, Fact]:
     return {
-        "ecosystem": manifest.ecosystem,
-        "declared": _number(manifest.declared_count),
-        "dev": _number(manifest.dev_count),
-        "manifest_path": _text(manifest.manifest_path),
-        "threshold": _number(threshold),
+        "ecosystem": _m("structure.ecosystem", manifest.ecosystem),
+        "declared": _m("structure.declared_count", manifest.declared_count),
+        "dev": _m("structure.dev_count", manifest.dev_count),
+        "manifest_path": _m("structure.manifest_path", manifest.manifest_path),
+        "threshold": _m("structure.threshold", threshold),
     }
 
 
@@ -1140,13 +1394,15 @@ def _judge_structure(metrics: RepoMetrics) -> list[Finding]:
     structure = metrics.structure
     findings: list[Finding] = []
 
+    source_files = _m("palate.source_file_count", metrics.palate.source_file_count)
+
     if structure.undeclared:
         findings.append(
             _finding(
                 "structure.undeclared",
                 {
-                    "name": metrics.name,
-                    "source_files": _number(metrics.palate.source_file_count),
+                    "name": _m("repo.name", metrics.name),
+                    "source_files": source_files,
                 },
             )
         )
@@ -1189,10 +1445,12 @@ def _judge_structure(metrics: RepoMetrics) -> list[Finding]:
         austere = _finding(
             "structure.austere",
             {
-                "ecosystem": largest.ecosystem,
-                "declared": _number(structure.total_declared),
-                "manifest_path": _text(largest.manifest_path),
-                "source_files": _number(metrics.palate.source_file_count),
+                "ecosystem": _m("structure.ecosystem", largest.ecosystem),
+                "declared": _m("structure.declared_count", structure.total_declared),
+                "manifest_path": _m(
+                    "structure.manifest_path", largest.manifest_path
+                ),
+                "source_files": source_files,
             },
         )
 
@@ -1205,10 +1463,14 @@ def _judge_structure(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "structure.declared",
                 {
-                    "ecosystem": largest.ecosystem,
-                    "declared": _number(largest.declared_count),
-                    "dev": _number(largest.dev_count),
-                    "manifest_path": _text(largest.manifest_path),
+                    "ecosystem": _m("structure.ecosystem", largest.ecosystem),
+                    "declared": _m(
+                        "structure.declared_count", largest.declared_count
+                    ),
+                    "dev": _m("structure.dev_count", largest.dev_count),
+                    "manifest_path": _m(
+                        "structure.manifest_path", largest.manifest_path
+                    ),
                 },
             )
         )
@@ -1232,9 +1494,13 @@ def _judge_structure(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "structure.no_lockfile",
                 {
-                    "manifest_path": _text(unlocked.manifest_path),
-                    "ecosystem": unlocked.ecosystem,
-                    "declared": _number(unlocked.declared_count),
+                    "manifest_path": _m(
+                        "structure.manifest_path", unlocked.manifest_path
+                    ),
+                    "ecosystem": _m("structure.ecosystem", unlocked.ecosystem),
+                    "declared": _m(
+                        "structure.declared_count", unlocked.declared_count
+                    ),
                 },
             )
         )
@@ -1244,11 +1510,19 @@ def _judge_structure(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "structure.drift",
                 {
-                    "manifest_path": _text(disagreeing.manifest_path),
-                    "lockfile_path": _text(disagreeing.lockfile_path),
-                    "reason": _text(disagreeing.drift_reason),
-                    "declared": _number(disagreeing.declared_count),
-                    "locked": _number(disagreeing.locked_count),
+                    "manifest_path": _m(
+                        "structure.manifest_path", disagreeing.manifest_path
+                    ),
+                    "lockfile_path": _m(
+                        "structure.lockfile_path", disagreeing.lockfile_path
+                    ),
+                    "reason": _m(
+                        "structure.drift_reason", disagreeing.drift_reason
+                    ),
+                    "declared": _m(
+                        "structure.declared_count", disagreeing.declared_count
+                    ),
+                    "locked": _m("structure.locked_count", disagreeing.locked_count),
                 },
             )
         )
@@ -1275,9 +1549,15 @@ def _judge_abandonment(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "abandonment.suspiciously_clean",
                 {
-                    "source_files": _number(metrics.palate.source_file_count),
-                    "total_lines": _number(metrics.palate.total_lines),
-                    "debug_prints": _number(markers.debug_print_count),
+                    "source_files": _m(
+                        "palate.source_file_count", metrics.palate.source_file_count
+                    ),
+                    "total_lines": _m(
+                        "palate.total_lines", metrics.palate.total_lines
+                    ),
+                    "debug_prints": _m(
+                        "abandonment.debug_print_count", markers.debug_print_count
+                    ),
                 },
             )
         ]
@@ -1293,15 +1573,21 @@ def _judge_abandonment(metrics: RepoMetrics) -> list[Finding]:
         _finding(
             key,
             {
-                "total": _number(markers.total),
-                "per_kloc": _decimal(per_kloc),
-                "todo": _number(markers.todo),
-                "fixme": _number(markers.fixme),
-                "hack": _number(markers.hack),
-                "xxx": _number(markers.xxx),
-                "worst_path": _text(markers.worst_file_path),
-                "worst_count": _number(markers.worst_file_count),
-                "debug_prints": _number(markers.debug_print_count),
+                "total": _m("abandonment.total", markers.total),
+                "per_kloc": _m("abandonment.per_kloc", per_kloc),
+                "todo": _m("abandonment.todo", markers.todo),
+                "fixme": _m("abandonment.fixme", markers.fixme),
+                "hack": _m("abandonment.hack", markers.hack),
+                "xxx": _m("abandonment.xxx", markers.xxx),
+                "worst_path": _m(
+                    "abandonment.worst_file_path", markers.worst_file_path
+                ),
+                "worst_count": _m(
+                    "abandonment.worst_file_count", markers.worst_file_count
+                ),
+                "debug_prints": _m(
+                    "abandonment.debug_print_count", markers.debug_print_count
+                ),
             },
         )
     ]
@@ -1315,9 +1601,19 @@ def _judge_finish(metrics: RepoMetrics) -> list[Finding]:
     git = metrics.git
     findings: list[Finding] = []
     identity = {
-        "name": metrics.name,
-        "file_count": _number(metrics.palate.total_file_count),
+        "name": _m("repo.name", metrics.name),
+        "file_count": _m("palate.total_file_count", metrics.palate.total_file_count),
     }
+
+    commits = _m("git.commit_count", git.commit_count)
+    commits_phrase = _m("git.commit_count", git.commit_count, COMMITS)
+    fix_commits = _m("git.fix_commit_count", git.fix_commit_count)
+    fixes_phrase = _m("git.fix_commit_count", git.fix_commit_count, COMMITS)
+    fix_percent = _m("git.fix_ratio", git.fix_ratio)
+    authors = _m("git.author_count", git.author_count)
+    authors_phrase = _m("git.author_count", git.author_count, AUTHORS)
+    last_date = _m("git.last_commit", git.last_commit_date)
+    subject = _m("git.last_commit_subject", git.last_commit_subject)
 
     if not git.is_repo:
         findings.append(_finding("finish.no_history", identity))
@@ -1328,21 +1624,15 @@ def _judge_finish(metrics: RepoMetrics) -> list[Finding]:
             _finding(
                 "finish.history",
                 {
-                    "commit_count": _number(git.commit_count),
-                    "fix_commits": _number(git.fix_commit_count),
-                    "fix_percent": _percent(git.fix_ratio),
-                    "subject": _text(git.last_commit_subject),
-                    "last_date": _text(git.last_commit_date),
-                    "author_count": _number(git.author_count),
-                    "commits_phrase": _phrase(
-                        git.commit_count, "commit", "commits"
-                    ),
-                    "authors_phrase": _phrase(
-                        git.author_count, "author", "authors"
-                    ),
-                    "fixes_phrase": _phrase(
-                        git.fix_commit_count, "commit", "commits"
-                    ),
+                    "commit_count": commits,
+                    "fix_commits": fix_commits,
+                    "fix_percent": fix_percent,
+                    "subject": subject,
+                    "last_date": last_date,
+                    "author_count": authors,
+                    "commits_phrase": commits_phrase,
+                    "authors_phrase": authors_phrase,
+                    "fixes_phrase": fixes_phrase,
                 },
             )
         )
@@ -1353,15 +1643,11 @@ def _judge_finish(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "finish.fix_ratio",
                     {
-                        "fix_commits": _number(git.fix_commit_count),
-                        "commit_count": _number(git.commit_count),
-                        "fix_percent": _percent(git.fix_ratio),
-                        "fixes_phrase": _phrase(
-                            git.fix_commit_count, "commit", "commits"
-                        ),
-                        "commits_phrase": _phrase(
-                            git.commit_count, "commit", "commits"
-                        ),
+                        "fix_commits": fix_commits,
+                        "commit_count": commits,
+                        "fix_percent": fix_percent,
+                        "fixes_phrase": fixes_phrase,
+                        "commits_phrase": commits_phrase,
                     },
                 )
             )
@@ -1371,9 +1657,13 @@ def _judge_finish(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "finish.the_silence",
                     {
-                        "gap_days": _number(git.longest_gap_days),
-                        "gap_start": _text(git.longest_gap_start),
-                        "gap_end": _text(git.longest_gap_end),
+                        "gap_days": _m(
+                            "git.longest_gap_days", git.longest_gap_days
+                        ),
+                        "gap_start": _m(
+                            "git.longest_gap_start", git.longest_gap_start
+                        ),
+                        "gap_end": _m("git.longest_gap_end", git.longest_gap_end),
                     },
                 )
             )
@@ -1385,11 +1675,15 @@ def _judge_finish(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "finish.single_estate",
                     {
-                        "author": _text(git.top_author_name),
-                        "author_commits": _number(git.top_author_commits),
-                        "share": _percent(git.top_author_share),
-                        "commit_count": _number(git.commit_count),
-                        "author_count": _number(git.author_count),
+                        "author": _m("git.top_author_name", git.top_author_name),
+                        "author_commits": _m(
+                            "git.top_author_commits", git.top_author_commits
+                        ),
+                        "share": _m(
+                            "git.top_author_share", git.top_author_share
+                        ),
+                        "commit_count": commits,
+                        "author_count": authors,
                     },
                 )
             )
@@ -1406,26 +1700,22 @@ def _judge_finish(metrics: RepoMetrics) -> list[Finding]:
                     _finding(
                         "finish.crowded",
                         {
-                            "author_count": _number(git.author_count),
-                            "total_lines": _number(metrics.palate.total_lines),
-                            "per_kloc": _decimal(per_kloc),
-                            "commit_count": _number(git.commit_count),
-                            "authors_phrase": _phrase(
-                                git.author_count, "author", "authors"
+                            "author_count": authors,
+                            "total_lines": _m(
+                                "palate.total_lines", metrics.palate.total_lines
                             ),
+                            "per_kloc": _m("git.authors_per_kloc", per_kloc),
+                            "commit_count": commits,
+                            "authors_phrase": authors_phrase,
                         },
                     )
                 )
 
-        subject = git.last_commit_subject
-        if subject is not None and _FIX_SUBJECT_RE.search(subject) is not None:
+        title = git.last_commit_subject
+        if title is not None and _FIX_SUBJECT_RE.search(title) is not None:
             findings.append(
                 _finding(
-                    "finish.abrupt",
-                    {
-                        "subject": _text(subject),
-                        "last_date": _text(git.last_commit_date),
-                    },
+                    "finish.abrupt", {"subject": subject, "last_date": last_date}
                 )
             )
 
@@ -1434,9 +1724,19 @@ def _judge_finish(metrics: RepoMetrics) -> list[Finding]:
                 _finding(
                     "finish.dormant",
                     {
-                        "days": _number(git.days_since_last_commit),
-                        "years": _decimal(git.days_since_last_commit / _DAYS_PER_YEAR),
-                        "last_date": _text(git.last_commit_date),
+                        "days": _m(
+                            "git.days_since_last_commit",
+                            git.days_since_last_commit,
+                        ),
+                        # The same measurement in a second unit, said out loud
+                        # in one breath. It is a conversion, not a second
+                        # reading, so it keeps the first one's identity.
+                        "years": _m(
+                            "git.days_since_last_commit",
+                            git.days_since_last_commit / _DAYS_PER_YEAR,
+                            YEARS,
+                        ),
+                        "last_date": last_date,
                     },
                 )
             )

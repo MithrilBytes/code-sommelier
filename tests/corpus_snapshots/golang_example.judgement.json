@@ -93,11 +93,31 @@
     {
       "course": "label",
       "facts": {
-        "file_count": "71",
-        "language": "Go",
-        "name": "golang_example",
-        "source_file_count": "55",
-        "total_lines": "3,943"
+        "file_count": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 71
+        },
+        "language": {
+          "measurement": "terroir.primary_language",
+          "unit": "text",
+          "value": "Go"
+        },
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "golang_example"
+        },
+        "source_file_count": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 55
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 3943
+        }
       },
       "key": "label.identity",
       "severity": 0
@@ -105,11 +125,31 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "76",
-        "commits_phrase": "76 commits",
-        "first_date": "2014-07-25",
-        "first_year": "2014",
-        "years": "12"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 76
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 76
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2014-07-25"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2014
+        },
+        "years": {
+          "measurement": "git.age",
+          "unit": "years",
+          "value": 12.0493
+        }
       },
       "key": "vintage.aged",
       "severity": 0
@@ -117,13 +157,41 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "76",
-        "commits_phrase": "76 commits",
-        "first_date": "2014-07-25",
-        "first_year": "2014",
-        "last_date": "2025-09-15",
-        "last_year": "2025",
-        "years": "11.1"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 76
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 76
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2014-07-25"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2014
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-09-15"
+        },
+        "last_year": {
+          "measurement": "git.last_commit",
+          "unit": "year",
+          "value": 2025
+        },
+        "years": {
+          "measurement": "git.history_span",
+          "unit": "years",
+          "value": 11.1431
+        }
       },
       "key": "vintage.declared",
       "severity": 0
@@ -131,8 +199,16 @@
     {
       "course": "nose",
       "facts": {
-        "name": "golang_example",
-        "total_files": "71"
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "golang_example"
+        },
+        "total_files": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 71
+        }
       },
       "key": "nose.no_gitignore",
       "severity": 3
@@ -140,8 +216,16 @@
     {
       "course": "nose",
       "facts": {
-        "debug_prints": "32",
-        "source_files": "55"
+        "debug_prints": {
+          "measurement": "abandonment.debug_print_count",
+          "unit": "count",
+          "value": 32
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 55
+        }
       },
       "key": "nose.debug_prints",
       "severity": 1
@@ -149,9 +233,21 @@
     {
       "course": "palate",
       "facts": {
-        "lines": "154",
-        "name": "main",
-        "path": "internal/cmd/weave/weave.go"
+        "lines": {
+          "measurement": "palate.longest_function_lines",
+          "unit": "lines",
+          "value": 154
+        },
+        "name": {
+          "measurement": "palate.longest_function_name",
+          "unit": "text",
+          "value": "main"
+        },
+        "path": {
+          "measurement": "palate.longest_function_path",
+          "unit": "path",
+          "value": "internal/cmd/weave/weave.go"
+        }
       },
       "key": "palate.long_function",
       "severity": 2
@@ -159,11 +255,36 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "71.7",
-        "depth": "5",
-        "largest_lines": "283",
-        "largest_path": "internal/cmd/weave/weave.go",
-        "source_files": "55"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 71.6909
+        },
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 5
+        },
+        "largest_lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 283
+        },
+        "largest_path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "internal/cmd/weave/weave.go"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 55
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 3943
+        }
       },
       "key": "palate.body",
       "severity": 0
@@ -171,10 +292,26 @@
     {
       "course": "structure",
       "facts": {
-        "declared": "4",
-        "dev": "0",
-        "ecosystem": "go",
-        "manifest_path": "ragserver/ragserver/go.mod"
+        "declared": {
+          "measurement": "structure.declared_count",
+          "unit": "count",
+          "value": 4
+        },
+        "dev": {
+          "measurement": "structure.dev_count",
+          "unit": "count",
+          "value": 0
+        },
+        "ecosystem": {
+          "measurement": "structure.ecosystem",
+          "unit": "text",
+          "value": "go"
+        },
+        "manifest_path": {
+          "measurement": "structure.manifest_path",
+          "unit": "path",
+          "value": "ragserver/ragserver/go.mod"
+        }
       },
       "key": "structure.declared",
       "severity": 0
@@ -182,9 +319,21 @@
     {
       "course": "finish",
       "facts": {
-        "gap_days": "1,227",
-        "gap_end": "2021-01-12",
-        "gap_start": "2017-09-03"
+        "gap_days": {
+          "measurement": "git.longest_gap_days",
+          "unit": "days",
+          "value": 1227
+        },
+        "gap_end": {
+          "measurement": "git.longest_gap_end",
+          "unit": "date",
+          "value": "2021-01-12"
+        },
+        "gap_start": {
+          "measurement": "git.longest_gap_start",
+          "unit": "date",
+          "value": "2017-09-03"
+        }
       },
       "key": "finish.the_silence",
       "severity": 2
@@ -192,15 +341,51 @@
     {
       "course": "finish",
       "facts": {
-        "author_count": "22",
-        "authors_phrase": "22 authors",
-        "commit_count": "76",
-        "commits_phrase": "76 commits",
-        "fix_commits": "17",
-        "fix_percent": "22",
-        "fixes_phrase": "17 commits",
-        "last_date": "2025-09-15",
-        "subject": "internal/cmd/weave: print two levels of headings in TOC"
+        "author_count": {
+          "measurement": "git.author_count",
+          "unit": "count",
+          "value": 22
+        },
+        "authors_phrase": {
+          "measurement": "git.author_count",
+          "unit": "authors",
+          "value": 22
+        },
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 76
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 76
+        },
+        "fix_commits": {
+          "measurement": "git.fix_commit_count",
+          "unit": "count",
+          "value": 17
+        },
+        "fix_percent": {
+          "measurement": "git.fix_ratio",
+          "unit": "percent",
+          "value": 0.2237
+        },
+        "fixes_phrase": {
+          "measurement": "git.fix_commit_count",
+          "unit": "commits",
+          "value": 17
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2025-09-15"
+        },
+        "subject": {
+          "measurement": "git.last_commit_subject",
+          "unit": "text",
+          "value": "internal/cmd/weave: print two levels of headings in TOC"
+        }
       },
       "key": "finish.history",
       "severity": 0

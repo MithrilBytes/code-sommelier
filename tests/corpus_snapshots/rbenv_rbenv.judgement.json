@@ -93,11 +93,31 @@
     {
       "course": "label",
       "facts": {
-        "file_count": "70",
-        "language": "Shell",
-        "name": "rbenv_rbenv",
-        "source_file_count": "30",
-        "total_lines": "2,219"
+        "file_count": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 70
+        },
+        "language": {
+          "measurement": "terroir.primary_language",
+          "unit": "text",
+          "value": "Shell"
+        },
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "rbenv_rbenv"
+        },
+        "source_file_count": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 30
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 2219
+        }
       },
       "key": "label.identity",
       "severity": 0
@@ -105,11 +125,31 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "855",
-        "commits_phrase": "855 commits",
-        "first_date": "2011-08-01",
-        "first_year": "2011",
-        "years": "15"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 855
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 855
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2011-08-01"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2011
+        },
+        "years": {
+          "measurement": "git.age",
+          "unit": "years",
+          "value": 15.0308
+        }
       },
       "key": "vintage.aged",
       "severity": 0
@@ -117,13 +157,41 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "855",
-        "commits_phrase": "855 commits",
-        "first_date": "2011-08-01",
-        "first_year": "2011",
-        "last_date": "2026-07-14",
-        "last_year": "2026",
-        "years": "15.0"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 855
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 855
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2011-08-01"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2011
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2026-07-14"
+        },
+        "last_year": {
+          "measurement": "git.last_commit",
+          "unit": "year",
+          "value": 2026
+        },
+        "years": {
+          "measurement": "git.history_span",
+          "unit": "years",
+          "value": 14.9514
+        }
       },
       "key": "vintage.declared",
       "severity": 0
@@ -131,9 +199,21 @@
     {
       "course": "nose",
       "facts": {
-        "debug_prints": "0",
-        "source_files": "30",
-        "total_lines": "2,219"
+        "debug_prints": {
+          "measurement": "abandonment.debug_print_count",
+          "unit": "count",
+          "value": 0
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 30
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 2219
+        }
       },
       "key": "abandonment.suspiciously_clean",
       "severity": 0
@@ -141,10 +221,26 @@
     {
       "course": "nose",
       "facts": {
-        "readme_bytes": "13,847",
-        "readme_lines": "360",
-        "readme_path": "README.md",
-        "source_files": "30"
+        "readme_bytes": {
+          "measurement": "nose.readme_bytes",
+          "unit": "bytes",
+          "value": 13847
+        },
+        "readme_lines": {
+          "measurement": "nose.readme_lines",
+          "unit": "lines",
+          "value": 360
+        },
+        "readme_path": {
+          "measurement": "nose.readme_path",
+          "unit": "path",
+          "value": "README.md"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 30
+        }
       },
       "key": "nose.exhaustive_readme",
       "severity": 0
@@ -152,11 +248,36 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "74.0",
-        "depth": "5",
-        "largest_lines": "164",
-        "largest_path": "test/init.bats",
-        "source_files": "30"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 73.9667
+        },
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 5
+        },
+        "largest_lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 164
+        },
+        "largest_path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "test/init.bats"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 30
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 2219
+        }
       },
       "key": "palate.body",
       "severity": 0
@@ -164,8 +285,16 @@
     {
       "course": "structure",
       "facts": {
-        "name": "rbenv_rbenv",
-        "source_files": "30"
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "rbenv_rbenv"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 30
+        }
       },
       "key": "structure.undeclared",
       "severity": 1
@@ -173,15 +302,51 @@
     {
       "course": "finish",
       "facts": {
-        "author_count": "133",
-        "authors_phrase": "133 authors",
-        "commit_count": "855",
-        "commits_phrase": "855 commits",
-        "fix_commits": "98",
-        "fix_percent": "11",
-        "fixes_phrase": "98 commits",
-        "last_date": "2026-07-14",
-        "subject": "Merge pull request #1654 from rbenv/dependabot/github_actions/mislav/bump-homebrew-formula-action-4.2"
+        "author_count": {
+          "measurement": "git.author_count",
+          "unit": "count",
+          "value": 133
+        },
+        "authors_phrase": {
+          "measurement": "git.author_count",
+          "unit": "authors",
+          "value": 133
+        },
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 855
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 855
+        },
+        "fix_commits": {
+          "measurement": "git.fix_commit_count",
+          "unit": "count",
+          "value": 98
+        },
+        "fix_percent": {
+          "measurement": "git.fix_ratio",
+          "unit": "percent",
+          "value": 0.1146
+        },
+        "fixes_phrase": {
+          "measurement": "git.fix_commit_count",
+          "unit": "commits",
+          "value": 98
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2026-07-14"
+        },
+        "subject": {
+          "measurement": "git.last_commit_subject",
+          "unit": "text",
+          "value": "Merge pull request #1654 from rbenv/dependabot/github_actions/mislav/bump-homebrew-formula-action-4.2"
+        }
       },
       "key": "finish.history",
       "severity": 0

@@ -1,8 +1,8 @@
 CODE SOMMELIER                                   tasting no. 96
 
-The label    This is loose-scripts. It is Python. There are 2 source files, and
-             every one of them was somebody's idea. 100 percent of this is
-             Python, across 2 files. Commitment, of a sort.
+The label    loose-scripts. 2 source files out of 3 on disk, 10 lines between
+             them. One language, 100 percent of it, and nothing in the tree to
+             argue with.
 Vintage      There is no repository here. loose-scripts holds 3 files of
              entirely unknown provenance.
 Nose         There is no .gitignore. The sommelier would like a moment. A
@@ -13,10 +13,9 @@ Nose         There is no .gitignore. The sommelier would like a moment. A
              offered to the repository, and the repository has accepted. This
              is the finding the sommelier will think about tonight. No tests
              anywhere. Confidence in 10 lines is being sustained by memory
-             alone. No LICENSE file anywhere. loose-scripts is public and
-             unusable at the same time.
-Palate       2 files averaging 5.0 lines. The largest, helper.py, runs to 5.
-             Nesting reaches depth 1.
+             alone. There is no licence file. Every use of this code is a
+             guess, including the ones made in good faith.
+Palate       2 files, 10 lines, 5.0 to a file.
 Structure    Undeclared. There is no manifest in loose-scripts, so there is no
              answer to the question of what 2 files require in order to run.
 Finish       No history. The code claims to have always existed.

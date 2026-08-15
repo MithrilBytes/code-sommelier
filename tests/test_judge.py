@@ -34,10 +34,21 @@ from sommelier.judge import (
     CARE_GATES,
     COURSES,
     DIMENSIONS,
+    AUTHORS,
+    COMMITS,
+    COUNT,
+    DATE,
+    DAYS,
+    DIRECTORIES,
     KEY_DIMENSIONS,
     KEY_FACTS,
+    MEASUREMENTS,
     REFUSAL_FACTS,
     REFUSALS,
+    UNITS,
+    YEAR,
+    YEARS,
+    Fact,
     Finding,
     judge,
 )
@@ -1707,8 +1718,70 @@ class JudgementShapeTests(unittest.TestCase):
                             finding.facts,
                             f"{finding.key} is missing the fact {fact}",
                         )
-                    for value in finding.facts.values():
-                        self.assertIsInstance(value, str)
+                    for name, value in finding.facts.items():
+                        self.assertIsInstance(
+                            value,
+                            Fact,
+                            f"{finding.key}.{name} is not a typed fact",
+                        )
+                        self.assertIsInstance(value.written(), str)
+
+    def test_every_fact_names_a_measurement_with_one_unit(self) -> None:
+        """A quantity is written the same way wherever it is cited.
+
+        This is the structural half of the promise that a card never prints
+        one number at two precisions. The other half is plan.py refusing to
+        say a measurement twice, and it can only rely on the identity if the
+        identity is stable.
+        """
+        for name, metrics in spread():
+            with self.subTest(case=name):
+                for finding in judge(metrics).findings:
+                    for fact in finding.facts.values():
+                        if fact.measurement.startswith("absent:"):
+                            continue
+                        self.assertIn(
+                            fact.measurement,
+                            MEASUREMENTS,
+                            f"{finding.key} cites an unregistered measurement",
+                        )
+                        self.assertIn(fact.unit, UNITS)
+
+    def test_a_measurement_written_twice_agrees_with_itself(self) -> None:
+        """One finding may write one measurement twice, in exactly three ways.
+
+        A count and the same count with its noun. A date and the year inside
+        it. A day count and the same span in years, which the template signposts
+        as a conversion. Anything else is a measurement disagreeing with itself
+        inside a single sentence, which is the defect the typed facts exist to
+        make impossible rather than merely unlikely.
+        """
+        nouned = ({COUNT, COMMITS}, {COUNT, AUTHORS}, {COUNT, DIRECTORIES})
+        for name, metrics in spread():
+            with self.subTest(case=name):
+                for finding in judge(metrics).findings:
+                    written: dict[str, dict[str, str]] = {}
+                    for fact in finding.facts.values():
+                        written.setdefault(fact.measurement, {})[fact.unit] = (
+                            fact.written()
+                        )
+                    for measurement, seen in written.items():
+                        if len(seen) < 2:
+                            continue
+                        units = set(seen)
+                        label = f"{finding.key} writes {measurement} as {seen}"
+                        if units in nouned:
+                            plain, *_ = seen[COUNT].split(" ")
+                            self.assertTrue(
+                                seen[units.difference({COUNT}).pop()].startswith(
+                                    plain
+                                ),
+                                label,
+                            )
+                        elif units == {DATE, YEAR}:
+                            self.assertTrue(seen[DATE].startswith(seen[YEAR]), label)
+                        else:
+                            self.assertEqual({DAYS, YEARS}, units, label)
 
     def test_judgement_survives_a_bare_directory(self) -> None:
         judgement = judge(empty_metrics())

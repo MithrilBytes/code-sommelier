@@ -93,11 +93,31 @@
     {
       "course": "label",
       "facts": {
-        "dirs_phrase": "1 directory",
-        "total_files": "59",
-        "vendored_dirs": "1",
-        "vendored_files": "1",
-        "vendored_share": "2"
+        "dirs_phrase": {
+          "measurement": "sediment.vendored_dir_count",
+          "unit": "directories",
+          "value": 1
+        },
+        "total_files": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 59
+        },
+        "vendored_dirs": {
+          "measurement": "sediment.vendored_dir_count",
+          "unit": "count",
+          "value": 1
+        },
+        "vendored_files": {
+          "measurement": "sediment.vendored_file_count",
+          "unit": "count",
+          "value": 1
+        },
+        "vendored_share": {
+          "measurement": "sediment.vendored_share",
+          "unit": "percent",
+          "value": 0.0169
+        }
       },
       "key": "label.vendored",
       "severity": 3
@@ -105,11 +125,31 @@
     {
       "course": "label",
       "facts": {
-        "file_count": "59",
-        "language": "Rust",
-        "name": "sharkdp_fd",
-        "source_file_count": "32",
-        "total_lines": "9,191"
+        "file_count": {
+          "measurement": "palate.total_file_count",
+          "unit": "count",
+          "value": 59
+        },
+        "language": {
+          "measurement": "terroir.primary_language",
+          "unit": "text",
+          "value": "Rust"
+        },
+        "name": {
+          "measurement": "repo.name",
+          "unit": "text",
+          "value": "sharkdp_fd"
+        },
+        "source_file_count": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 32
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 9191
+        }
       },
       "key": "label.identity",
       "severity": 0
@@ -117,11 +157,31 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "2,005",
-        "commits_phrase": "2,005 commits",
-        "first_date": "2017-05-09",
-        "first_year": "2017",
-        "years": "9"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 2005
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 2005
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2017-05-09"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2017
+        },
+        "years": {
+          "measurement": "git.age",
+          "unit": "years",
+          "value": 9.2594
+        }
       },
       "key": "vintage.aged",
       "severity": 0
@@ -129,13 +189,41 @@
     {
       "course": "vintage",
       "facts": {
-        "commit_count": "2,005",
-        "commits_phrase": "2,005 commits",
-        "first_date": "2017-05-09",
-        "first_year": "2017",
-        "last_date": "2026-08-09",
-        "last_year": "2026",
-        "years": "9.3"
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 2005
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 2005
+        },
+        "first_date": {
+          "measurement": "git.first_commit",
+          "unit": "date",
+          "value": "2017-05-09"
+        },
+        "first_year": {
+          "measurement": "git.first_commit",
+          "unit": "year",
+          "value": 2017
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2026-08-09"
+        },
+        "last_year": {
+          "measurement": "git.last_commit",
+          "unit": "year",
+          "value": 2026
+        },
+        "years": {
+          "measurement": "git.history_span",
+          "unit": "years",
+          "value": 9.2512
+        }
       },
       "key": "vintage.declared",
       "severity": 0
@@ -143,10 +231,26 @@
     {
       "course": "nose",
       "facts": {
-        "readme_bytes": "28,132",
-        "readme_lines": "790",
-        "readme_path": "README.md",
-        "source_files": "32"
+        "readme_bytes": {
+          "measurement": "nose.readme_bytes",
+          "unit": "bytes",
+          "value": 28132
+        },
+        "readme_lines": {
+          "measurement": "nose.readme_lines",
+          "unit": "lines",
+          "value": 790
+        },
+        "readme_path": {
+          "measurement": "nose.readme_path",
+          "unit": "path",
+          "value": "README.md"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 32
+        }
       },
       "key": "nose.exhaustive_readme",
       "severity": 0
@@ -154,9 +258,21 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "287.2",
-        "lines": "2,878",
-        "path": "tests/tests.rs"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 287.2188
+        },
+        "lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 2878
+        },
+        "path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "tests/tests.rs"
+        }
       },
       "key": "palate.cry_for_help",
       "severity": 3
@@ -164,8 +280,16 @@
     {
       "course": "palate",
       "facts": {
-        "depth": "7",
-        "path": "src/exec/mod.rs"
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 7
+        },
+        "path": {
+          "measurement": "palate.max_indent_path",
+          "unit": "path",
+          "value": "src/exec/mod.rs"
+        }
       },
       "key": "palate.deep_nesting",
       "severity": 2
@@ -173,9 +297,21 @@
     {
       "course": "palate",
       "facts": {
-        "lines": "172",
-        "name": "spawn_senders",
-        "path": "src/walk.rs"
+        "lines": {
+          "measurement": "palate.longest_function_lines",
+          "unit": "lines",
+          "value": 172
+        },
+        "name": {
+          "measurement": "palate.longest_function_name",
+          "unit": "text",
+          "value": "spawn_senders"
+        },
+        "path": {
+          "measurement": "palate.longest_function_path",
+          "unit": "path",
+          "value": "src/walk.rs"
+        }
       },
       "key": "palate.long_function",
       "severity": 2
@@ -183,11 +319,36 @@
     {
       "course": "palate",
       "facts": {
-        "average_lines": "287.2",
-        "depth": "7",
-        "largest_lines": "2,878",
-        "largest_path": "tests/tests.rs",
-        "source_files": "32"
+        "average_lines": {
+          "measurement": "palate.average_lines",
+          "unit": "average",
+          "value": 287.2188
+        },
+        "depth": {
+          "measurement": "palate.max_indent_depth",
+          "unit": "depth",
+          "value": 7
+        },
+        "largest_lines": {
+          "measurement": "palate.largest_file_lines",
+          "unit": "lines",
+          "value": 2878
+        },
+        "largest_path": {
+          "measurement": "palate.largest_file_path",
+          "unit": "path",
+          "value": "tests/tests.rs"
+        },
+        "source_files": {
+          "measurement": "palate.source_file_count",
+          "unit": "count",
+          "value": 32
+        },
+        "total_lines": {
+          "measurement": "palate.total_lines",
+          "unit": "lines",
+          "value": 9191
+        }
       },
       "key": "palate.body",
       "severity": 0
@@ -195,10 +356,26 @@
     {
       "course": "structure",
       "facts": {
-        "declared": "20",
-        "dev": "4",
-        "ecosystem": "rust",
-        "manifest_path": "Cargo.toml"
+        "declared": {
+          "measurement": "structure.declared_count",
+          "unit": "count",
+          "value": 20
+        },
+        "dev": {
+          "measurement": "structure.dev_count",
+          "unit": "count",
+          "value": 4
+        },
+        "ecosystem": {
+          "measurement": "structure.ecosystem",
+          "unit": "text",
+          "value": "rust"
+        },
+        "manifest_path": {
+          "measurement": "structure.manifest_path",
+          "unit": "path",
+          "value": "Cargo.toml"
+        }
       },
       "key": "structure.declared",
       "severity": 0
@@ -206,15 +383,51 @@
     {
       "course": "finish",
       "facts": {
-        "author_count": "242",
-        "authors_phrase": "242 authors",
-        "commit_count": "2,005",
-        "commits_phrase": "2,005 commits",
-        "fix_commits": "217",
-        "fix_percent": "11",
-        "fixes_phrase": "217 commits",
-        "last_date": "2026-08-09",
-        "subject": "Merge pull request #2091 from sharkdp/dependabot/github_actions/actions/attest-4.2.1"
+        "author_count": {
+          "measurement": "git.author_count",
+          "unit": "count",
+          "value": 242
+        },
+        "authors_phrase": {
+          "measurement": "git.author_count",
+          "unit": "authors",
+          "value": 242
+        },
+        "commit_count": {
+          "measurement": "git.commit_count",
+          "unit": "count",
+          "value": 2005
+        },
+        "commits_phrase": {
+          "measurement": "git.commit_count",
+          "unit": "commits",
+          "value": 2005
+        },
+        "fix_commits": {
+          "measurement": "git.fix_commit_count",
+          "unit": "count",
+          "value": 217
+        },
+        "fix_percent": {
+          "measurement": "git.fix_ratio",
+          "unit": "percent",
+          "value": 0.1082
+        },
+        "fixes_phrase": {
+          "measurement": "git.fix_commit_count",
+          "unit": "commits",
+          "value": 217
+        },
+        "last_date": {
+          "measurement": "git.last_commit",
+          "unit": "date",
+          "value": "2026-08-09"
+        },
+        "subject": {
+          "measurement": "git.last_commit_subject",
+          "unit": "text",
+          "value": "Merge pull request #2091 from sharkdp/dependabot/github_actions/actions/attest-4.2.1"
+        }
       },
       "key": "finish.history",
       "severity": 0

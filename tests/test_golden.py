@@ -39,6 +39,7 @@ from unittest.mock import patch
 import sommelier.collect as collect_module
 from sommelier.collect import RepoMetrics, collect
 from sommelier.judge import judge
+from sommelier.plan import compose
 from sommelier.render import render_card, render_sober
 from sommelier.voice import pour
 
@@ -112,7 +113,7 @@ class GoldenCase(unittest.TestCase):
         self.addCleanup(fixture.cleanup)
         metrics = self.measure(fixture.path)
         judgement = judge(metrics)
-        card = render_card(pour(metrics, judgement, seed=seed))
+        card = render_card(pour(compose(metrics, judgement), seed=seed))
         suffix = "default-seed" if seed is None else f"seed{seed}"
         self.assert_golden(f"{slug}.{suffix}.txt", card + "\n")
 

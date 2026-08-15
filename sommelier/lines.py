@@ -38,6 +38,9 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "exists, which is the strongest thing that can be said for it so far.",
         "This is {name}. It is {language}. There are {source_file_count} source "
         "files, and every one of them was somebody's idea.",
+        "{name}. {source_file_count} source files out of {file_count} on disk, "
+        "{total_lines} lines between them.",
+        "{source_file_count} source files. {total_lines} lines. This is {name}.",
     ),
     "label.vendored": (
         "{vendored_files} of the {total_files} files here are vendored, which is "
@@ -94,17 +97,21 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "this tree.",
         "One language, {language}, at {share} percent of {file_count} files. "
         "Whatever happens next is entirely its fault.",
+        "{share} percent of {file_count} files, and only one language among "
+        "them.",
+        "One language, {share} percent of it, and nothing in the tree to "
+        "argue with.",
     ),
     # --------------------------------------------------------------- vintage
     "vintage.declared": (
         "{first_year}. The first commit landed on {first_date} and the last on "
-        "{last_date}, {years} years apart, across {commits_phrase}.",
-        "{first_year} to {last_year}. {years} years, {commits_phrase}. "
+        "{last_date}, across {commits_phrase}.",
+        "{first_year} to {last_year}, {commits_phrase}. "
         "The arithmetic is not flattering.",
         "Laid down in {first_year}, last disturbed on {last_date}. "
         "{commits_phrase} stand between those two dates.",
-        "{first_year}. A vintage of {years} years and {commits_phrase}, "
-        "and the sommelier has tasted every one of them.",
+        "{first_year}, and {commits_phrase} since. The sommelier has tasted "
+        "every one of them.",
     ),
     "vintage.no_history": (
         "There is no repository here. {name} holds {file_count} files of entirely "
@@ -121,6 +128,9 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "{name}. Initialised, never committed, {file_count} files on disk. "
         "Somebody meant to start.",
     ),
+    # The count here is always claimed first by vintage.declared, which opens
+    # the course. Without a line that names no count, the reader is never told
+    # the history was truncated, and a withheld history reads as a short one.
     "vintage.shallow": (
         "This is a shallow clone. {commit_count} commits are visible and the "
         "rest have been withheld, which the sommelier will take personally.",
@@ -128,6 +138,10 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "proceed on what was served.",
         "A shallow clone. {commit_count} commits shown. The sommelier can only "
         "taste what reached the glass.",
+        "The clone is shallow, so the history above is the part that was "
+        "served and not the part that exists.",
+        "This history has been truncated before it arrived. What follows is "
+        "judged on what reached the glass.",
     ),
     "vintage.aged": (
         "{years} years in the cellar since {first_year}. Age is not the same as "
@@ -136,6 +150,9 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "have followed. Old, and not in the way that adds value.",
         "{years} years old. {first_year} was a long time ago, and this has been "
         "here for all of it.",
+        # Cites the age and nothing else, so it still has something to say when
+        # the opening line has already taken both dates and the commit count.
+        "{years} years old. Age is not the same as improvement.",
     ),
     "vintage.recent": (
         "{days} days old, first committed on {first_date}. Too young to have "
@@ -144,6 +161,7 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "still ahead of it, including the regret.",
         "{first_date}, and only {days} days of it. The sommelier will return "
         "when it has aged into something arguable.",
+        "{days} days in the bottle. Nothing has had time to go wrong yet.",
     ),
     # ------------------------------------------------------------------ nose
     "nose.documented": (
@@ -169,6 +187,8 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "Somebody started, and then something more interesting happened.",
         "A {readme_lines} line README. It answers no question that anyone has "
         "ever had.",
+        "{readme_path} is {readme_bytes} bytes, which is a note to self left "
+        "where a reader was expected.",
     ),
     "nose.exhaustive_readme": (
         "{readme_path} runs to {readme_lines} lines against {source_files} source "
@@ -178,6 +198,10 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "A README of {readme_lines} lines over {source_files} source files. "
         "Exhaustive, and it will be read once.",
     ),
+    # Every line here used to name the repository, and the repository is named
+    # by whatever else the nose has to say, so the licence finding was the one
+    # that went unsaid. A name is not a measurement, but it is claimed like
+    # one, and the course was quieter for it.
     "nose.no_license": (
         "No licence file. Legally, {name} belongs to nobody and may be used by "
         "nobody, which is a bold distribution strategy.",
@@ -185,6 +209,10 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "anyone who does not.",
         "No LICENSE file anywhere. {name} is public and unusable at the same "
         "time.",
+        "There is no licence file. Every use of this code is a guess, "
+        "including the ones made in good faith.",
+        "No licence of any kind. The terms are whatever the next reader "
+        "decides they are.",
     ),
     "nose.no_gitignore": (
         "There is no .gitignore. The sommelier would like a moment. A "
@@ -226,6 +254,8 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "nose. Suspiciously clean.",
         "Not a single marker of any kind across {total_lines} lines. The "
         "sommelier does not believe it, and cannot prove otherwise.",
+        "{debug_prints} debug prints, and not one TODO, FIXME, HACK or XXX "
+        "anywhere. Suspiciously clean.",
     ),
     "abandonment.notes": (
         "Notes of abandonment: {total} markers, {per_kloc} per thousand lines, "
@@ -248,6 +278,10 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "intended to come back.",
     ),
     # ---------------------------------------------------------------- palate
+    # The opening line of the largest course, and the one most often asked to
+    # stand aside: every measurement here except total_lines can also be cited
+    # by cry_for_help, thin, flat or deep_nesting, and those have more to add.
+    # The short forms are what it says once they have taken their share.
     "palate.body": (
         "{source_files} files averaging {average_lines} lines. The largest, "
         "{largest_path}, runs to {largest_lines}. Nesting reaches depth {depth}.",
@@ -255,6 +289,23 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "at {largest_lines} lines in {largest_path}.",
         "Average length {average_lines} lines across {source_files} files, with "
         "{largest_path} at {largest_lines} and nesting down to depth {depth}.",
+        "{total_lines} lines in {source_files} files, {average_lines} to a "
+        "file, the longest of them {largest_lines}, nesting to depth {depth}.",
+        "{source_files} files, {total_lines} lines, {average_lines} to a file, "
+        "the longest of them {largest_lines}.",
+        "{source_files} files, {total_lines} lines, {average_lines} to a file.",
+        "{source_files} files, {total_lines} lines, nesting to depth {depth}.",
+        "{total_lines} lines across {source_files} files, and nothing indents "
+        "past depth {depth}.",
+        "{source_files} files hold {total_lines} lines between them.",
+        "{source_files} source files, {total_lines} lines between them.",
+        "{total_lines} lines, spread across {source_files} files.",
+        "Nesting bottoms out at depth {depth}.",
+        "Indentation stops at depth {depth}.",
+        "Depth {depth}, at the deepest point of it.",
+        "The average file here is {average_lines} lines.",
+        "{average_lines} lines to a file, on average.",
+        "Averaging {average_lines} lines a file, and nothing more to add.",
     ),
     "palate.empty": (
         "There are no source files. {total_files} objects on disk in {name} and "
@@ -270,7 +321,12 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "has volunteered to split it.",
         "The largest file, {path}, is {lines} lines. Full bodied. It will be "
         "read once, by its author, and never again.",
+        "Full bodied, against an average of {average_lines} lines a file.",
     ),
+    # The sharpest thing the palate has to say, and on a tree whose longest
+    # file is also its deepest it has no path of its own to name: abyssal
+    # names that file first. The last two lines are what it says then, since
+    # dropping it leaves the course milder than the measurements are.
     "palate.cry_for_help": (
         "{path} runs to {lines} lines, which is not a module, it is a cry for "
         "help.",
@@ -280,6 +336,10 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "made that nobody remembers and everybody depends on.",
         "The body is enormous. {path} is {lines} lines long and it has never "
         "once been opened with confidence.",
+        "{lines} lines of it sit in a single file, which is not a module, it "
+        "is a cry for help.",
+        "One file carries {lines} lines against an average of "
+        "{average_lines}. Nobody decided that. It accumulated.",
     ),
     "palate.thin": (
         "{source_files} files averaging {average_lines} lines. Thin, and the "
@@ -297,6 +357,11 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "{total_lines} lines of data wearing the extensions of a program.",
         "Flat. {total_lines} lines across {source_files} files with no "
         "indentation anywhere, {largest_path} included at {largest_lines} lines.",
+        "Flat throughout: {source_files} files, {total_lines} lines, and depth "
+        "{depth} from one end of the tree to the other.",
+        "Depth {depth} everywhere. {total_lines} lines across {source_files} "
+        "files, and {largest_path} runs to {largest_lines} of them without "
+        "indenting once.",
     ),
     "palate.deep_nesting": (
         "Nesting reaches depth {depth} in {path}. Down there, conditions are "
@@ -305,6 +370,8 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "has never seen daylight.",
         "{path} nests to depth {depth}. By that level the code has stopped "
         "describing what it does and started describing how it got there.",
+        "The nesting reaches depth {depth}, and nothing at that level is easy "
+        "to read.",
     ),
     "palate.abyssal": (
         "Nesting reaches depth {depth} in {path}. That is not control flow, "
@@ -313,6 +380,8 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "whitespace than meaning.",
         "{path} nests {depth} levels deep. Nothing at that depth has been "
         "understood by two people at the same time.",
+        "The nesting goes {depth} levels down, and nobody has been to the "
+        "bottom of it twice.",
     ),
     "palate.long_function": (
         "The longest function, {name} in {path}, runs to {lines} lines. It does "
@@ -370,6 +439,8 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "development. The tree beneath them has never been read by anyone alive.",
         "{declared} dependencies in {manifest_path}. Opaque, impenetrable, and "
         "installed in full every time anyone new joins the project.",
+        "Opaque. Past {threshold} the sommelier stops counting, and {dev} of "
+        "them are there only for development.",
     ),
     "structure.no_lockfile": (
         "{manifest_path} declares {declared} dependencies and there is no "
@@ -389,13 +460,33 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "slightly different project.",
     ),
     # ---------------------------------------------------------------- finish
+    # The opening line of the finish, spoken after dormant, the silence and
+    # abrupt have taken what they need. Those name the last commit and its
+    # date, so several forms here name neither.
     "finish.history": (
-        "{commits_phrase}, of which {fix_commits} are titled fix. It ends on "
-        "{last_date} with {subject}.",
+        "{commits_phrase}, {fix_commits} titled fix. It ends on {last_date} "
+        "with {subject}.",
         "{commits_phrase} from {authors_phrase}. {fix_percent} percent say fix. "
         "The last one, on {last_date}, says {subject}.",
         "Long finish: {commits_phrase} ending {last_date}. The final word "
         "on the matter is {subject}.",
+        "{commits_phrase} from {authors_phrase}, {fix_percent} percent of them "
+        "titled fix.",
+        "{commits_phrase} from {authors_phrase}. {fix_commits} of them titled "
+        "fix.",
+        "{commits_phrase}, {fix_commits} of them titled fix, and "
+        "{authors_phrase} behind it.",
+        "{fixes_phrase} titled fix. It ends on {last_date} with {subject}.",
+        "{fix_percent} percent of the history says fix. The last word, on "
+        "{last_date}, is {subject}.",
+        # fixes_phrase is the count of commits titled fix and not the length
+        # of the history. Said as "came before it" the sentence reported the
+        # fix count as the total, which was the one number on the card a
+        # reader would have checked against the log and found wrong.
+        "It ends on {last_date}, and the final word is {subject}. "
+        "{fixes_phrase} along the way said fix.",
+        "The last word on the matter is {subject}.",
+        "{authors_phrase} wrote all of it, and the last word is {subject}.",
     ),
     "finish.no_history": (
         "No history. The code claims to have always existed.",
@@ -416,9 +507,11 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "{commits_phrase}. {fix_commits} of them titled fix. It is not fixed.",
         "{fix_percent} percent of the {commits_phrase} here say fix, and the "
         "count is still rising.",
-        "{fixes_phrase} of {commits_phrase} are fixes. {fix_percent} "
-        "percent. At some point that stops being maintenance and starts being "
-        "the shape of the thing.",
+        # Not {fixes_phrase} of {commits_phrase}, which agreed with neither
+        # number and read as one commit of three commits are fixes.
+        "{fix_percent} percent of the history says fix, {fix_commits} of "
+        "{commits_phrase}. At some point that stops being maintenance and "
+        "starts being the shape of the thing.",
     ),
     "finish.the_silence": (
         "Then the silence. {gap_days} days between {gap_start} and {gap_end}, "
@@ -427,6 +520,13 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "happened, and it was not development.",
         "{gap_days} days of silence, {gap_start} to {gap_end}. The longest "
         "thing in this history is the pause.",
+        # The gap is bounded by two commits, so somebody did come back. Only
+        # the forms that name gap_end may say so, and this one does not.
+        "A gap of {gap_days} days opens on {gap_start}, and nothing was "
+        "committed into it.",
+        "{gap_days} days of nothing, from {gap_start} onward.",
+        "The longest thing in this history is a pause of {gap_days} days "
+        "beginning {gap_start}.",
     ),
     "finish.single_estate": (
         "A single estate wine. {author} is responsible for {share} percent of "
@@ -453,6 +553,9 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "The last commit, on {last_date}, is titled {subject}. That is where "
         "everyone stopped.",
         "The finish is abrupt. {subject}, on {last_date}, and then nothing.",
+        "The last thing said here was {subject}, and nothing followed it.",
+        "{subject}, and then the log stops.",
+        "The final commit is titled {subject}. Nobody wrote another.",
     ),
     "finish.dormant": (
         "Nothing has been committed for {days} days. The last was {last_date}. "
