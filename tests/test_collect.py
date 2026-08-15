@@ -536,6 +536,51 @@ class NeglectedJavaScriptRepoTest(unittest.TestCase):
         self.assertFalse(nose.has_tests)
 
 
+class TestDirectoryTest(unittest.TestCase):
+    """A directory named tests is not a test suite until something is in it.
+
+    The tested gate is one of the seven that admit a repository to the
+    nineties, and it is supposed to cost the author real work. An empty
+    directory costs one command, and emptying a real one used to leave the
+    answer unchanged, which made removing the tests free.
+    """
+
+    def test_an_empty_test_directory_is_not_a_test_suite(self) -> None:
+        with fixtures.Fixture("hollow") as fixture:
+            fixtures.write_tree(fixture.path, {"src/app.py": "VALUE = 1\n"})
+            (fixture.path / "tests").mkdir()
+            self.assertFalse(collect(fixture.path).nose.has_tests)
+
+    def test_a_populated_test_directory_is_one(self) -> None:
+        with fixtures.Fixture("populated") as fixture:
+            fixtures.write_tree(
+                fixture.path,
+                {"src/app.py": "VALUE = 1\n", "tests/cases.py": "CASES = ()\n"},
+            )
+            self.assertTrue(collect(fixture.path).nose.has_tests)
+
+    def test_a_test_directory_counts_on_a_file_nested_inside_it(self) -> None:
+        with fixtures.Fixture("nested") as fixture:
+            fixtures.write_tree(
+                fixture.path,
+                {
+                    "src/app.py": "VALUE = 1\n",
+                    "tests/unit/cases.py": "CASES = ()\n",
+                },
+            )
+            self.assertTrue(collect(fixture.path).nose.has_tests)
+
+    def test_emptying_a_test_directory_removes_the_evidence(self) -> None:
+        with fixtures.Fixture("emptied") as fixture:
+            fixtures.write_tree(
+                fixture.path,
+                {"src/app.py": "VALUE = 1\n", "tests/cases.py": "CASES = ()\n"},
+            )
+            self.assertTrue(collect(fixture.path).nose.has_tests)
+            (fixture.path / "tests" / "cases.py").unlink()
+            self.assertFalse(collect(fixture.path).nose.has_tests)
+
+
 class ContainmentTest(unittest.TestCase):
     """The tool tastes the path it is handed and nothing above it."""
 

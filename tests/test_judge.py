@@ -27,7 +27,20 @@ from sommelier.collect import (
     StructureMetrics,
     TerroirMetrics,
 )
-from sommelier.judge import ALL_KEYS, COURSES, KEY_FACTS, Finding, judge
+from sommelier.judge import (
+    ALL_KEYS,
+    BANDS,
+    BASE_GATES,
+    CARE_GATES,
+    COURSES,
+    DIMENSIONS,
+    KEY_DIMENSIONS,
+    KEY_FACTS,
+    REFUSAL_FACTS,
+    REFUSALS,
+    Finding,
+    judge,
+)
 
 # Every key judge can emit, with the severity it must carry. Nine of these are
 # not in the contract's band list. Judge adds the severity zero openers
@@ -51,6 +64,7 @@ EXPECTED_SEVERITY: dict[str, int] = {
     "vintage.empty": 2,
     "vintage.declared": 0,
     "nose.documented": 0,
+    "nose.exhaustive_readme": 0,
     "nose.debug_prints": 1,
     "nose.thin_readme": 1,
     "nose.no_license": 1,
@@ -60,6 +74,8 @@ EXPECTED_SEVERITY: dict[str, int] = {
     "palate.sampled": 0,
     "palate.body": 0,
     "palate.full_bodied": 1,
+    "palate.thin": 1,
+    "palate.flat": 1,
     "palate.deep_nesting": 2,
     "palate.long_function": 2,
     "palate.abyssal": 3,
@@ -67,6 +83,7 @@ EXPECTED_SEVERITY: dict[str, int] = {
     "palate.empty": 3,
     "structure.undeclared": 1,
     "structure.declared": 0,
+    "structure.austere": 0,
     "structure.tannic": 1,
     "structure.drift": 2,
     "structure.no_lockfile": 2,
@@ -75,6 +92,7 @@ EXPECTED_SEVERITY: dict[str, int] = {
     "abandonment.notes": 1,
     "abandonment.aggressive": 2,
     "finish.single_estate": 1,
+    "finish.crowded": 1,
     "finish.abrupt": 1,
     "finish.fix_ratio": 2,
     "finish.the_silence": 2,
@@ -82,6 +100,62 @@ EXPECTED_SEVERITY: dict[str, int] = {
     "finish.history": 0,
     "finish.no_history": 2,
     "finish.void": 2,
+}
+
+# Where each finding is counted, which is a different question from where it
+# is spoken. A finding on the label may be a hygiene defect, and a finding on
+# the finish may be an authorship one.
+EXPECTED_DIMENSION: dict[str, str] = {
+    "label.identity": "body",
+    "label.monoculture": "structure",
+    "label.polyglot": "structure",
+    "label.os_cruft": "hygiene",
+    "label.large_binary": "hygiene",
+    "label.vendored": "hygiene",
+    "label.secrets": "hygiene",
+    "vintage.shallow": "history",
+    "vintage.aged": "history",
+    "vintage.recent": "history",
+    "vintage.no_history": "history",
+    "vintage.empty": "history",
+    "vintage.declared": "history",
+    "nose.documented": "documentation",
+    "nose.exhaustive_readme": "documentation",
+    "nose.debug_prints": "hygiene",
+    "nose.thin_readme": "documentation",
+    "nose.no_license": "documentation",
+    "nose.no_readme": "documentation",
+    "nose.no_tests": "testing",
+    "nose.no_gitignore": "hygiene",
+    "palate.sampled": "body",
+    "palate.body": "body",
+    "palate.full_bodied": "body",
+    "palate.thin": "body",
+    "palate.flat": "body",
+    "palate.deep_nesting": "body",
+    "palate.long_function": "body",
+    "palate.abyssal": "body",
+    "palate.cry_for_help": "body",
+    "palate.empty": "body",
+    "structure.undeclared": "structure",
+    "structure.declared": "structure",
+    "structure.austere": "structure",
+    "structure.tannic": "structure",
+    "structure.drift": "structure",
+    "structure.no_lockfile": "structure",
+    "structure.opaque": "structure",
+    "abandonment.suspiciously_clean": "markers",
+    "abandonment.notes": "markers",
+    "abandonment.aggressive": "markers",
+    "finish.single_estate": "authorship",
+    "finish.crowded": "authorship",
+    "finish.abrupt": "history",
+    "finish.fix_ratio": "history",
+    "finish.the_silence": "history",
+    "finish.dormant": "history",
+    "finish.history": "history",
+    "finish.no_history": "history",
+    "finish.void": "history",
 }
 
 ABANDONMENT_BAND = (
@@ -441,6 +515,20 @@ def repo_with_dependencies(ecosystem: str, declared: int) -> RepoMetrics:
         ecosystems=(ecosystem,),
     )
     return replace(BASE_METRICS, structure=structure)
+
+
+def repo_with_austerity(declared: int, source_files: int) -> RepoMetrics:
+    """A manifest that declares almost nothing, over a stated number of files."""
+    manifest = replace(BASE_MANIFEST, declared_count=declared, locked_count=declared)
+    return replace(
+        repo_with_palate(source_file_count=source_files),
+        structure=StructureMetrics(
+            manifests=(manifest,),
+            total_declared=declared,
+            undeclared=False,
+            ecosystems=("python",),
+        ),
+    )
 
 
 def repo_with_languages(*shares: float) -> RepoMetrics:
@@ -929,6 +1017,49 @@ class PalateBandTests(BandTestCase):
             note="repository with no source files",
         )
 
+    def test_thin_body_band(self) -> None:
+        """The deficient end of the file size axis, against full bodied."""
+        cases: tuple[tuple[int, float, str | None], ...] = (
+            (24, 19.0, None),
+            (25, 20.0, None),
+            (25, 19.9, "palate.thin"),
+            (400, 4.0, "palate.thin"),
+        )
+        for files, average, expected in cases:
+            with self.subTest(source_files=files, average_lines=average):
+                self.assert_band(
+                    repo_with_palate(source_file_count=files, average_lines=average),
+                    family=("palate.thin",),
+                    expected=expected,
+                    note=f"{files} files averaging {average} lines",
+                )
+
+    def test_flat_band(self) -> None:
+        """The deficient end of the nesting axis, against deep and abyssal."""
+        cases: tuple[tuple[int, int, str | None], ...] = (
+            (24, 0, None),
+            (25, 1, None),
+            (25, 0, "palate.flat"),
+            (309, 0, "palate.flat"),
+        )
+        for files, depth, expected in cases:
+            with self.subTest(source_files=files, max_indent_depth=depth):
+                self.assert_band(
+                    repo_with_palate(source_file_count=files, max_indent_depth=depth),
+                    family=("palate.flat",),
+                    expected=expected,
+                    note=f"{files} files nesting to depth {depth}",
+                )
+
+    def test_flat_and_deep_are_the_same_axis(self) -> None:
+        """One nesting finding at a time, whichever end it falls off."""
+        keys = self.keys_for(
+            repo_with_palate(source_file_count=25, max_indent_depth=0)
+        )
+        self.assertIn("palate.flat", keys)
+        self.assertNotIn("palate.deep_nesting", keys)
+        self.assertNotIn("palate.abyssal", keys)
+
 
 class NoseBandTests(BandTestCase):
     def test_readme_absence_and_thinness(self) -> None:
@@ -996,6 +1127,28 @@ class NoseBandTests(BandTestCase):
             note="untested repository",
         )
 
+    def test_readme_length_is_banded_at_both_ends(self) -> None:
+        """Thin at one end, exhaustive at the other, documented in between."""
+        cases: tuple[tuple[int, str], ...] = (
+            (9, "nose.thin_readme"),
+            (10, "nose.documented"),
+            (299, "nose.documented"),
+            (300, "nose.exhaustive_readme"),
+            (790, "nose.exhaustive_readme"),
+        )
+        for lines, expected in cases:
+            with self.subTest(readme_lines=lines):
+                self.assert_band(
+                    repo_with_nose(readme_lines=lines, readme_bytes=lines * 40),
+                    family=(
+                        "nose.thin_readme",
+                        "nose.documented",
+                        "nose.exhaustive_readme",
+                    ),
+                    expected=expected,
+                    note=f"readme of {lines} lines",
+                )
+
     def test_debug_print_band(self) -> None:
         cases: tuple[tuple[int, str | None], ...] = (
             (0, None),
@@ -1033,6 +1186,32 @@ class StructureBandTests(BandTestCase):
                         expected=expected,
                         note=f"{ecosystem} with {declared} dependencies",
                     )
+
+    def test_austere_band(self) -> None:
+        """The deficient end of the dependency axis, against tannic and opaque.
+
+        Only asked of a repository large enough that declaring nothing is a
+        claim. A four file package with no dependencies has none to declare.
+        """
+        cases: tuple[tuple[int, int, str | None], ...] = (
+            (0, 49, None),
+            (1, 50, None),
+            (0, 50, "structure.austere"),
+            (0, 400, "structure.austere"),
+        )
+        for declared, files, expected in cases:
+            with self.subTest(declared=declared, source_files=files):
+                self.assert_band(
+                    repo_with_austerity(declared, files),
+                    family=("structure.austere",),
+                    expected=expected,
+                    note=f"{declared} declared across {files} files",
+                )
+
+    def test_austere_replaces_the_neutral_opener(self) -> None:
+        keys = self.keys_for(repo_with_austerity(0, 50))
+        self.assertIn("structure.austere", keys)
+        self.assertNotIn("structure.declared", keys)
 
     def test_undeclared_dependencies(self) -> None:
         self.assert_band(
@@ -1361,6 +1540,27 @@ class FinishBandTests(BandTestCase):
                     note=f"share {share} over {commits} commits",
                 )
 
+    def test_crowded_band(self) -> None:
+        """The excess end of the authorship axis, against single estate.
+
+        BASE_PALATE holds 4,000 lines, so the threshold of 100 authors per
+        thousand lines falls at 400 names in the log.
+        """
+        cases: tuple[tuple[int, str | None], ...] = (
+            (4, None),
+            (399, None),
+            (400, "finish.crowded"),
+            (1656, "finish.crowded"),
+        )
+        for authors, expected in cases:
+            with self.subTest(author_count=authors):
+                self.assert_band(
+                    repo_with_git(author_count=authors),
+                    family=("finish.crowded",),
+                    expected=expected,
+                    note=f"{authors} authors over 4,000 lines",
+                )
+
     def test_dormancy_band(self) -> None:
         cases: tuple[tuple[int, str | None], ...] = (
             (10, None),
@@ -1446,20 +1646,6 @@ class JudgementShapeTests(unittest.TestCase):
         courses = {finding.course for finding in judge(worst_metrics()).findings}
         self.assertEqual(set(COURSES), courses)
 
-    def test_score_is_always_within_the_band(self) -> None:
-        for name, metrics in spread():
-            with self.subTest(case=name):
-                judgement = judge(metrics)
-                self.assertGreaterEqual(judgement.score, 87)
-                self.assertLessEqual(judgement.score, 94)
-
-    def test_score_follows_the_contract_formula(self) -> None:
-        for name, metrics in spread():
-            with self.subTest(case=name):
-                judgement = judge(metrics)
-                expected = 94 - min(7, judgement.total_severity // 3)
-                self.assertEqual(expected, judgement.score)
-
     def test_total_severity_is_the_sum_of_findings(self) -> None:
         for name, metrics in spread():
             with self.subTest(case=name):
@@ -1467,11 +1653,12 @@ class JudgementShapeTests(unittest.TestCase):
                 total = sum(finding.severity for finding in judgement.findings)
                 self.assertEqual(total, judgement.total_severity)
 
-    def test_spotless_scores_at_the_ceiling(self) -> None:
-        self.assertEqual(94, judge(BASE_METRICS).score)
-
-    def test_catastrophic_scores_at_the_floor(self) -> None:
-        self.assertEqual(87, judge(worst_metrics()).score)
+    def test_every_key_is_counted_on_a_declared_dimension(self) -> None:
+        self.assertEqual(set(EXPECTED_DIMENSION), set(ALL_KEYS))
+        for key, dimension in EXPECTED_DIMENSION.items():
+            with self.subTest(key=key):
+                self.assertIn(dimension, DIMENSIONS)
+                self.assertEqual(dimension, KEY_DIMENSIONS[key])
 
     def test_findings_are_sorted(self) -> None:
         for name, metrics in spread():
@@ -1525,8 +1712,42 @@ class JudgementShapeTests(unittest.TestCase):
 
     def test_judgement_survives_a_bare_directory(self) -> None:
         judgement = judge(empty_metrics())
-        self.assertGreaterEqual(judgement.score, 87)
+        self.assertIsNone(judgement.score)
+        self.assertEqual("no_source_files", judgement.refusal)
         self.assertTrue(judgement.findings)
+
+    def test_every_refusal_code_declares_its_facts(self) -> None:
+        self.assertEqual(set(REFUSALS), set(REFUSAL_FACTS))
+        for code in REFUSALS:
+            with self.subTest(code=code):
+                self.assertTrue(REFUSAL_FACTS[code], f"{code} declares no facts")
+
+    def test_refusal_facts_are_complete_when_a_refusal_fires(self) -> None:
+        judgement = judge(empty_metrics())
+        assert judgement.refusal is not None
+        for fact in REFUSAL_FACTS[judgement.refusal]:
+            self.assertIn(fact, judgement.refusal_facts)
+
+    def test_gate_names_are_the_declared_ones(self) -> None:
+        for name, metrics in spread():
+            with self.subTest(case=name):
+                judgement = judge(metrics)
+                self.assertEqual(
+                    BASE_GATES, tuple(gate.name for gate in judgement.gates)
+                )
+                self.assertEqual(
+                    CARE_GATES, tuple(gate.name for gate in judgement.care_gates)
+                )
+
+    def test_bands_table_is_contiguous_and_ordered(self) -> None:
+        bands = BANDS["score_bands"]
+        assert isinstance(bands, tuple)
+        # Listed from the top down, and every band abuts the next.
+        edges = [(entry[1], entry[2]) for entry in bands]
+        for low, high in edges:
+            self.assertLessEqual(low, high)
+        for (upper_low, _), (_, lower_high) in zip(edges, edges[1:]):
+            self.assertEqual(upper_low - 1, lower_high, "the bands leave a gap")
 
 
 if __name__ == "__main__":
