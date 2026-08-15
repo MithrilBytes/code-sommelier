@@ -19,6 +19,9 @@ from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from string import Formatter
 from types import ModuleType
+from unittest import mock
+
+from tests import fixtures
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_DIR = REPO_ROOT / "sommelier"
@@ -504,6 +507,114 @@ class VersionFloorTests(unittest.TestCase):
             "the declared minimum Python is not in the CI matrix, so it is "
             "never actually executed",
         )
+
+
+# Network-capable and model-serving roots. The package importing any of these
+# would be the first step toward a runtime that phones somewhere.
+NETWORK_ROOTS = frozenset(
+    {
+        "socket", "ssl", "urllib", "http", "ftplib", "smtplib", "poplib",
+        "imaplib", "telnetlib", "xmlrpc", "asyncio", "webbrowser", "requests",
+        "httpx", "aiohttp", "urllib3",
+    }
+)
+MODEL_ROOTS = frozenset(
+    {
+        "anthropic", "openai", "cohere", "mistralai", "ollama", "replicate",
+        "groq", "transformers", "torch", "langchain", "llama_cpp", "tiktoken",
+        "huggingface_hub", "google",
+    }
+)
+
+
+class NoIntelligenceTests(unittest.TestCase):
+    """No AI at runtime, and nothing that could reach one.
+
+    The package already may not import anything outside the standard library,
+    but the standard library can open a socket perfectly well. These pin the
+    stronger claim: the shipped tool cannot phone anywhere, and the only
+    binary it is able to execute is git.
+    """
+
+    def _import_roots(self) -> set[str]:
+        roots: set[str] = set()
+        for path in sorted(PACKAGE_DIR.rglob("*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    roots.update(a.name.split(".")[0] for a in node.names)
+                elif isinstance(node, ast.ImportFrom) and not node.level:
+                    roots.add((node.module or "").split(".")[0])
+        return roots
+
+    def test_the_package_imports_nothing_that_can_reach_a_network(self) -> None:
+        found = sorted(self._import_roots() & NETWORK_ROOTS)
+        self.assertEqual([], found, f"network-capable imports: {found}")
+
+    def test_the_package_imports_no_model_library(self) -> None:
+        found = sorted(self._import_roots() & MODEL_ROOTS)
+        self.assertEqual([], found, f"model libraries: {found}")
+
+    def test_the_only_binary_it_can_execute_is_git(self) -> None:
+        spawn = {
+            "run", "Popen", "call", "check_output", "check_call", "system",
+            "popen", "execv", "execve", "spawnv",
+        }
+        offences: list[str] = []
+        for path in sorted(PACKAGE_DIR.rglob("*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call):
+                    continue
+                name = getattr(node.func, "attr", None) or getattr(
+                    node.func, "id", None
+                )
+                if name not in spawn:
+                    continue
+                where = f"{relative(path)}:{node.lineno}"
+                for keyword in node.keywords:
+                    if keyword.arg == "shell":
+                        offences.append(f"{where} passes shell=")
+                if not node.args:
+                    offences.append(f"{where} spawns with no literal argv")
+                    continue
+                argv = node.args[0]
+                if not isinstance(argv, (ast.List, ast.Tuple)) or not argv.elts:
+                    offences.append(f"{where} argv is not a literal sequence")
+                    continue
+                first = argv.elts[0]
+                if not (isinstance(first, ast.Constant) and first.value == "git"):
+                    offences.append(f"{where} argv[0] is not the literal 'git'")
+        self.assertEqual([], offences, "\n".join(offences))
+
+    def test_a_full_tasting_completes_with_every_socket_severed(self) -> None:
+        """The claim, proved by removing the capability rather than auditing it."""
+        import socket
+
+        from sommelier.collect import collect
+        from sommelier.judge import judge
+        from sommelier.render import render_card, render_json, render_sober
+        from sommelier.voice import pour
+
+        def severed(*args: object, **kwargs: object) -> None:
+            raise AssertionError("the tool attempted a network call")
+
+        with (
+            mock.patch.object(socket, "socket", severed),
+            mock.patch.object(socket, "create_connection", severed),
+            mock.patch.object(socket, "getaddrinfo", severed),
+        ):
+            with fixtures.Fixture("severed") as fixture:
+                fixtures.write_tree(
+                    fixture.path,
+                    {"a.py": "def f():\n    return 1\n", "README.md": "# severed\n"},
+                )
+                metrics = collect(fixture.path)
+                judgement = judge(metrics)
+                card = render_card(pour(metrics, judgement))
+                render_json(metrics, judgement)
+                render_sober(metrics, judgement)
+        self.assertTrue(card.splitlines())
 
 
 if __name__ == "__main__":
