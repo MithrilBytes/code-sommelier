@@ -1,0 +1,143 @@
+{
+  "abandonment": {
+    "commented_out_code_lines": 3,
+    "debug_print_count": 3,
+    "fixme": 1,
+    "hack": 0,
+    "per_kloc": 1.3573,
+    "todo": 11,
+    "total": 12,
+    "worst_file_count": 6,
+    "worst_file_path": "tests/tests.rs",
+    "xxx": 0
+  },
+  "dropped": [],
+  "git": {
+    "author_count": 242,
+    "commit_count": 2005,
+    "days_since_last_commit": 3,
+    "first_commit_date": "2017-05-09",
+    "first_commit_year": 2017,
+    "fix_commit_count": 217,
+    "fix_ratio": 0.1082,
+    "has_commits": true,
+    "is_repo": true,
+    "last_commit_date": "2026-08-09",
+    "last_commit_subject": "Merge pull request #2091 from sharkdp/dependabot/github_actions/actions/attest-4.2.1",
+    "last_commit_year": 2026,
+    "longest_gap_days": 88,
+    "longest_gap_end": "2019-09-13",
+    "longest_gap_start": "2019-06-17",
+    "shallow": false,
+    "top_author_commits": 510,
+    "top_author_name": "Thayne McCombs",
+    "top_author_share": 0.2544
+  },
+  "is_empty": false,
+  "is_git_repo": true,
+  "name": "sharkdp_fd",
+  "nose": {
+    "gitignore_path": ".gitignore",
+    "gitignore_rules": 3,
+    "has_ci": true,
+    "has_contributing": true,
+    "has_tests": true,
+    "license_name": "Apache-2.0",
+    "license_path": "LICENSE-APACHE",
+    "readme_bytes": 28132,
+    "readme_lines": 790,
+    "readme_path": "README.md"
+  },
+  "palate": {
+    "average_lines": 276.2812,
+    "inventory": "git",
+    "largest_file_lines": 2528,
+    "largest_file_path": "tests/tests.rs",
+    "longest_function_lines": 172,
+    "longest_function_name": "spawn_senders",
+    "longest_function_path": "src/walk.rs",
+    "max_indent_depth": 7,
+    "max_indent_path": "src/exec/mod.rs",
+    "sampled": false,
+    "scanned_file_count": 32,
+    "source_file_count": 32,
+    "total_file_count": 59,
+    "total_lines": 8841
+  },
+  "path": "<CACHE>",
+  "sediment": {
+    "items": [
+      {
+        "detail": "1 file",
+        "file_count": 1,
+        "kind": "vendored",
+        "path": ".cargo",
+        "size_bytes": 326
+      }
+    ],
+    "large_binary_count": 0,
+    "largest_binary_bytes": 0,
+    "largest_binary_path": null,
+    "os_cruft_count": 0,
+    "secret_file_count": 0,
+    "vendored_dir_count": 1,
+    "vendored_file_count": 1
+  },
+  "structure": {
+    "ecosystems": [
+      "rust"
+    ],
+    "manifests": [
+      {
+        "declared_count": 20,
+        "dev_count": 4,
+        "drift": true,
+        "drift_reason": "lockfile is older than manifest",
+        "ecosystem": "rust",
+        "locked_count": 130,
+        "lockfile_path": "Cargo.lock",
+        "manifest_path": "Cargo.toml"
+      }
+    ],
+    "total_declared": 20,
+    "undeclared": false
+  },
+  "terroir": {
+    "frameworks": [
+      "clap"
+    ],
+    "languages": [
+      {
+        "file_count": 24,
+        "line_count": 7931,
+        "name": "Rust",
+        "share": 0.7742
+      },
+      {
+        "file_count": 4,
+        "line_count": 229,
+        "name": "Shell",
+        "share": 0.129
+      },
+      {
+        "file_count": 1,
+        "line_count": 41,
+        "name": "Awk",
+        "share": 0.0323
+      },
+      {
+        "file_count": 1,
+        "line_count": 1,
+        "name": "Fish",
+        "share": 0.0323
+      },
+      {
+        "file_count": 1,
+        "line_count": 52,
+        "name": "Makefile",
+        "share": 0.0323
+      }
+    ],
+    "primary_language": "Rust"
+  }
+}

@@ -50,7 +50,8 @@ class CorpusSnapshotTest(unittest.TestCase):
         for entry in corpus.load_manifest():
             with self.subTest(entry.slug):
                 self.assertTrue(
-                    corpus.snapshot_path(entry).exists(),
+                    corpus.snapshot_path(entry).exists()
+                    and corpus.judgement_path(entry).exists(),
                     f"no snapshot for {entry.slug}; run "
                     f"`python3 -m tests.corpus --sync --snapshot`",
                 )
@@ -71,15 +72,21 @@ class CorpusSnapshotTest(unittest.TestCase):
                     f"{entry.slug} is checked out at the wrong commit; "
                     f"run `python3 -m tests.corpus --sync`",
                 )
-                expected: dict[str, Any] = json.loads(
-                    corpus.snapshot_path(entry).read_text(encoding="utf-8")
-                )
+                expected: dict[str, Any] = corpus.read_snapshot(entry)
                 actual = corpus.measure(entry)
+                # Compared half by half, so the failure names which layer moved.
                 self.assertEqual(
-                    actual,
-                    expected,
-                    f"{entry.slug} measures differently than its snapshot. Read the "
-                    f"diff; if the change is intended, rerun "
+                    actual["metrics"],
+                    expected["metrics"],
+                    f"{entry.slug} MEASURES differently than its snapshot. This is "
+                    f"a collect layer change. Read the diff; if intended, rerun "
+                    f"`python3 -m tests.corpus --snapshot`.",
+                )
+                self.assertEqual(
+                    actual["judgement"],
+                    expected["judgement"],
+                    f"{entry.slug} is JUDGED differently than its snapshot, on "
+                    f"identical measurements. Read the diff; if intended, rerun "
                     f"`python3 -m tests.corpus --snapshot`.",
                 )
 

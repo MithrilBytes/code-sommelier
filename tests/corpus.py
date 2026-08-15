@@ -121,14 +121,42 @@ def measure(entry: Entry) -> dict[str, Any]:
 
 
 def snapshot_path(entry: Entry) -> Path:
-    return SNAPSHOT_DIR / f"{entry.slug}.json"
+    """The measurement half. Kept separate from the judgement on purpose.
+
+    Everything above collect is being rewritten: the score, the content plan,
+    the grammar. Those phases move every judgement in the corpus at once. If
+    the two halves shared a file, a measurement regression riding along in a
+    1,300 line judgement diff would be invisible. Split, the metrics file not
+    moving is itself the evidence that collect was untouched.
+    """
+    return SNAPSHOT_DIR / f"{entry.slug}.metrics.json"
+
+
+def judgement_path(entry: Entry) -> Path:
+    return SNAPSHOT_DIR / f"{entry.slug}.judgement.json"
+
+
+def _dump(path: Path, payload: Any) -> None:
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def write_snapshot(entry: Entry, payload: dict[str, Any]) -> None:
     SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
-    snapshot_path(entry).write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    _dump(snapshot_path(entry), payload["metrics"])
+    _dump(judgement_path(entry), payload["judgement"])
+    legacy = SNAPSHOT_DIR / f"{entry.slug}.json"
+    if legacy.exists():
+        legacy.unlink()
+
+
+def read_snapshot(entry: Entry) -> dict[str, Any]:
+    """The two halves recombined into the shape measure() returns."""
+    return {
+        "metrics": json.loads(snapshot_path(entry).read_text(encoding="utf-8")),
+        "judgement": json.loads(judgement_path(entry).read_text(encoding="utf-8")),
+    }
 
 
 # --- command line ----------------------------------------------------

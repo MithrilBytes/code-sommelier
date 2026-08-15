@@ -1,0 +1,101 @@
+{
+  "findings": [
+    {
+      "course": "label",
+      "facts": {
+        "file_count": "70",
+        "language": "Shell",
+        "name": "rbenv_rbenv",
+        "source_file_count": "30",
+        "total_lines": "2,219"
+      },
+      "key": "label.identity",
+      "severity": 0
+    },
+    {
+      "course": "vintage",
+      "facts": {
+        "commit_count": "855",
+        "commits_phrase": "855 commits",
+        "first_date": "2011-08-01",
+        "first_year": "2011",
+        "years": "15"
+      },
+      "key": "vintage.aged",
+      "severity": 0
+    },
+    {
+      "course": "vintage",
+      "facts": {
+        "commit_count": "855",
+        "commits_phrase": "855 commits",
+        "first_date": "2011-08-01",
+        "first_year": "2011",
+        "last_date": "2026-07-14",
+        "last_year": "2026",
+        "years": "15.0"
+      },
+      "key": "vintage.declared",
+      "severity": 0
+    },
+    {
+      "course": "nose",
+      "facts": {
+        "debug_prints": "0",
+        "source_files": "30",
+        "total_lines": "2,219"
+      },
+      "key": "abandonment.suspiciously_clean",
+      "severity": 0
+    },
+    {
+      "course": "nose",
+      "facts": {
+        "license_name": "MIT",
+        "readme_lines": "360",
+        "readme_path": "README.md"
+      },
+      "key": "nose.documented",
+      "severity": 0
+    },
+    {
+      "course": "palate",
+      "facts": {
+        "average_lines": "74.0",
+        "depth": "5",
+        "largest_lines": "164",
+        "largest_path": "test/init.bats",
+        "source_files": "30"
+      },
+      "key": "palate.body",
+      "severity": 0
+    },
+    {
+      "course": "structure",
+      "facts": {
+        "name": "rbenv_rbenv",
+        "source_files": "30"
+      },
+      "key": "structure.undeclared",
+      "severity": 1
+    },
+    {
+      "course": "finish",
+      "facts": {
+        "author_count": "133",
+        "authors_phrase": "133 authors",
+        "commit_count": "855",
+        "commits_phrase": "855 commits",
+        "fix_commits": "98",
+        "fix_percent": "11",
+        "fixes_phrase": "98 commits",
+        "last_date": "2026-07-14",
+        "subject": "Merge pull request #1654 from rbenv/dependabot/github_actions/mislav/bump-homebrew-formula-action-4.2"
+      },
+      "key": "finish.history",
+      "severity": 0
+    }
+  ],
+  "score": 94,
+  "total_severity": 1
+}

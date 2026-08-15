@@ -1,0 +1,89 @@
+{
+  "abandonment": {
+    "commented_out_code_lines": 3,
+    "debug_print_count": 0,
+    "fixme": 0,
+    "hack": 0,
+    "per_kloc": 0.565,
+    "todo": 5,
+    "total": 5,
+    "worst_file_count": 2,
+    "worst_file_path": "Rails.gitignore",
+    "xxx": 0
+  },
+  "dropped": [],
+  "git": {
+    "author_count": 1656,
+    "commit_count": 4217,
+    "days_since_last_commit": 20,
+    "first_commit_date": "2010-11-08",
+    "first_commit_year": 2010,
+    "fix_commit_count": 147,
+    "fix_ratio": 0.0349,
+    "has_commits": true,
+    "is_repo": true,
+    "last_commit_date": "2026-07-23",
+    "last_commit_subject": "Merge pull request #4873 from lissy93-forks/updates-laravel-phpcache-dir",
+    "last_commit_year": 2026,
+    "longest_gap_days": 49,
+    "longest_gap_end": "2020-08-30",
+    "longest_gap_start": "2020-07-12",
+    "shallow": false,
+    "top_author_commits": 665,
+    "top_author_name": "Brendan Forster",
+    "top_author_share": 0.1577
+  },
+  "is_empty": false,
+  "is_git_repo": true,
+  "name": "github_gitignore",
+  "nose": {
+    "gitignore_path": null,
+    "gitignore_rules": 0,
+    "has_ci": true,
+    "has_contributing": true,
+    "has_tests": true,
+    "license_name": "CC0-1.0",
+    "license_path": "LICENSE",
+    "readme_bytes": 5624,
+    "readme_lines": 133,
+    "readme_path": "README.md"
+  },
+  "palate": {
+    "average_lines": 28.6408,
+    "inventory": "git",
+    "largest_file_lines": 705,
+    "largest_file_path": "Joomla.gitignore",
+    "longest_function_lines": 0,
+    "longest_function_name": null,
+    "longest_function_path": null,
+    "max_indent_depth": 0,
+    "max_indent_path": null,
+    "sampled": false,
+    "scanned_file_count": 309,
+    "source_file_count": 309,
+    "total_file_count": 316,
+    "total_lines": 8850
+  },
+  "path": "<CACHE>",
+  "sediment": {
+    "items": [],
+    "large_binary_count": 0,
+    "largest_binary_bytes": 0,
+    "largest_binary_path": null,
+    "os_cruft_count": 0,
+    "secret_file_count": 0,
+    "vendored_dir_count": 0,
+    "vendored_file_count": 0
+  },
+  "structure": {
+    "ecosystems": [],
+    "manifests": [],
+    "total_declared": 0,
+    "undeclared": true
+  },
+  "terroir": {
+    "frameworks": [],
+    "languages": [],
+    "primary_language": null
+  }
+}

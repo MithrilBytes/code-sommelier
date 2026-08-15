@@ -1,0 +1,102 @@
+{
+  "abandonment": {
+    "commented_out_code_lines": 0,
+    "debug_print_count": 0,
+    "fixme": 0,
+    "hack": 0,
+    "per_kloc": 0.0,
+    "todo": 0,
+    "total": 0,
+    "worst_file_count": 0,
+    "worst_file_path": null,
+    "xxx": 0
+  },
+  "dropped": [],
+  "git": {
+    "author_count": 8,
+    "commit_count": 20,
+    "days_since_last_commit": 585,
+    "first_commit_date": "2016-07-10",
+    "first_commit_year": 2016,
+    "fix_commit_count": 5,
+    "fix_ratio": 0.25,
+    "has_commits": true,
+    "is_repo": true,
+    "last_commit_date": "2025-01-04",
+    "last_commit_subject": "Fix function declaration missing void.",
+    "last_commit_year": 2025,
+    "longest_gap_days": 1644,
+    "longest_gap_end": "2025-01-04",
+    "longest_gap_start": "2020-07-05",
+    "shallow": false,
+    "top_author_commits": 10,
+    "top_author_name": "antirez",
+    "top_author_share": 0.5
+  },
+  "is_empty": false,
+  "is_git_repo": true,
+  "name": "antirez_kilo",
+  "nose": {
+    "gitignore_path": ".gitignore",
+    "gitignore_rules": 1,
+    "has_ci": false,
+    "has_contributing": false,
+    "has_tests": false,
+    "license_name": "BSD-2-Clause",
+    "license_path": "LICENSE",
+    "readme_bytes": 828,
+    "readme_lines": 26,
+    "readme_path": "README.md"
+  },
+  "palate": {
+    "average_lines": 657.5,
+    "inventory": "git",
+    "largest_file_lines": 1308,
+    "largest_file_path": "kilo.c",
+    "longest_function_lines": 943,
+    "longest_function_name": "is_separator",
+    "longest_function_path": "kilo.c",
+    "max_indent_depth": 6,
+    "max_indent_path": "kilo.c",
+    "sampled": false,
+    "scanned_file_count": 2,
+    "source_file_count": 2,
+    "total_file_count": 6,
+    "total_lines": 1315
+  },
+  "path": "<CACHE>",
+  "sediment": {
+    "items": [],
+    "large_binary_count": 0,
+    "largest_binary_bytes": 0,
+    "largest_binary_path": null,
+    "os_cruft_count": 0,
+    "secret_file_count": 0,
+    "vendored_dir_count": 0,
+    "vendored_file_count": 0
+  },
+  "structure": {
+    "ecosystems": [],
+    "manifests": [],
+    "total_declared": 0,
+    "undeclared": true
+  },
+  "terroir": {
+    "frameworks": [],
+    "languages": [
+      {
+        "file_count": 1,
+        "line_count": 1308,
+        "name": "C",
+        "share": 0.5
+      },
+      {
+        "file_count": 1,
+        "line_count": 7,
+        "name": "Makefile",
+        "share": 0.5
+      }
+    ],
+    "primary_language": "C"
+  }
+}

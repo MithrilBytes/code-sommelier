@@ -1,0 +1,120 @@
+{
+  "findings": [
+    {
+      "course": "label",
+      "facts": {
+        "path": ".npmrc",
+        "secret_files": "1"
+      },
+      "key": "label.secrets",
+      "severity": 3
+    },
+    {
+      "course": "label",
+      "facts": {
+        "file_count": "13",
+        "language": "JavaScript",
+        "name": "sindresorhus_slugify",
+        "source_file_count": "4",
+        "total_lines": "689"
+      },
+      "key": "label.identity",
+      "severity": 0
+    },
+    {
+      "course": "vintage",
+      "facts": {
+        "commit_count": "71",
+        "commits_phrase": "71 commits",
+        "first_date": "2018-04-18",
+        "first_year": "2018",
+        "years": "8"
+      },
+      "key": "vintage.aged",
+      "severity": 0
+    },
+    {
+      "course": "vintage",
+      "facts": {
+        "commit_count": "71",
+        "commits_phrase": "71 commits",
+        "first_date": "2018-04-18",
+        "first_year": "2018",
+        "last_date": "2025-09-11",
+        "last_year": "2025",
+        "years": "7.4"
+      },
+      "key": "vintage.declared",
+      "severity": 0
+    },
+    {
+      "course": "nose",
+      "facts": {
+        "source_files": "4",
+        "total_lines": "689"
+      },
+      "key": "nose.no_tests",
+      "severity": 2
+    },
+    {
+      "course": "nose",
+      "facts": {
+        "debug_prints": "0",
+        "source_files": "4",
+        "total_lines": "689"
+      },
+      "key": "abandonment.suspiciously_clean",
+      "severity": 0
+    },
+    {
+      "course": "palate",
+      "facts": {
+        "average_lines": "172.2",
+        "depth": "4",
+        "largest_lines": "286",
+        "largest_path": "index.d.ts",
+        "source_files": "4"
+      },
+      "key": "palate.body",
+      "severity": 0
+    },
+    {
+      "course": "structure",
+      "facts": {
+        "declared": "2",
+        "ecosystem": "javascript",
+        "manifest_path": "package.json"
+      },
+      "key": "structure.no_lockfile",
+      "severity": 2
+    },
+    {
+      "course": "finish",
+      "facts": {
+        "gap_days": "848",
+        "gap_end": "2025-09-11",
+        "gap_start": "2023-05-17"
+      },
+      "key": "finish.the_silence",
+      "severity": 2
+    },
+    {
+      "course": "finish",
+      "facts": {
+        "author_count": "19",
+        "authors_phrase": "19 authors",
+        "commit_count": "71",
+        "commits_phrase": "71 commits",
+        "fix_commits": "4",
+        "fix_percent": "6",
+        "fixes_phrase": "4 commits",
+        "last_date": "2025-09-11",
+        "subject": "3.0.0"
+      },
+      "key": "finish.history",
+      "severity": 0
+    }
+  ],
+  "score": 91,
+  "total_severity": 9
+}

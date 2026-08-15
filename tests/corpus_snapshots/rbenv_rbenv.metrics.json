@@ -1,0 +1,108 @@
+{
+  "abandonment": {
+    "commented_out_code_lines": 61,
+    "debug_print_count": 0,
+    "fixme": 0,
+    "hack": 0,
+    "per_kloc": 0.0,
+    "todo": 0,
+    "total": 0,
+    "worst_file_count": 0,
+    "worst_file_path": null,
+    "xxx": 0
+  },
+  "dropped": [],
+  "git": {
+    "author_count": 133,
+    "commit_count": 855,
+    "days_since_last_commit": 29,
+    "first_commit_date": "2011-08-01",
+    "first_commit_year": 2011,
+    "fix_commit_count": 98,
+    "fix_ratio": 0.1146,
+    "has_commits": true,
+    "is_repo": true,
+    "last_commit_date": "2026-07-14",
+    "last_commit_subject": "Merge pull request #1654 from rbenv/dependabot/github_actions/mislav/bump-homebrew-formula-action-4.2",
+    "last_commit_year": 2026,
+    "longest_gap_days": 176,
+    "longest_gap_end": "2019-09-27",
+    "longest_gap_start": "2019-04-04",
+    "shallow": false,
+    "top_author_commits": 269,
+    "top_author_name": "Mislav Marohni\u0107",
+    "top_author_share": 0.3146
+  },
+  "is_empty": false,
+  "is_git_repo": true,
+  "name": "rbenv_rbenv",
+  "nose": {
+    "gitignore_path": ".gitignore",
+    "gitignore_rules": 10,
+    "has_ci": true,
+    "has_contributing": false,
+    "has_tests": true,
+    "license_name": "MIT",
+    "license_path": "LICENSE",
+    "readme_bytes": 13847,
+    "readme_lines": 360,
+    "readme_path": "README.md"
+  },
+  "palate": {
+    "average_lines": 73.9667,
+    "inventory": "git",
+    "largest_file_lines": 164,
+    "largest_file_path": "test/init.bats",
+    "longest_function_lines": 17,
+    "longest_function_name": "install",
+    "longest_function_path": "rbenv.d/exec/gem-rehash/rubygems_plugin.rb",
+    "max_indent_depth": 5,
+    "max_indent_path": "rbenv.d/exec/gem-rehash/rubygems_plugin.rb",
+    "sampled": false,
+    "scanned_file_count": 30,
+    "source_file_count": 30,
+    "total_file_count": 70,
+    "total_lines": 2219
+  },
+  "path": "<CACHE>",
+  "sediment": {
+    "items": [],
+    "large_binary_count": 0,
+    "largest_binary_bytes": 0,
+    "largest_binary_path": null,
+    "os_cruft_count": 0,
+    "secret_file_count": 0,
+    "vendored_dir_count": 0,
+    "vendored_file_count": 0
+  },
+  "structure": {
+    "ecosystems": [],
+    "manifests": [],
+    "total_declared": 0,
+    "undeclared": true
+  },
+  "terroir": {
+    "frameworks": [],
+    "languages": [
+      {
+        "file_count": 3,
+        "line_count": 148,
+        "name": "Shell",
+        "share": 0.5
+      },
+      {
+        "file_count": 2,
+        "line_count": 12,
+        "name": "Makefile",
+        "share": 0.3333
+      },
+      {
+        "file_count": 1,
+        "line_count": 45,
+        "name": "Ruby",
+        "share": 0.1667
+      }
+    ],
+    "primary_language": "Shell"
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "abandonment": {
+    "commented_out_code_lines": 17,
+    "debug_print_count": 32,
+    "fixme": 0,
+    "hack": 0,
+    "per_kloc": 1.2681,
+    "todo": 5,
+    "total": 5,
+    "worst_file_count": 4,
+    "worst_file_path": "slog-handler-guide/indenthandler1/indent_handler.go",
+    "xxx": 0
+  },
+  "dropped": [],
+  "git": {
+    "author_count": 22,
+    "commit_count": 76,
+    "days_since_last_commit": 331,
+    "first_commit_date": "2014-07-25",
+    "first_commit_year": 2014,
+    "fix_commit_count": 17,
+    "fix_ratio": 0.2237,
+    "has_commits": true,
+    "is_repo": true,
+    "last_commit_date": "2025-09-15",
+    "last_commit_subject": "internal/cmd/weave: print two levels of headings in TOC",
+    "last_commit_year": 2025,
+    "longest_gap_days": 1227,
+    "longest_gap_end": "2021-01-12",
+    "longest_gap_start": "2017-09-03",
+    "shallow": false,
+    "top_author_commits": 22,
+    "top_author_name": "Jonathan Amsterdam",
+    "top_author_share": 0.2895
+  },
+  "is_empty": false,
+  "is_git_repo": true,
+  "name": "golang_example",
+  "nose": {
+    "gitignore_path": null,
+    "gitignore_rules": 0,
+    "has_ci": false,
+    "has_contributing": false,
+    "has_tests": true,
+    "license_name": "BSD-3-Clause",
+    "license_path": "LICENSE",
+    "readme_bytes": 3214,
+    "readme_lines": 100,
+    "readme_path": "README.md"
+  },
+  "palate": {
+    "average_lines": 71.6909,
+    "inventory": "git",
+    "largest_file_lines": 283,
+    "largest_file_path": "internal/cmd/weave/weave.go",
+    "longest_function_lines": 154,
+    "longest_function_name": "main",
+    "longest_function_path": "internal/cmd/weave/weave.go",
+    "max_indent_depth": 5,
+    "max_indent_path": "internal/cmd/weave/weave.go",
+    "sampled": false,
+    "scanned_file_count": 55,
+    "source_file_count": 55,
+    "total_file_count": 71,
+    "total_lines": 3943
+  },
+  "path": "<CACHE>",
+  "sediment": {
+    "items": [],
+    "large_binary_count": 0,
+    "largest_binary_bytes": 0,
+    "largest_binary_path": null,
+    "os_cruft_count": 0,
+    "secret_file_count": 0,
+    "vendored_dir_count": 0,
+    "vendored_file_count": 0
+  },
+  "structure": {
+    "ecosystems": [
+      "go"
+    ],
+    "manifests": [
+      {
+        "declared_count": 2,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 6,
+        "lockfile_path": "go.sum",
+        "manifest_path": "go.mod"
+      },
+      {
+        "declared_count": 0,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 0,
+        "lockfile_path": null,
+        "manifest_path": "hello/go.mod"
+      },
+      {
+        "declared_count": 0,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 0,
+        "lockfile_path": null,
+        "manifest_path": "helloserver/go.mod"
+      },
+      {
+        "declared_count": 0,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 0,
+        "lockfile_path": null,
+        "manifest_path": "outyet/go.mod"
+      },
+      {
+        "declared_count": 1,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 272,
+        "lockfile_path": "ragserver/ragserver-genkit/go.sum",
+        "manifest_path": "ragserver/ragserver-genkit/go.mod"
+      },
+      {
+        "declared_count": 1,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 336,
+        "lockfile_path": "ragserver/ragserver-langchaingo/go.sum",
+        "manifest_path": "ragserver/ragserver-langchaingo/go.mod"
+      },
+      {
+        "declared_count": 4,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 261,
+        "lockfile_path": "ragserver/ragserver/go.sum",
+        "manifest_path": "ragserver/ragserver/go.mod"
+      }
+    ],
+    "total_declared": 8,
+    "undeclared": false
+  },
+  "terroir": {
+    "frameworks": [],
+    "languages": [
+      {
+        "file_count": 37,
+        "line_count": 3523,
+        "name": "Go",
+        "share": 0.8043
+      },
+      {
+        "file_count": 4,
+        "line_count": 67,
+        "name": "Shell",
+        "share": 0.087
+      },
+      {
+        "file_count": 2,
+        "line_count": 26,
+        "name": "Makefile",
+        "share": 0.0435
+      },
+      {
+        "file_count": 1,
+        "line_count": 9,
+        "name": "CSS",
+        "share": 0.0217
+      },
+      {
+        "file_count": 1,
+        "line_count": 24,
+        "name": "HTML",
+        "share": 0.0217
+      },
+      {
+        "file_count": 1,
+        "line_count": 14,
+        "name": "JavaScript",
+        "share": 0.0217
+      }
+    ],
+    "primary_language": "Go"
+  }
+}

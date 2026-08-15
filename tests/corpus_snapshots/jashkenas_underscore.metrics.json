@@ -1,0 +1,139 @@
+{
+  "abandonment": {
+    "commented_out_code_lines": 19,
+    "debug_print_count": 2,
+    "fixme": 0,
+    "hack": 0,
+    "per_kloc": 0.0,
+    "todo": 0,
+    "total": 0,
+    "worst_file_count": 0,
+    "worst_file_path": null,
+    "xxx": 0
+  },
+  "dropped": [],
+  "git": {
+    "author_count": 336,
+    "commit_count": 2892,
+    "days_since_last_commit": 0,
+    "first_commit_date": "2009-10-25",
+    "first_commit_year": 2009,
+    "fix_commit_count": 387,
+    "fix_ratio": 0.1338,
+    "has_commits": true,
+    "is_repo": true,
+    "last_commit_date": "2026-08-12",
+    "last_commit_subject": "Merge pull request #3022 from jgonggrijp/faster-isequal",
+    "last_commit_year": 2026,
+    "longest_gap_days": 342,
+    "longest_gap_end": "2026-01-28",
+    "longest_gap_start": "2025-02-20",
+    "shallow": false,
+    "top_author_commits": 923,
+    "top_author_name": "Jeremy Ashkenas",
+    "top_author_share": 0.3192
+  },
+  "is_empty": false,
+  "is_git_repo": true,
+  "name": "jashkenas_underscore",
+  "nose": {
+    "gitignore_path": ".gitignore",
+    "gitignore_rules": 11,
+    "has_ci": true,
+    "has_contributing": true,
+    "has_tests": true,
+    "license_name": "MIT",
+    "license_path": "LICENSE",
+    "readme_bytes": 1846,
+    "readme_lines": 34,
+    "readme_path": "README.md"
+  },
+  "palate": {
+    "average_lines": 475.1685,
+    "inventory": "git",
+    "largest_file_lines": 1966,
+    "largest_file_path": "underscore-esm.js",
+    "longest_function_lines": 1891,
+    "longest_function_name": "anonymous",
+    "longest_function_path": "underscore.js",
+    "max_indent_depth": 9,
+    "max_indent_path": "docs/linked-esm.jst",
+    "sampled": false,
+    "scanned_file_count": 356,
+    "source_file_count": 356,
+    "total_file_count": 400,
+    "total_lines": 169160
+  },
+  "path": "<CACHE>",
+  "sediment": {
+    "items": [
+      {
+        "detail": "2 files",
+        "file_count": 2,
+        "kind": "vendored",
+        "path": "test/vendor",
+        "size_bytes": 198842
+      }
+    ],
+    "large_binary_count": 0,
+    "largest_binary_bytes": 0,
+    "largest_binary_path": null,
+    "os_cruft_count": 0,
+    "secret_file_count": 0,
+    "vendored_dir_count": 1,
+    "vendored_file_count": 2
+  },
+  "structure": {
+    "ecosystems": [
+      "javascript"
+    ],
+    "manifests": [
+      {
+        "declared_count": 0,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "javascript",
+        "locked_count": 0,
+        "lockfile_path": null,
+        "manifest_path": "modules/package.json"
+      },
+      {
+        "declared_count": 0,
+        "dev_count": 17,
+        "drift": true,
+        "drift_reason": "lockfile is older than manifest",
+        "ecosystem": "javascript",
+        "locked_count": 2144,
+        "lockfile_path": "package-lock.json",
+        "manifest_path": "package.json"
+      }
+    ],
+    "total_declared": 0,
+    "undeclared": false
+  },
+  "terroir": {
+    "frameworks": [],
+    "languages": [
+      {
+        "file_count": 189,
+        "line_count": 15105,
+        "name": "JavaScript",
+        "share": 0.5324
+      },
+      {
+        "file_count": 164,
+        "line_count": 153054,
+        "name": "HTML",
+        "share": 0.462
+      },
+      {
+        "file_count": 2,
+        "line_count": 893,
+        "name": "CSS",
+        "share": 0.0056
+      }
+    ],
+    "primary_language": "JavaScript"
+  }
+}

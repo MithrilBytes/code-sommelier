@@ -1,0 +1,109 @@
+{
+  "abandonment": {
+    "commented_out_code_lines": 0,
+    "debug_print_count": 0,
+    "fixme": 0,
+    "hack": 0,
+    "per_kloc": 0.0,
+    "todo": 0,
+    "total": 0,
+    "worst_file_count": 0,
+    "worst_file_path": null,
+    "xxx": 0
+  },
+  "dropped": [],
+  "git": {
+    "author_count": 51,
+    "commit_count": 132,
+    "days_since_last_commit": 411,
+    "first_commit_date": "2013-11-06",
+    "first_commit_year": 2013,
+    "fix_commit_count": 17,
+    "fix_ratio": 0.1288,
+    "has_commits": true,
+    "is_repo": true,
+    "last_commit_date": "2025-06-27",
+    "last_commit_subject": "migrate to github actions",
+    "last_commit_year": 2025,
+    "longest_gap_days": 1975,
+    "longest_gap_end": "2025-06-27",
+    "longest_gap_start": "2020-01-30",
+    "shallow": false,
+    "top_author_commits": 34,
+    "top_author_name": "Kelsey Hightower",
+    "top_author_share": 0.2576
+  },
+  "is_empty": false,
+  "is_git_repo": true,
+  "name": "kelseyhightower_envconfig",
+  "nose": {
+    "gitignore_path": null,
+    "gitignore_rules": 0,
+    "has_ci": true,
+    "has_contributing": false,
+    "has_tests": true,
+    "license_name": "MIT",
+    "license_path": "LICENSE",
+    "readme_bytes": 5809,
+    "readme_lines": 229,
+    "readme_path": "README.md"
+  },
+  "palate": {
+    "average_lines": 184.2222,
+    "inventory": "git",
+    "largest_file_lines": 864,
+    "largest_file_path": "envconfig_test.go",
+    "longest_function_lines": 132,
+    "longest_function_name": "TestProcess",
+    "longest_function_path": "envconfig_test.go",
+    "max_indent_depth": 6,
+    "max_indent_path": "envconfig.go",
+    "sampled": false,
+    "scanned_file_count": 9,
+    "source_file_count": 9,
+    "total_file_count": 17,
+    "total_lines": 1658
+  },
+  "path": "<CACHE>",
+  "sediment": {
+    "items": [],
+    "large_binary_count": 0,
+    "largest_binary_bytes": 0,
+    "largest_binary_path": null,
+    "os_cruft_count": 0,
+    "secret_file_count": 0,
+    "vendored_dir_count": 0,
+    "vendored_file_count": 0
+  },
+  "structure": {
+    "ecosystems": [
+      "go"
+    ],
+    "manifests": [
+      {
+        "declared_count": 0,
+        "dev_count": 0,
+        "drift": false,
+        "drift_reason": null,
+        "ecosystem": "go",
+        "locked_count": 0,
+        "lockfile_path": null,
+        "manifest_path": "go.mod"
+      }
+    ],
+    "total_declared": 0,
+    "undeclared": false
+  },
+  "terroir": {
+    "frameworks": [],
+    "languages": [
+      {
+        "file_count": 8,
+        "line_count": 1655,
+        "name": "Go",
+        "share": 1.0
+      }
+    ],
+    "primary_language": "Go"
+  }
+}
