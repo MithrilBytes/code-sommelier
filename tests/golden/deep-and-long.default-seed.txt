@@ -1,25 +1,26 @@
-CODE SOMMELIER                                   tasting no. 94
+CODE SOMMELIER                                   tasting no. 58
 
-The label    nested-things. Python, 2 files, 218 lines. It exists, which is the
-             strongest thing that can be said for it so far. 100 percent
-             Python. There is no second opinion anywhere in this tree.
+The label    nested-things, written in Python, across 2 files. That is the last
+             neutral sentence in this tasting. 100 percent of this is Python,
+             across 2 files. Commitment, of a sort.
 Vintage      nested-things has no git directory. Not one of its 3 files has a
              date, an author, or a reason.
 Nose         nested-things has no .gitignore file. Every temporary thing among
              its 3 files is one careless git add away from being permanent. The
              sommelier has seen the consequences of this and would rather not
-             discuss them. There is no test suite. The 2 files here have never
-             been asked to prove anything. There is no licence. Anyone who
-             copies nested-things is guessing, and so is anyone who does not.
-Palate       Average length 109.0 lines across 2 files, with src/long.py at 205
-             and nesting down to depth 10. src/deep.py nests 10 levels deep.
-             Nothing at that depth has been understood by two people at the
-             same time. long_function is 201 lines long. It was one thing once,
-             in src/long.py, some years ago.
+             discuss them. No tests anywhere. Confidence in 218 lines is being
+             sustained by memory alone. No licence file. Legally, nested-things
+             belongs to nobody and may be used by nobody, which is a bold
+             distribution strategy.
+Palate       2 files averaging 109.0 lines. The largest, src/long.py, runs to
+             205. Nesting reaches depth 10. Nesting reaches depth 10 in
+             src/deep.py. That is not control flow, that is sediment. The
+             longest function, long_function in src/long.py, runs to 201 lines.
+             It does not do one thing.
 Structure    No manifest of any kind. Whatever these 2 files need, they need it
              in secret.
-Finish       There is no git history at all. nested-things has no finish,
-             because it has no beginning.
-Verdict      89 points, because wine scoring is compressed and the sommelier
-             respects tradition. The notes are not compressed.
-Pairing      Pairs with a fresh branch and lowered expectations.
+Finish       There is nothing in the log to read. nested-things and its 3 files
+             arrived fully formed and unexplained.
+Verdict      89 points. Everything scores between 87 and 94 points. The notes
+             are where the truth lives.
+Pairing      Pairs with silence, and a very slow read of the largest file.

@@ -1,21 +1,22 @@
-CODE SOMMELIER                                    tasting no. 6
+CODE SOMMELIER                                   tasting no. 42
 
-The label    unstarted. Python, 1 files, 5 lines. It exists, which is the
-             strongest thing that can be said for it so far. 100 percent of
-             this is Python, across 1 files. Commitment, of a sort.
-Vintage      A git repository containing no commits. unstarted has been
-             prepared for a history it has not begun, and 2 files are waiting.
-Nose         unstarted has no .gitignore file. Every temporary thing among its
-             2 files is one careless git add away from being permanent. The
-             sommelier has seen the consequences of this and would rather not
-             discuss them. There is no test suite. The 1 files here have never
-             been asked to prove anything. No LICENSE file anywhere. unstarted
-             is public and unusable at the same time.
+The label    unstarted, written in Python, across 1 files. That is the last
+             neutral sentence in this tasting. 100 percent Python. There is no
+             second opinion anywhere in this tree.
+Vintage      unstarted. Initialised, never committed, 2 files on disk. Somebody
+             meant to start.
+Nose         unstarted has no .gitignore of any kind, not even a copied one.
+             Everything it has ever produced by accident is a candidate for the
+             permanent record, and across 2 files the record has been keeping.
+             There is no test suite. The 1 files here have never been asked to
+             prove anything. There is no licence. Anyone who copies unstarted
+             is guessing, and so is anyone who does not.
 Palate       Average length 5.0 lines across 1 files, with main.py at 5 and
              nesting down to depth 1.
-Structure    No manifest of any kind. Whatever these 1 files need, they need it
-             in secret.
-Finish       Zero commits. The tasting of unstarted ends here, on the void,
-             which at least is clean.
-Verdict      90 points. The number is a formality. Read the notes again.
-Pairing      Pairs with silence, and a very slow read of the largest file.
+Structure    The dependencies are undeclared. 1 files in unstarted import
+             whatever was on the machine that day.
+Finish       unstarted has a repository and no commits. The finish is short,
+             because there is nothing to finish.
+Verdict      90 points. Everything scores between 87 and 94 points. The notes
+             are where the truth lives.
+Pairing      Pairs with a second opinion, which the sommelier does not offer.

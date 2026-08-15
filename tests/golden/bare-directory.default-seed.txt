@@ -1,21 +1,25 @@
-CODE SOMMELIER                                   tasting no. 15
+CODE SOMMELIER                                   tasting no. 96
 
-The label    loose-scripts. Python. 2 source files out of 3 on disk, and 10
-             lines between them. 100 percent Python. There is no second opinion
-             anywhere in this tree.
+The label    This is loose-scripts. It is Python. There are 2 source files, and
+             every one of them was somebody's idea. 100 percent of this is
+             Python, across 2 files. Commitment, of a sort.
 Vintage      There is no repository here. loose-scripts holds 3 files of
              entirely unknown provenance.
-Nose         loose-scripts has no .gitignore of any kind, not even a copied
-             one. Everything it has ever produced by accident is a candidate
-             for the permanent record, and across 3 files the record has been
-             keeping. No tests. 2 source files, 10 lines, all of them correct
-             by assertion. No LICENSE file anywhere. loose-scripts is public
-             and unusable at the same time.
+Nose         There is no .gitignore. The sommelier would like a moment. A
+             .gitignore is four lines of text. It takes ninety seconds to
+             write, it has taken ninety seconds to write for twenty years, and
+             its absence means every build artefact, every editor backup and
+             every local secret among the 3 files in loose-scripts has been
+             offered to the repository, and the repository has accepted. This
+             is the finding the sommelier will think about tonight. No tests
+             anywhere. Confidence in 10 lines is being sustained by memory
+             alone. No LICENSE file anywhere. loose-scripts is public and
+             unusable at the same time.
 Palate       2 files averaging 5.0 lines. The largest, helper.py, runs to 5.
              Nesting reaches depth 1.
-Structure    No manifest of any kind. Whatever these 2 files need, they need it
-             in secret.
-Finish       There is no git history at all. loose-scripts has no finish,
-             because it has no beginning.
-Verdict      90 points. The number is a formality. Read the notes again.
-Pairing      Decant into smaller files and revisit in a year.
+Structure    Undeclared. There is no manifest in loose-scripts, so there is no
+             answer to the question of what 2 files require in order to run.
+Finish       No history. The code claims to have always existed.
+Verdict      90 points, because wine scoring is compressed and the sommelier
+             respects tradition. The notes are not compressed.
+Pairing      Pairs with a fresh branch and lowered expectations.

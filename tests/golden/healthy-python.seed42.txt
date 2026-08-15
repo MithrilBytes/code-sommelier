@@ -1,23 +1,24 @@
-CODE SOMMELIER                                   tasting no. 82
+CODE SOMMELIER                                   tasting no. 19
 
-The label    cellar-book. Python. 4 source files out of 10 on disk, and 90
-             lines between them. 100 percent of this is Python, across 4 files.
-             Commitment, of a sort.
+The label    cellar-book, written in Python, across 4 files. That is the last
+             neutral sentence in this tasting. 100 percent Python. There is no
+             second opinion anywhere in this tree.
 Vintage      Laid down in 2021, last disturbed on 2022-01-20. 4 commits stand
-             between those two dates. 5 years in the cellar since 2021. Age is
-             not the same as improvement.
-Nose         A README of 13 lines and a MIT licence. Adequate. Not one TODO
-             across 90 lines. Either this is finished, or nobody has been
-             honest in writing.
-Palate       Average length 22.5 lines across 4 files, with src/cellar/core.py
-             at 63 and nesting down to depth 4.
-Structure    requirements.txt declares 6 dependencies and there is no lockfile.
-             Every install is a fresh guess.
+             between those two dates. First committed on 2021-03-01, 5 years
+             ago, and 4 commits have followed. Old, and not in the way that
+             adds value.
+Nose         The nose is clean. 13 lines of README, licensed MIT, and nothing
+             to complain about, which is itself suspicious. Not a single marker
+             of any kind across 90 lines. The sommelier does not believe it,
+             and cannot prove otherwise.
+Palate       Body: 4 files, 22.5 lines on average, peaking at 63 lines in
+             src/cellar/core.py.
+Structure    6 python dependencies, unlocked. Two people installing this on the
+             same day will not get the same project.
 Finish       Long finish: 4 commits ending 2022-01-20. The final word on the
              matter is Add a test for the pour helper. Dormant. 4.6 years since
              2022-01-20. The repository is not abandoned, it is resting, and it
              has been resting for 1,665 days. 311 days of silence, 2021-03-05
              to 2022-01-10. The longest thing in this history is the pause.
-Verdict      92 points. Everything scores between 87 and 94 points. The notes
-             are where the truth lives.
-Pairing      Pairs with silence, and a very slow read of the largest file.
+Verdict      92 points. The number is a formality. Read the notes again.
+Pairing      Pairs with a second opinion, which the sommelier does not offer.

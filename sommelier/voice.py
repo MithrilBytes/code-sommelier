@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import zlib
 from dataclasses import dataclass
-from random import Random
 
 from sommelier.collect import RepoMetrics
 from sommelier.judge import COURSES, Finding, Judgement
@@ -94,11 +93,25 @@ def _order(findings: tuple[Finding, ...]) -> tuple[Finding, ...]:
     )
 
 
-def _speak(finding: Finding, rng: Random) -> str | None:
+def _pick(base: int, site: str, count: int) -> int:
+    """Choose an index for one named draw site, independently of every other.
+
+    A single RNG stream makes every choice depend on how many choices came
+    before it, so removing one finding shifts the template of every finding
+    after it and the verdict as well. Measured on a real card, dropping one
+    Finish finding moved 9 of 24 lines. Keying each draw on a stable site name
+    means a diff shows the thing that changed and nothing else.
+    """
+    if count <= 1:
+        return 0
+    return zlib.crc32(site.encode("utf-8"), base) % count
+
+
+def _speak(finding: Finding, base: int) -> str | None:
     templates = CELLAR.get(finding.key)
     if not templates:
         return None
-    template = templates[rng.randrange(len(templates))]
+    template = templates[_pick(base, f"cellar:{finding.key}", len(templates))]
     try:
         return template.format(**finding.facts)
     except (KeyError, IndexError):
@@ -111,8 +124,8 @@ def _speak(finding: Finding, rng: Random) -> str | None:
 def pour(
     metrics: RepoMetrics, judgement: Judgement, *, seed: int | None = None
 ) -> TastingCard:
-    rng = Random(seed if seed is not None else stable_seed(metrics.name))
-    tasting_number = rng.randrange(1, 100)
+    base = seed if seed is not None else stable_seed(metrics.name)
+    tasting_number = 1 + _pick(base, "tasting-number", 99)
 
     by_course: dict[str, list[Finding]] = {course: [] for course in COURSES}
     for finding in judgement.findings:
@@ -128,14 +141,16 @@ def pour(
         for finding in _order(tuple(by_course[course])):
             if len(sentences) >= ceiling:
                 break
-            spoken = _speak(finding, rng)
+            spoken = _speak(finding, base)
             if spoken:
                 sentences.append(spoken)
         if sentences:
             courses.append(Course(name=COURSE_TITLES[course], body=" ".join(sentences)))
 
-    verdict = VERDICTS[rng.randrange(len(VERDICTS))].format(score=judgement.score)
-    pairing = PAIRINGS[rng.randrange(len(PAIRINGS))]
+    verdict = VERDICTS[_pick(base, "verdict", len(VERDICTS))].format(
+        score=judgement.score
+    )
+    pairing = PAIRINGS[_pick(base, "pairing", len(PAIRINGS))]
     footnotes = tuple(
         FOOTNOTE_INVENTORY
         if dropped.name == "inventory"

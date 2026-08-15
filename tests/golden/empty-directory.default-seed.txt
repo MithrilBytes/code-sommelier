@@ -1,11 +1,10 @@
-CODE SOMMELIER                                   tasting no. 78
+CODE SOMMELIER                                   tasting no. 16
 
-The label    void, written in unknown, across 0 files. That is the last neutral
-             sentence in this tasting.
-Vintage      There is no repository here. void holds 0 files of entirely
-             unknown provenance.
-Finish       There is nothing in the log to read. void and its 0 files arrived
-             fully formed and unexplained.
+The label    This is void. It is unknown. There are 0 source files, and every
+             one of them was somebody's idea.
+Vintage      This has never been committed. void is not a vintage, it is a
+             puddle.
+Finish       No history. The code claims to have always existed.
 Verdict      89 points, because wine scoring is compressed and the sommelier
              respects tradition. The notes are not compressed.
-Pairing      Pairs with a fresh branch and lowered expectations.
+Pairing      Decant into smaller files and revisit in a year.

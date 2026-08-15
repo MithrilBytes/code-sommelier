@@ -1,25 +1,25 @@
-CODE SOMMELIER                                   tasting no. 72
+CODE SOMMELIER                                   tasting no. 87
 
-The label    zzz-project. unknown, 8 files, 26 lines. It exists, which is the
-             strongest thing that can be said for it so far.
-Vintage      zzz-project has no git directory. Not one of its 8 files has a
-             date, an author, or a reason.
+The label    zzz-project, written in unknown, across 8 files. That is the last
+             neutral sentence in this tasting.
+Vintage      There is no repository here. zzz-project holds 8 files of entirely
+             unknown provenance.
 Nose         There is no .gitignore. The sommelier would like a moment. A
              .gitignore is four lines of text. It takes ninety seconds to
              write, it has taken ninety seconds to write for twenty years, and
              its absence means every build artefact, every editor backup and
              every local secret among the 8 files in zzz-project has been
              offered to the repository, and the repository has accepted. This
-             is the finding the sommelier will think about tonight. 384.6
-             markers per thousand lines. That is not a list of tasks, it is a
-             diary. 8 files, zero lines of README. The authors of zzz-project
-             knew what it did, and that was evidently enough for them.
-Palate       8 files averaging 3.2 lines. The largest, others.zzz, runs to 5.
-             Nesting reaches depth 0.
-Structure    Undeclared. There is no manifest in zzz-project, so there is no
-             answer to the question of what 8 files require in order to run.
-Finish       There is no git history at all. zzz-project has no finish, because
-             it has no beginning.
-Verdict      89 points. Everything scores between 87 and 94 points. The notes
-             are where the truth lives.
-Pairing      Pairs well with a strong drink and a rewrite.
+             is the finding the sommelier will think about tonight. The
+             abandonment is on the nose immediately: 10 markers, 384.6 per
+             thousand lines. Every one was written by somebody who intended to
+             come back. No README. The reader is expected to deduce 26 lines of
+             intent from first principles.
+Palate       Average length 3.2 lines across 8 files, with others.zzz at 5 and
+             nesting down to depth 0.
+Structure    No manifest of any kind. Whatever these 8 files need, they need it
+             in secret.
+Finish       No history. The code claims to have always existed.
+Verdict      89 points, because wine scoring is compressed and the sommelier
+             respects tradition. The notes are not compressed.
+Pairing      Decant into smaller files and revisit in a year.

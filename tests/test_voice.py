@@ -112,7 +112,7 @@ class SnapshotTests(unittest.TestCase):
     def test_snapshot_seed_seven(self) -> None:
         expected = "\n".join(
             [
-                "CODE SOMMELIER                                   tasting no. 42",
+                "CODE SOMMELIER                                   tasting no. 48",
                 "",
                 "The label    todo-app. JavaScript. 13 source files.",
                 "Palate       One file, src/app.js, contains 2,400 lines.",
