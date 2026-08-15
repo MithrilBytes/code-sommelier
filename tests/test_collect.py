@@ -13,7 +13,9 @@ from unittest import mock
 from sommelier.collect import (
     RepoMetrics,
     TastingError,
+    _FileRecord,
     _is_secret_name,
+    _is_source,
     collect,
 )
 from tests import fixtures
@@ -457,6 +459,63 @@ class NeglectedJavaScriptRepoTest(unittest.TestCase):
         self.assertFalse(nose.has_contributing)
         self.assertFalse(nose.has_ci)
         self.assertFalse(nose.has_tests)
+
+
+class FalsePositiveTest(unittest.TestCase):
+    """Claims the card states with conviction had better be true.
+
+    Both cases here were found on psf/requests, where the tool reported the
+    max nesting depth of a 2.1 MB Adobe Illustrator logo and called the
+    expired certificates of an HTTPS test suite committed secrets.
+    """
+
+    def test_vector_and_page_formats_are_not_source(self) -> None:
+        for name in ("logo.ai", "figure.eps", "print.ps", "part.stl", "ui.psd"):
+            with self.subTest(name=name):
+                record = _FileRecord(
+                    rel=f"ext/{name}",
+                    name=name,
+                    ext=Path(name).suffix,
+                    size=2_100_000,
+                    depth=1,
+                    language=None,
+                )
+                self.assertFalse(_is_source(record))
+
+    def test_an_unknown_code_extension_is_still_source(self) -> None:
+        """The exclusions must not undo the universality guarantee."""
+        record = _FileRecord(
+            rel="thing.zzz", name="thing.zzz", ext=".zzz", size=100,
+            depth=0, language=None,
+        )
+        self.assertTrue(_is_source(record))
+
+    def test_certificates_under_a_test_tree_are_fixtures(self) -> None:
+        fixtures.require_git()
+        files = {
+            "main.py": "x = 1\n",
+            "tests/certs/valid/server/server.pem": "----- FAKE -----\n",
+            "tests/certs/expired/ca.pem": "----- FAKE -----\n",
+            "testdata/client.key": "----- FAKE -----\n",
+            "spec/fixtures/id_rsa": "----- FAKE -----\n",
+        }
+        with fixtures.Fixture("certs") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            fixtures.git_init(fixture.path)
+            fixtures.git_commit(fixture.path, "add suite", day="2024-03-01")
+            sediment = collect(fixture.path).sediment
+        self.assertEqual(sediment.secret_file_count, 0)
+
+    def test_a_real_leaked_secret_is_still_caught(self) -> None:
+        """The fixture carve-out must not blind the detector everywhere else."""
+        fixtures.require_git()
+        files = {"main.py": "x = 1\n", ".env": "TOKEN=1\n", "deploy/server.pem": "K\n"}
+        with fixtures.Fixture("leak") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            fixtures.git_init(fixture.path)
+            fixtures.git_commit(fixture.path, "add leak", day="2024-03-01")
+            sediment = collect(fixture.path).sediment
+        self.assertEqual(sediment.secret_file_count, 2)
 
 
 class FileInventoryTest(unittest.TestCase):

@@ -1044,8 +1044,53 @@ NON_CODE_EXTENSIONS: Final[frozenset[str]] = frozenset(
         ".a", ".bin", ".class", ".db", ".dll", ".dylib", ".exe", ".o", ".obj",
         ".pdb", ".pyc", ".pyd", ".pyo", ".so", ".sqlite", ".sqlite3", ".wasm",
         ".crt", ".der", ".key", ".p12", ".pem",
+        # Vector, CAD and page-description formats. These are text or partly
+        # text, so a binary sniff does not catch them, and their coordinate
+        # payloads are deeply indented. Left in, an Illustrator logo wins the
+        # nesting-depth finding outright.
+        ".ai", ".eps", ".ps", ".dxf", ".stl", ".obj", ".gltf", ".step", ".stp",
+        ".iges", ".igs", ".fbx", ".blend", ".sketch", ".fig", ".psd", ".xcf",
+        # Generated or transcribed text that nobody authored as code.
+        ".snap", ".patch", ".diff", ".po", ".pot", ".mo", ".srt", ".vtt",
+        ".ics", ".rtfd", ".dat",
     }
 )
+
+# A secret-looking file inside one of these is a test fixture. Shipping an
+# expired certificate is how an HTTPS test suite is written, and calling it a
+# leak is both wrong and the kind of wrong that gets the tool ignored.
+_FIXTURE_DIRS: Final[frozenset[str]] = frozenset(
+    {
+        "test",
+        "tests",
+        "testdata",
+        "test_data",
+        "testing",
+        "__tests__",
+        "fixture",
+        "fixtures",
+        "spec",
+        "specs",
+        "example",
+        "examples",
+        "sample",
+        "samples",
+        "mock",
+        "mocks",
+        "demo",
+        "demos",
+        "e2e",
+        "integration",
+        "conformance",
+        "golden",
+        "testcases",
+    }
+)
+
+
+def _in_fixture_path(rel: str) -> bool:
+    parts = rel.split("/")[:-1]
+    return any(part.lower() in _FIXTURE_DIRS for part in parts)
 
 
 def _is_source(record: _FileRecord) -> bool:
@@ -2544,7 +2589,9 @@ def _sediment(
     secrets = tuple(
         record.rel
         for record in records
-        if _is_secret_name(record.name) and committed(record.rel)
+        if _is_secret_name(record.name)
+        and committed(record.rel)
+        and not _in_fixture_path(record.rel)
     )
     sizes = {record.rel: record.size for record in records}
     for rel in sorted(secrets):

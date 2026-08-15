@@ -19,8 +19,8 @@
           "file_count": "400",
           "language": "JavaScript",
           "name": "jashkenas_underscore",
-          "source_file_count": "357",
-          "total_lines": "169,173"
+          "source_file_count": "356",
+          "total_lines": "169,160"
         },
         "key": "label.identity",
         "severity": 0
@@ -55,8 +55,8 @@
         "course": "nose",
         "facts": {
           "debug_prints": "2",
-          "source_files": "357",
-          "total_lines": "169,173"
+          "source_files": "356",
+          "total_lines": "169,160"
         },
         "key": "abandonment.suspiciously_clean",
         "severity": 0
@@ -83,7 +83,7 @@
       {
         "course": "palate",
         "facts": {
-          "average_lines": "473.9",
+          "average_lines": "475.2",
           "lines": "1,966",
           "path": "underscore-esm.js"
         },
@@ -103,11 +103,11 @@
       {
         "course": "palate",
         "facts": {
-          "average_lines": "473.9",
+          "average_lines": "475.2",
           "depth": "9",
           "largest_lines": "1,966",
           "largest_path": "underscore-esm.js",
-          "source_files": "357"
+          "source_files": "356"
         },
         "key": "palate.body",
         "severity": 0
@@ -205,7 +205,7 @@
       "readme_path": "README.md"
     },
     "palate": {
-      "average_lines": 473.8739,
+      "average_lines": 475.1685,
       "inventory": "git",
       "largest_file_lines": 1966,
       "largest_file_path": "underscore-esm.js",
@@ -215,10 +215,10 @@
       "max_indent_depth": 9,
       "max_indent_path": "docs/linked-esm.jst",
       "sampled": false,
-      "scanned_file_count": 357,
-      "source_file_count": 357,
+      "scanned_file_count": 356,
+      "source_file_count": 356,
       "total_file_count": 400,
-      "total_lines": 169173
+      "total_lines": 169160
     },
     "path": "<CACHE>",
     "sediment": {
