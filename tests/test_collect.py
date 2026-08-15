@@ -581,6 +581,46 @@ class TestDirectoryTest(unittest.TestCase):
             self.assertFalse(collect(fixture.path).nose.has_tests)
 
 
+class DriftDeterminismTest(unittest.TestCase):
+    """Drift must be a property of the commit, not of the checkout.
+
+    Drift used to compare file mtimes, so a fresh clone, which writes every
+    file at checkout time in an order git chooses, disagreed with a working
+    copy that had sat on disk. CI and this laptop reported different drift for
+    two of the ten pinned repositories.
+    """
+
+    def _manifest(self, root: Path) -> object:
+        return collect(root).structure.manifests[0]
+
+    def test_touching_the_manifest_does_not_invent_drift(self) -> None:
+        files = {
+            "package.json": '{"dependencies": {"a": "1", "b": "2"}}\n',
+            "package-lock.json": '{"packages": {"a": {"resolved": "x"}, '
+            '"b": {"resolved": "y"}}}\n',
+            "index.js": "var a = 1;\n",
+        }
+        with fixtures.Fixture("mtime") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            before = self._manifest(fixture.path)
+            # Make the lockfile look stale in exactly the way the old rule read.
+            os.utime(fixture.path / "package-lock.json", (0, 0))
+            after = self._manifest(fixture.path)
+        self.assertEqual(before, after)
+
+    def test_drift_still_fires_on_a_real_disagreement(self) -> None:
+        files = {
+            "package.json": '{"dependencies": {"a": "1", "b": "2", "c": "3"}}\n',
+            "package-lock.json": '{"packages": {"a": {"resolved": "x"}}}\n',
+            "index.js": "var a = 1;\n",
+        }
+        with fixtures.Fixture("realdrift") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            manifest = collect(fixture.path).structure.manifests[0]
+        self.assertTrue(manifest.drift)
+        self.assertEqual(manifest.drift_reason, "counts disagree")
+
+
 class ContainmentTest(unittest.TestCase):
     """The tool tastes the path it is handed and nothing above it."""
 

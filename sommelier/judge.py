@@ -43,7 +43,7 @@ from __future__ import annotations
 import math
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, timedelta
 from types import MappingProxyType
 from typing import Final, cast
@@ -266,6 +266,8 @@ BANDS: Final[Mapping[str, object]] = MappingProxyType(
     }
 )
 
+_NO_FACTS: Final[Mapping[str, str]] = MappingProxyType({})
+
 _UNKNOWN: Final[str] = "unknown"
 _DAYS_PER_YEAR: Final[float] = 365.25
 _LINES_PER_KLOC: Final[float] = 1000.0
@@ -361,7 +363,10 @@ class Judgement:
     refusal: str | None = None
     """The reason there is no score, as a code the cellar has lines for."""
 
-    refusal_facts: Mapping[str, str] = MappingProxyType({})
+    # default_factory, not a bare default: Python 3.11 rejects mappingproxy as
+    # a dataclass default and 3.12 accepts it, so the bare form imports fine
+    # here and explodes on the version the project claims to support.
+    refusal_facts: Mapping[str, str] = field(default_factory=lambda: _NO_FACTS)
 
 
 @dataclass(frozen=True)

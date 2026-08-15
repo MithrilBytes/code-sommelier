@@ -182,8 +182,8 @@
       {
         "declared_count": 20,
         "dev_count": 4,
-        "drift": true,
-        "drift_reason": "lockfile is older than manifest",
+        "drift": false,
+        "drift_reason": null,
         "ecosystem": "rust",
         "locked_count": 130,
         "lockfile_path": "Cargo.lock",

@@ -166,8 +166,8 @@
       {
         "declared_count": 0,
         "dev_count": 17,
-        "drift": true,
-        "drift_reason": "lockfile is older than manifest",
+        "drift": false,
+        "drift_reason": null,
         "ecosystem": "javascript",
         "locked_count": 2144,
         "lockfile_path": "package-lock.json",

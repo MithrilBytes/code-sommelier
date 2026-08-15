@@ -20,7 +20,7 @@
     },
     {
       "name": "locked",
-      "passed": false
+      "passed": true
     },
     {
       "name": "craft",
@@ -55,10 +55,10 @@
     },
     {
       "cap": 5,
-      "deduction": 0.4,
+      "deduction": 0.0,
       "measured": true,
       "name": "structure",
-      "severity": 2
+      "severity": 0
     },
     {
       "cap": 6,
@@ -195,18 +195,6 @@
       "course": "structure",
       "facts": {
         "declared": "0",
-        "locked": "2,144",
-        "lockfile_path": "package-lock.json",
-        "manifest_path": "package.json",
-        "reason": "lockfile is older than manifest"
-      },
-      "key": "structure.drift",
-      "severity": 2
-    },
-    {
-      "course": "structure",
-      "facts": {
-        "declared": "0",
         "ecosystem": "javascript",
         "manifest_path": "modules/package.json",
         "source_files": "356"
@@ -273,8 +261,8 @@
   ],
   "refusal": null,
   "refusal_facts": {},
-  "score": 90,
+  "score": 91,
   "scored_dimensions": 8,
   "total_dimensions": 8,
-  "total_severity": 15
+  "total_severity": 13
 }

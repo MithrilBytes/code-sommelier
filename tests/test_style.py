@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import ast
 import importlib
+import re
 import shutil
 import subprocess
 import sys
@@ -452,6 +453,56 @@ class CommitMessageTests(unittest.TestCase):
                 )
         self.assertEqual(
             [], offences, "commit subjects:\n" + "\n".join(offences)
+        )
+
+
+class VersionFloorTests(unittest.TestCase):
+    """The package must import on the oldest Python it claims to support.
+
+    Python 3.12 relaxed the dataclass mutable-default rule that 3.11 enforces,
+    so a mappingproxy default imports fine on a 3.13 laptop and raises
+    ValueError at import time on 3.11. That shipped, and only the CI matrix
+    caught it. This test applies 3.11's rule on whatever version runs it.
+    """
+
+    def test_no_dataclass_default_that_python_311_rejects(self) -> None:
+        import dataclasses
+        import importlib
+        import pkgutil
+
+        import sommelier
+
+        offences: list[str] = []
+        for module in pkgutil.iter_modules(sommelier.__path__):
+            loaded = importlib.import_module(f"sommelier.{module.name}")
+            for name in dir(loaded):
+                obj = getattr(loaded, name)
+                if not (dataclasses.is_dataclass(obj) and isinstance(obj, type)):
+                    continue
+                for item in dataclasses.fields(obj):
+                    if item.default is dataclasses.MISSING:
+                        continue
+                    if item.default.__class__.__hash__ is None:
+                        offences.append(
+                            f"{module.name}.{obj.__name__}.{item.name} defaults to "
+                            f"{type(item.default).__name__}, which 3.11 rejects; "
+                            f"use field(default_factory=...)"
+                        )
+        self.assertEqual([], offences, "\n".join(offences))
+
+    def test_the_declared_floor_matches_the_ci_matrix(self) -> None:
+        pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        workflow = REPO_ROOT / ".github" / "workflows" / "ci.yml"
+        if not workflow.is_file():
+            self.skipTest("no ci workflow")
+        declared = re.search(r'requires-python\s*=\s*"[><=]*(\d+\.\d+)"', pyproject)
+        self.assertIsNotNone(declared, "pyproject must declare requires-python")
+        assert declared is not None
+        self.assertIn(
+            f'"{declared.group(1)}"',
+            workflow.read_text(encoding="utf-8"),
+            "the declared minimum Python is not in the CI matrix, so it is "
+            "never actually executed",
         )
 
 

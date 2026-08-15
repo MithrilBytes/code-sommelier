@@ -20,7 +20,7 @@
     },
     {
       "name": "locked",
-      "passed": false
+      "passed": true
     },
     {
       "name": "craft",
@@ -55,10 +55,10 @@
     },
     {
       "cap": 5,
-      "deduction": 0.4,
+      "deduction": 0.0,
       "measured": true,
       "name": "structure",
-      "severity": 2
+      "severity": 0
     },
     {
       "cap": 6,
@@ -196,13 +196,12 @@
       "course": "structure",
       "facts": {
         "declared": "20",
-        "locked": "130",
-        "lockfile_path": "Cargo.lock",
-        "manifest_path": "Cargo.toml",
-        "reason": "lockfile is older than manifest"
+        "dev": "4",
+        "ecosystem": "rust",
+        "manifest_path": "Cargo.toml"
       },
-      "key": "structure.drift",
-      "severity": 2
+      "key": "structure.declared",
+      "severity": 0
     },
     {
       "course": "finish",
@@ -253,8 +252,8 @@
   ],
   "refusal": null,
   "refusal_facts": {},
-  "score": 91,
+  "score": 92,
   "scored_dimensions": 8,
   "total_dimensions": 8,
-  "total_severity": 12
+  "total_severity": 10
 }

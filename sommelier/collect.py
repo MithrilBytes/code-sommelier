@@ -1911,7 +1911,7 @@ def _read_manifest(root: Path, record: _FileRecord) -> DependencyManifest | None
     if lock_rel is not None and lock_path is not None:
         locked = _count_lockfile(lock_path, lock_path.name)
 
-    drift, reason = _drift(path, lock_path, declared, locked)
+    drift, reason = _drift(lock_path, declared, locked)
     return DependencyManifest(
         ecosystem=ecosystem,
         manifest_path=record.rel,
@@ -1962,18 +1962,17 @@ def _count_lockfile(path: Path, name: str) -> int:
 
 
 def _drift(
-    manifest_path: Path, lock_path: Path | None, declared: int, locked: int
+    lock_path: Path | None, declared: int, locked: int
 ) -> tuple[bool, str | None]:
     if lock_path is None:
         # Nothing declared is nothing to lock, and that is not drift.
         return (declared > 0, "no lockfile" if declared > 0 else None)
-    try:
-        manifest_mtime = manifest_path.stat().st_mtime
-        lock_mtime = lock_path.stat().st_mtime
-    except OSError:
-        return (False, None)
-    if lock_mtime < manifest_mtime:
-        return (True, "lockfile is older than manifest")
+    # Deliberately no mtime comparison. A fresh clone writes every file at
+    # checkout time in an order git chooses, so "the lockfile is older than the
+    # manifest" measures when the working copy was created rather than anything
+    # about the repository. CI on a clean runner disagreed with this laptop on
+    # two of the ten pinned repositories, which is the whole tell: a
+    # measurement has to be a property of the commit.
     if declared > 0 and locked < declared:
         return (True, "counts disagree")
     return (False, None)
