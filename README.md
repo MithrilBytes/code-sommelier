@@ -1,11 +1,12 @@
 # code-sommelier
 
-**Your repository is about to be tasted. It will not enjoy the experience.**
+**Real static analysis, read back as tasting notes by a critic who has seen
+things.**
 
-Point `sommelier` at a git repository and it performs real static analysis:
-age, file sizes, nesting depth, dependency health, commit history, and
-everything that got committed by accident. It reads the findings back as a wine
-tasting card, in the voice of a critic who has seen better and expected worse.
+Point `sommelier` at a git repository and it measures age, file sizes, nesting
+depth, dependency health, commit history, and everything that got committed by
+accident. It reads those findings back as a wine tasting card, with total
+conviction and a number at the end.
 
 Every sentence on the card is generated from a measurement, and no sentence
 survives that cannot print the number behind it. `--sober` prints the numbers
