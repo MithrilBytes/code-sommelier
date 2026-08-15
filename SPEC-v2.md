@@ -24,7 +24,7 @@ It is the one that matters most, because it is the one that ends the project.
 Every measurement in this document comes from the ten public repositories
 pinned in `tests/corpus_manifest.json`, each fixed at a commit. Tasted with v1:
 
-| repo | score | files | lines | depth | largest | tests | commits |
+| repo | score | files | lines | depth | largest* | tests | commits |
 |---|---|---|---|---|---|---|---|
 | antirez/kilo | 89 | 2 | 1,315 | 6 | 1,308 | no | 20 |
 | github/gitignore | 93 | 309 | 8,850 | 0 | 705 | yes | 4,217 |
@@ -37,7 +37,8 @@ pinned in `tests/corpus_manifest.json`, each fixed at a commit. Tasted with v1:
 | sharkdp/fd | 90 | 32 | 8,841 | 7 | 2,528 | yes | 2,005 |
 | sindresorhus/slugify | 91 | 4 | 689 | 4 | 286 | yes | 71 |
 
-The inputs span 246 times in size. The scores span five points, standard
+`largest*` is understated for any file over 64 KiB, per Part 3 defect 1. The
+inputs span 246 times in size. The scores span five points, standard
 deviation 1.58. The ordering is worse than the spread:
 
 > **`github/gitignore` scores 93. It contains no program.** It is a collection
@@ -165,8 +166,8 @@ than it has.
   the other. Most v1 metrics band one direction only. Zero TODOs is as
   suspicious as forty. Zero dependencies is austere, three hundred is cloying.
   This is better judgement and it doubles the available material.
-- **Calibration is a versioned artefact.** `calibration/v1.json` ships in the
-  wheel. Every score is reported as `(score, calibration_version,
+- **Calibration is a versioned artefact.** `sommelier/calibration/v1.json`
+  ships in the wheel as package data. Every score is reported as `(score, calibration_version,
   metric_schema_version)`. Recalibration publishes a new version. A published
   score is never mutated in place, and the leaderboard renders a hard break in
   the series rather than a smooth line across incompatible units.
@@ -274,27 +275,47 @@ Two different failures, two different tests.
 
 ## Part 3: truthfulness
 
-Verified against the current build, on a real repository:
+Two defects of this kind were found and fixed while writing this spec: Adobe
+Illustrator files counted as source, so the nesting-depth finding on
+`psf/requests` was attributed to a 2.1 MB logo; and the expired certificates of
+an HTTPS test suite were reported as committed secrets. Both were false, both
+were stated with total conviction, and both are gone.
 
-- `.ai`, `.eps` and `.ps` are absent from `NON_CODE_EXTENSIONS`, so an Adobe
-  Illustrator file counts as source. On `psf/requests` the maximum nesting depth
-  finding is attributed to a 2.1 MB logo.
-- `_is_secret_name("server.pem")` returns true, so the `tests/certs/` fixtures
-  that are the standard way to ship an HTTPS test suite are reported as
-  "3 secrets files, tracked, versioned, and backed up with admirable diligence."
+The category is not closed. Three defects of the same kind are open, and they
+are worse than the two that are fixed:
 
-Both are false, both are stated with total conviction, and both would be
-published about a repository maintained by the Python Software Foundation.
+1. **The 64 KiB read cap truncates line counts silently.** `collect.py` reads
+   every file to a cap and then reports the resulting count as the file's
+   length. `psf/requests` `tests/test_requests.py` is 3,094 lines and is
+   reported as 1,850, a 40 percent undercount, on the metric the card calls the
+   largest file. Three of the ten pinned repositories have a wrong
+   `largest_file_lines`, and **the evidence table at the top of this document
+   prints the truncated numbers**. Line and marker counts must be streamed over
+   the whole file. The structural analysis may keep a cap, and must then record
+   a coverage gap rather than report a number as if it were complete.
+2. **Not measured is encoded as zero.** `longest_function_lines == 0` means
+   either that the longest function is short or that no detector exists for that
+   language, and 52 of the 78 known languages have no detector. Nothing in the
+   model distinguishes the two, so judge cannot tell a clean result from an
+   absent one.
+3. **Language coverage is unrecorded.** `github/gitignore` reports 309 source
+   files with zero of them attributed to any language, and `rbenv/rbenv` takes
+   the corpus top score of 94 on a repository where 6 files of 30 were
+   recognised. A score computed from metrics that were never really measured is
+   the same failure as the shallow-clone one below, arriving by a different
+   road.
 
 Requirements:
 
-- A **labelled validation set** of repositories with expected findings.
+- A **labelled validation set** of public repositories with expected findings.
 - A **published per-detector precision figure**.
 - **Below the precision floor, a detector may print a number in `--sober` and
   may not appear in prose.** Conviction is the voice's entire charm and it is
   only charming when the underlying claim is true.
-- Fix the two known defects: extend the non-code extension list, and stop
-  treating certificates under `tests/`, `fixtures/` and `testdata/` as secrets.
+- **A detector must be able to say "not measured" and have judge respect it.**
+  Today a shallow clone scores *higher*: measured on `pallets/itsdangerous`, a
+  full clone scores 92 and `git clone --depth 1` scores 93, with nothing
+  dropped and nothing flagged. Withholding information currently pays.
 
 ## Part 4: the cellar book
 
@@ -335,15 +356,19 @@ sommelier/
   cli.py          argparse, exit codes, nothing else
   collect.py      metrics only, pure functions           (mostly unchanged)
   judge.py        gates, bands, subscores                (rewritten)
-  calibration.py  versioned quantile tables              (new)
+  calibration/    versioned quantile tables, package data (new)
   plan.py         content planning and aggregation       (new)
   grammar.py      CFG expansion, fact binding            (new)
   lines.py        the cellar, now grammar rather than list
   voice.py        realisation, seeded                    (rewritten)
   render.py       card, json, sober                      (extended)
 cellar/           leaderboard build, static site         (new)
-calibration/      versioned quantile artefacts           (new)
 ```
+
+The calibration tables live **inside** the package. A repo-root sibling of
+`sommelier/` cannot be shipped as package data under any setuptools
+configuration, and the CLI must be able to read them from an installed wheel
+via `importlib.resources`.
 
 Data flows one way: collect, judge, plan, voice, render.
 
