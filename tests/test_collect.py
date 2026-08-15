@@ -14,6 +14,7 @@ from unittest import mock
 from sommelier.collect import (
     BINARY_SNIFF_BYTES,
     LanguagePalate,
+    MAX_LINE_CHARS,
     RepoMetrics,
     TastingError,
     _FileRecord,
@@ -1036,6 +1037,41 @@ class NotMeasuredTest(unittest.TestCase):
         self.assertEqual(metrics.coverage.function_detector_files, 1)
 
 
+class LanguageCoverageTest(unittest.TestCase):
+    """A score computed over files nobody recognised should say how many.
+
+    github/gitignore reports 309 source files with none of them attributed to
+    any language, and rbenv/rbenv took the corpus top score on a repository
+    where 6 files of 30 were recognised.
+    """
+
+    def test_unattributed_files_are_counted_and_bucketed(self) -> None:
+        files = {f"templates/t{index}.zzz": "value\nvalue\n" for index in range(5)}
+        with fixtures.Fixture("unattributed") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            metrics = collect(fixture.path)
+        assert_full_metrics(self, metrics)
+        coverage = metrics.coverage
+        self.assertEqual(coverage.source_files, 5)
+        self.assertEqual(coverage.attributed_files, 0)
+        self.assertEqual(metrics.terroir.languages, ())
+        self.assertEqual(len(metrics.palate.by_language), 1)
+        bucket = metrics.palate.by_language[0]
+        self.assertEqual(bucket.name, "")
+        self.assertEqual(bucket.file_count, 5)
+
+    def test_a_partly_recognised_tree_reports_both_halves(self) -> None:
+        files = {"main.py": "x = 1\n", "run.zzz": "value\n", "other.zzz": "value\n"}
+        with fixtures.Fixture("partly") as fixture:
+            fixtures.write_tree(fixture.path, files)
+            metrics = collect(fixture.path)
+        coverage = metrics.coverage
+        self.assertEqual(coverage.source_files, 3)
+        self.assertEqual(coverage.attributed_files, 1)
+        names = {item.name for item in metrics.palate.by_language}
+        self.assertEqual(names, {"", "Python"})
+
+
 class ReadSeamTest(unittest.TestCase):
     """A file arrives in chunks, and a line can sit across the join.
 
@@ -1077,6 +1113,36 @@ class ReadSeamTest(unittest.TestCase):
                     metrics.palate.largest_file_lines,
                     len(payload.decode("utf-8").splitlines()),
                 )
+
+
+class LongSingleLineTest(unittest.TestCase):
+    """A minified bundle is one line of several megabytes, and still one line.
+
+    The reader stops accumulating an unbroken line past a cap, which is what
+    keeps the whole bundle out of memory. Two things have to survive that:
+    the line counts once, and the lines after it are read as normal rather
+    than swallowed along with the tail that was dropped.
+    """
+
+    def test_an_overlong_line_counts_once_and_does_not_eat_the_next(self) -> None:
+        minified = "var a=1;" * (MAX_LINE_CHARS // 4)
+        self.assertGreater(len(minified), MAX_LINE_CHARS)
+        with fixtures.Fixture("minified") as fixture:
+            fixtures.write_tree(
+                fixture.path,
+                {"bundle.js": minified + "\nvar b = 2; // TODO: after the long line\n"},
+            )
+            metrics = collect(fixture.path, budget_seconds=60.0)
+        assert_full_metrics(self, metrics)
+        self.assertEqual(metrics.palate.largest_file_lines, 2)
+        self.assertEqual(metrics.abandonment.todo, 1)
+        self.assertEqual(metrics.abandonment.worst_file_path, "bundle.js")
+        coverage = metrics.coverage
+        self.assertTrue(coverage.lines_complete)
+        self.assertEqual(coverage.truncated_files, 0)
+        # Part of that line was never handed to the analysis, and the record
+        # says as much rather than reporting the head as the whole.
+        self.assertFalse(coverage.structural_scan_complete)
 
 
 class FunctionDetectorCoverageTest(unittest.TestCase):

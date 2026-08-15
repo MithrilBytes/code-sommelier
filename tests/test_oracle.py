@@ -41,8 +41,8 @@ from typing import Sequence
 from sommelier.collect import (
     BINARY_SNIFF_BYTES,
     MAX_READ_BYTES,
-    STREAM_CHUNK_BYTES,
     RepoMetrics,
+    STREAM_CHUNK_BYTES,
     collect,
 )
 
