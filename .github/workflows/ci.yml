@@ -1,0 +1,75 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      # Full history: the commit message gate reads the log back to a baseline.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache the pinned repository corpus
+        uses: actions/cache@v4
+        with:
+          path: tests/corpus_cache
+          key: corpus-${{ hashFiles('tests/corpus_manifest.json') }}
+
+      - name: Clone the corpus at its pinned commits
+        run: python3 -m tests.corpus --sync
+
+      # The corpus layer skips itself when the cache is missing, so a silent
+      # skip would look exactly like a pass. Fail instead.
+      - name: Refuse to pass on a partial or drifted corpus
+        run: |
+          python3 -m tests.corpus --status
+          if python3 -m tests.corpus --status | grep -qE "absent|WRONG COMMIT|no snapshot"; then
+            echo "corpus is not fully pinned and snapshotted"
+            exit 1
+          fi
+
+      - name: Tests
+        run: python3 -m unittest discover -s tests -t . --verbose
+
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install the type checker
+        run: python3 -m pip install --quiet mypy
+      - name: mypy --strict
+        run: mypy --strict sommelier tests
+
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # The zero dependency claim is only true if a clean install proves it.
+      - name: Install the package alone
+        run: python3 -m pip install --quiet .
+      - name: Taste something with it
+        run: |
+          sommelier taste . --sober
+          sommelier taste .
