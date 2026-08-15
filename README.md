@@ -9,17 +9,18 @@ from one of those measurements, and `--sober` prints the measurements instead.
 ## The card
 
 ```
-CODE SOMMELIER                                   tasting no. 97
+CODE SOMMELIER                                   tasting no. 86
 
-The label    This is todo-app. It is JavaScript. There are 3 source files, and
-             every one of them was somebody's idea. There is a tracked .env.
-             The sommelier has decided not to read it, which is more restraint
-             than the internet will show. 12 of the 20 files here are vendored,
-             which is 60 percent of the repository. The sommelier will pretend
-             not to have seen that.
-Vintage      2019. A vintage of 0.8 years and 3 commits, and the sommelier has
-             tasted every one of them. 7 years old. 2019 was a long time ago,
-             and this has been here for all of it.
+The label    todo-app, written in JavaScript, across 3 files. That is the last
+             neutral sentence in this tasting. 1 secrets files, tracked,
+             versioned, and backed up with admirable diligence to every clone
+             that has ever been made. .env among them. 12 committed vendored
+             files, 60 percent of everything here. That is not a repository, it
+             is a warehouse with a git remote.
+Vintage      2019. The first commit landed on 2019-01-15 and the last on
+             2019-11-03, 0.8 years apart, across 3 commits. First committed on
+             2019-01-15, 7 years ago, and 3 commits have followed. Old, and not
+             in the way that adds value.
 Nose         todo-app has no .gitignore of any kind, not even a copied one.
              Everything it has ever produced by accident is a candidate for the
              permanent record, and across 20 files the record has been keeping.
@@ -28,17 +29,19 @@ Nose         todo-app has no .gitignore of any kind, not even a copied one.
              README. 3 source files, 955 lines, and not one sentence explaining
              why.
 Palate       Body: 3 files, 318.3 lines on average, peaking at 900 lines in
-             src/legacy.js. The body is enormous. src/legacy.js is 900 lines
-             long and it has never once been opened with confidence.
-Structure    package.json declares 5 dependencies and there is no lockfile.
-             Every install is a fresh guess.
+             src/legacy.js. One file, src/legacy.js, contains 900 lines against
+             an average of 318.3. Nobody decided this. It accumulated.
+Structure    5 javascript dependencies, unlocked. Two people installing this on
+             the same day will not get the same project.
 Finish       3 commits from 1 author. 33 percent say fix. The last one, on
              2019-11-03, says fix login again. Nothing has been committed for
              2,474 days. The last was 2019-11-03. This is not a project, it is
-             a preserve. 3 commits. 1 of them titled fix. It is not fixed.
-Verdict      87 points, because wine scoring is compressed and the sommelier
-             respects tradition. The notes are not compressed.
-Pairing      Decant into smaller files and revisit in a year.
+             a preserve. 1 commit of 3 commits are fixes. 33 percent. At some
+             point that stops being maintenance and starts being the shape of
+             the thing.
+Verdict      8 of 8 dimensions were measured. They give 60 points. Below
+             average.
+Pairing      Pairs with a second opinion, which the sommelier does not offer.
 ```
 
 ## Install
@@ -98,6 +101,51 @@ The tool completes on any directory of code, whatever language it is written in
 and whatever condition it has been left in. Absent input is treated as a finding
 rather than an error, so a repository lacking a README, a dependency manifest, a
 recognised language or a git history still produces a full card and exits 0.
+
+## The score
+
+The number is on a hundred point scale with six bands, narrower at the top.
+
+| Band | Meaning |
+|---|---|
+| 96 to 100 | Exemplary. Every gate, plus evidence of sustained care. |
+| 90 to 95 | Outstanding. All positive gates met. |
+| 80 to 89 | Sound. No serious defect, no demonstrated craft either. |
+| 70 to 79 | Average. Working, with noticeable deficiencies. |
+| 60 to 69 | Below average. Several defects, or one severe one. |
+| 50 to 59 | Unacceptable. |
+| no score | Nothing to taste. Stated as a refusal, with a reason. |
+
+**You cannot reach 90 by not being bad.** Below 90 the tool runs a deduction
+system. At 90 and above it switches to positive evidence: a repository enters
+the band by meeting every gate at once, and each gate costs the author real
+effort. Tests that exist. A README past a length floor and a licence beside it.
+A `.gitignore`, no committed secrets, no operating system cruft. A manifest
+with a lockfile against every dependency it declares. Complete history, more
+than one author, and a commit cadence that has not gone dormant. Missing any
+one of them caps the repository at 89, however clean the rest of it is.
+
+The score is computed over eight dimensions: documentation, hygiene, testing,
+structure, body, markers, history and authorship. **A dimension whose inputs
+were never measured is dropped from the denominator**, and the denominator is
+printed beside the number on the card and in `--sober`. Every dropped dimension
+also adds a fixed weight to the deduction, and every gate fails when its
+evidence is absent rather than passing by default. Together those two rules
+make the score monotone in the information available: withholding a measurement
+can lower a score and can never raise one. A shallow clone scores at or below
+the full clone, which under the previous formula it did not.
+
+An analyzer that stopped at the time budget counts as a measurement that did
+not happen, not as a measurement that found nothing. Its dimensions leave the
+denominator and the gates that read it fail, so a run too short to reach the
+committed key cannot report a clean tree, and a log read that stopped after the
+recent commits cannot report a lively project. A walk that never finished is
+refused a number rather than given one.
+
+A repository the tool cannot read is refused rather than ranked. No source
+files, or fewer than half the source files attributable to any language, and
+the card prints the reason and no number. A tree of `.gitignore` templates is
+not scored above a text editor.
 
 ## Design rules
 

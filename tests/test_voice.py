@@ -41,19 +41,41 @@ FROZEN_CELLAR = {
     ),
 }
 
-FROZEN_VERDICTS = ("{score} points. The notes are where the truth lives.",)
+FROZEN_VERDICTS = ("{score} points. {band}, on {scored} of {total} dimensions.",)
 FROZEN_PAIRINGS = ("Pairs well with a strong drink and a rewrite.",)
+
+FROZEN_REFUSALS = {
+    "no_source_files": ("No score. {name} holds {total_files} files, none of it code.",),
+}
 
 
 def _finding(key: str, course: str, severity: int, **facts: str) -> Finding:
     return Finding(key=key, course=course, severity=severity, facts=dict(facts))
 
 
-def _judgement(*findings: Finding, score: int = 91) -> Judgement:
+def _judgement(
+    *findings: Finding,
+    score: int | None = 91,
+    band: str = "outstanding",
+    band_label: str = "Outstanding",
+    scored: int = 8,
+    total: int = 8,
+    refusal: str | None = None,
+    refusal_facts: dict[str, str] | None = None,
+) -> Judgement:
     return Judgement(
         findings=tuple(findings),
         score=score,
         total_severity=sum(f.severity for f in findings),
+        band=band,
+        band_label=band_label,
+        dimensions=(),
+        scored_dimensions=scored,
+        total_dimensions=total,
+        gates=(),
+        care_gates=(),
+        refusal=refusal,
+        refusal_facts=refusal_facts or {},
     )
 
 
@@ -116,7 +138,7 @@ class SnapshotTests(unittest.TestCase):
                 "",
                 "The label    todo-app. JavaScript. 13 source files.",
                 "Palate       One file, src/app.js, contains 2,400 lines.",
-                "Verdict      91 points. The notes are where the truth lives.",
+                "Verdict      91 points. Outstanding, on 8 of 8 dimensions.",
                 "Pairing      Pairs well with a strong drink and a rewrite.",
             ]
         )
@@ -193,11 +215,72 @@ class CellarFormattingTests(unittest.TestCase):
         }
         self.assertEqual(thin, {}, f"keys with fewer than three lines: {thin}")
 
-    def test_verdict_templates_cite_the_score(self) -> None:
+    def test_verdict_templates_state_the_score_band_and_denominator(self) -> None:
+        """A score without its denominator is what this rewrite exists to remove."""
         for template in lines_module.VERDICTS:
             with self.subTest(template=template):
-                self.assertIn("{score}", template)
-                self.assertEqual(set(PLACEHOLDER.findall(template)), {"score"})
+                self.assertEqual(
+                    set(PLACEHOLDER.findall(template)),
+                    {"score", "band", "scored", "total"},
+                )
+
+    def test_verdicts_no_longer_disown_the_number(self) -> None:
+        """The old lines existed to say the score meant nothing. It does now."""
+        for template in lines_module.VERDICTS:
+            with self.subTest(template=template):
+                lowered = template.lower()
+                for dead in ("formality", "never told anyone", "between 87 and 94"):
+                    self.assertNotIn(dead, lowered)
+
+    def test_every_refusal_code_has_at_least_three_lines(self) -> None:
+        thin = {
+            code: len(templates)
+            for code, templates in lines_module.REFUSALS.items()
+            if len(templates) < 3
+        }
+        self.assertEqual(thin, {}, f"refusal codes with fewer than three lines: {thin}")
+
+    def test_every_refusal_template_formats_from_its_declared_facts(self) -> None:
+        for code, templates in lines_module.REFUSALS.items():
+            facts = {name: "X" for name in judge_module.REFUSAL_FACTS[code]}
+            for index, template in enumerate(templates):
+                with self.subTest(code=code, index=index):
+                    rendered = template.format(**facts)
+                    self.assertNotIn("{", rendered)
+                    self.assertNotIn("}", rendered)
+
+    def test_a_refused_card_states_the_reason_and_no_number(self) -> None:
+        metrics = synthetic_metrics(name="templates-only")
+        judgement = _judgement(
+            score=None,
+            band="unscoreable",
+            band_label="No score",
+            refusal="no_source_files",
+            refusal_facts={"name": "templates-only", "total_files": "309"},
+        )
+        card = pour(metrics, judgement, seed=5)
+        self.assertIsNone(card.score)
+        self.assertIn("309", card.verdict)
+        self.assertNotIn("points", card.verdict)
+        rendered = render_card(card)
+        self.assertIn("Verdict", rendered)
+        self.assertNotIn("{", rendered)
+
+    def test_every_refusal_code_renders_a_verdict(self) -> None:
+        metrics = synthetic_metrics(name="todo-app")
+        for code in judge_module.REFUSALS:
+            facts = {name: "7" for name in judge_module.REFUSAL_FACTS[code]}
+            judgement = _judgement(
+                score=None,
+                band="unscoreable",
+                band_label="No score",
+                refusal=code,
+                refusal_facts=facts,
+            )
+            with self.subTest(code=code):
+                card = render_card(pour(metrics, judgement, seed=11))
+                self.assertNotIn("{", card)
+                self.assertNotIn("None", card)
 
     def test_pairings_take_no_placeholders(self) -> None:
         for template in lines_module.PAIRINGS:

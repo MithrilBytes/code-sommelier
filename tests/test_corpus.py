@@ -19,12 +19,12 @@ from __future__ import annotations
 
 import json
 import unittest
-from typing import Any
+from typing import Any, cast
 from unittest.mock import patch
 
 import sommelier.collect as collect_module
 from sommelier.collect import collect
-from sommelier.judge import judge
+from sommelier.judge import BANDS, REFUSALS, judge
 from sommelier.render import render_card
 from sommelier.voice import pour
 
@@ -137,7 +137,33 @@ class CorpusInvariantTest(unittest.TestCase):
                     "the first commit cannot postdate the last",
                 )
                 self.assertGreaterEqual(git["days_since_last_commit"], 0)
-                self.assertTrue(87 <= judgement["score"] <= 94, judgement["score"])
+                self.assert_scoring_is_coherent(judgement)
+
+    def assert_scoring_is_coherent(self, judgement: dict[str, Any]) -> None:
+        """The score, its band and its denominator have to agree with each other.
+
+        A snapshot says the number was 83. This says the number is inside the
+        band it claims, that a refused repository carries a reason rather than
+        a quietly zeroed score, and that the denominator was printed.
+        """
+        bands = cast(
+            "tuple[tuple[str, int, int, str], ...]", BANDS["score_bands"]
+        )
+        edges = {name: (low, high) for name, low, high, _ in bands}
+        self.assertGreater(judgement["total_dimensions"], 0)
+        self.assertLessEqual(
+            judgement["scored_dimensions"], judgement["total_dimensions"]
+        )
+        if judgement["score"] is None:
+            self.assertEqual("unscoreable", judgement["band"])
+            self.assertIn(judgement["refusal"], REFUSALS)
+            return
+        self.assertIsNone(judgement["refusal"])
+        low, high = edges[judgement["band"]]
+        self.assertTrue(
+            low <= judgement["score"] <= high,
+            f"score {judgement['score']} is outside band {judgement['band']}",
+        )
 
     def test_card_renders_for_every_entry(self) -> None:
         """No real repository may crash the renderer or emit an overlong line."""

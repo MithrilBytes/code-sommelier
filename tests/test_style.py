@@ -109,6 +109,32 @@ def key_facts() -> Mapping[str, Sequence[str]]:
     return facts
 
 
+def refusals() -> Mapping[str, Sequence[str]]:
+    templates: Mapping[str, Sequence[str]] = load_module("sommelier.lines").REFUSALS
+    return templates
+
+
+def refusal_codes() -> tuple[str, ...]:
+    codes: Sequence[str] = load_module("sommelier.judge").REFUSALS
+    return tuple(codes)
+
+
+def refusal_facts() -> Mapping[str, Sequence[str]]:
+    facts: Mapping[str, Sequence[str]] = load_module("sommelier.judge").REFUSAL_FACTS
+    return facts
+
+
+def verdicts() -> Sequence[str]:
+    templates: Sequence[str] = load_module("sommelier.lines").VERDICTS
+    return templates
+
+
+# What a verdict line is allowed to name, and what it must name. The band and
+# the denominator are not decoration: a number printed without the count of
+# dimensions behind it is the thing the score rewrite exists to remove.
+VERDICT_FACTS = frozenset({"score", "band", "scored", "total"})
+
+
 def placeholders(template: str) -> set[str]:
     names: set[str] = set()
     for _text, field, _spec, _conversion in Formatter().parse(template):
@@ -256,6 +282,69 @@ class CellarTests(unittest.TestCase):
             [],
             offences,
             "templates may only cite facts their key provides:\n"
+            + "\n".join(offences),
+        )
+
+
+class RefusalTests(unittest.TestCase):
+    """A refusal is a line the reader sees, so it lives under the same rules."""
+
+    def test_every_refusal_code_has_at_least_three_templates(self) -> None:
+        templates = refusals()
+        thin = sorted(
+            f"{code} has {len(templates.get(code, ()))}"
+            for code in refusal_codes()
+            if len(templates.get(code, ())) < 3
+        )
+        self.assertEqual(
+            [],
+            thin,
+            "every refusal code needs at least three lines:\n" + "\n".join(thin),
+        )
+
+    def test_the_cellar_holds_no_unreachable_refusals(self) -> None:
+        emittable = set(refusal_codes())
+        stranded = sorted(code for code in refusals() if code not in emittable)
+        self.assertEqual(
+            [],
+            stranded,
+            "the cellar holds refusals judge can never emit:\n" + "\n".join(stranded),
+        )
+
+    def test_refusal_templates_only_cite_facts_that_exist(self) -> None:
+        facts = refusal_facts()
+        offences: list[str] = []
+        for code, templates in sorted(refusals().items()):
+            available = set(facts.get(code, ()))
+            for index, template in enumerate(templates):
+                for name in sorted(placeholders(template)):
+                    if name not in available:
+                        offences.append(f"{code}[{index}] cites unknown fact {name}")
+        self.assertEqual(
+            [],
+            offences,
+            "refusal lines may only cite facts their code provides:\n"
+            + "\n".join(offences),
+        )
+
+
+class VerdictTests(unittest.TestCase):
+    """The verdict names the band and the denominator, on every line."""
+
+    def test_every_verdict_states_the_band_and_the_denominator(self) -> None:
+        offences: list[str] = []
+        for index, template in enumerate(verdicts()):
+            used = placeholders(template)
+            missing = sorted(VERDICT_FACTS - used)
+            extra = sorted(used - VERDICT_FACTS)
+            if missing:
+                offences.append(f"VERDICTS[{index}] omits {', '.join(missing)}")
+            if extra:
+                offences.append(f"VERDICTS[{index}] cites unknown {', '.join(extra)}")
+        self.assertEqual(
+            [],
+            offences,
+            "a score is never printed without its denominator:\n"
             + "\n".join(offences),
         )
 
