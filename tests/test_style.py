@@ -289,9 +289,10 @@ class DependencyTests(unittest.TestCase):
         )
 
 
-# Commit discipline is enforced from this commit forward. Earlier history
-# predates the rule and is not retroactively failed.
-COMMIT_BASELINE = "1df4949563282f1a39a48d72dabeee839a2a124d"
+# Every commit after the root is checked. The root itself is GitHub's own
+# "Initial commit" and is left alone. Pinning the root rather than a moving
+# point means this constant never needs touching again.
+COMMIT_BASELINE = "01550740dbceb37dd9024e3ed482be8ca1234173"
 
 ALLOWED_PREFIXES = ("add", "fix", "rm", "docs", "test", "perf")
 SUBJECT_LIMIT = 50
