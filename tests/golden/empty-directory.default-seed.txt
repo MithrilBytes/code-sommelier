@@ -5,6 +5,6 @@ The label    This is void. It is unknown. There are 0 source files, and every
 Vintage      This has never been committed. void is not a vintage, it is a
              puddle.
 Finish       No history. The code claims to have always existed.
-Verdict      89 points, because wine scoring is compressed and the sommelier
-             respects tradition. The notes are not compressed.
+Verdict      There is nothing here to score. 0 files in void, zero of them
+             code.
 Pairing      Decant into smaller files and revisit in a year.

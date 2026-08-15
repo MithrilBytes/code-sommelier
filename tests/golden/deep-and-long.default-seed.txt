@@ -21,6 +21,5 @@ Structure    No manifest of any kind. Whatever these 2 files need, they need it
              in secret.
 Finish       There is nothing in the log to read. nested-things and its 3 files
              arrived fully formed and unexplained.
-Verdict      89 points. Everything scores between 87 and 94 points. The notes
-             are where the truth lives.
+Verdict      50 points. Unacceptable, on 5 of 8 dimensions.
 Pairing      Pairs with silence, and a very slow read of the largest file.

@@ -20,6 +20,5 @@ Palate       2 files averaging 5.0 lines. The largest, helper.py, runs to 5.
 Structure    Undeclared. There is no manifest in loose-scripts, so there is no
              answer to the question of what 2 files require in order to run.
 Finish       No history. The code claims to have always existed.
-Verdict      90 points, because wine scoring is compressed and the sommelier
-             respects tradition. The notes are not compressed.
+Verdict      50 points. Unacceptable, on 5 of 8 dimensions.
 Pairing      Pairs with a fresh branch and lowered expectations.

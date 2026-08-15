@@ -170,6 +170,14 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "A {readme_lines} line README. It answers no question that anyone has "
         "ever had.",
     ),
+    "nose.exhaustive_readme": (
+        "{readme_path} runs to {readme_lines} lines against {source_files} source "
+        "files. The documentation is the larger work.",
+        "{readme_lines} lines of README, {readme_bytes} bytes of it. The manual "
+        "was written before anybody asked for one.",
+        "A README of {readme_lines} lines over {source_files} source files. "
+        "Exhaustive, and it will be read once.",
+    ),
     "nose.no_license": (
         "No licence file. Legally, {name} belongs to nobody and may be used by "
         "nobody, which is a bold distribution strategy.",
@@ -273,6 +281,23 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "The body is enormous. {path} is {lines} lines long and it has never "
         "once been opened with confidence.",
     ),
+    "palate.thin": (
+        "{source_files} files averaging {average_lines} lines. Thin, and the "
+        "structure is filing rather than design.",
+        "{total_lines} lines spread across {source_files} files, {average_lines} "
+        "to a file. Nothing here is long enough to hold an idea.",
+        "An average of {average_lines} lines across {source_files} files. Every "
+        "answer is in a different file, and {total_lines} lines have been "
+        "arranged so that no two of them meet.",
+    ),
+    "palate.flat": (
+        "Nothing in {source_files} files indents at all. {total_lines} lines, "
+        "flat throughout, {largest_path} the longest at {largest_lines}.",
+        "{source_files} files and not one level of nesting. This is "
+        "{total_lines} lines of data wearing the extensions of a program.",
+        "Flat. {total_lines} lines across {source_files} files with no "
+        "indentation anywhere, {largest_path} included at {largest_lines} lines.",
+    ),
     "palate.deep_nesting": (
         "Nesting reaches depth {depth} in {path}. Down there, conditions are "
         "difficult.",
@@ -313,6 +338,14 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "dependencies declared in {manifest_path}.",
         "{declared} {ecosystem} dependencies in {manifest_path}. Adequate. That "
         "is the whole of the praise.",
+    ),
+    "structure.austere": (
+        "{manifest_path} declares {declared} dependencies against "
+        "{source_files} source files. Austere, and somebody wrote all of it.",
+        "{declared} declared {ecosystem} dependencies for {source_files} files. "
+        "Austere. Everything here was built rather than installed.",
+        "Austere: {source_files} source files and {declared} declared "
+        "dependencies in {manifest_path}. The tree is the author's alone.",
     ),
     "structure.undeclared": (
         "The dependencies are undeclared. {source_files} files in {name} import "
@@ -405,6 +438,15 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
         "percent of the work, which is either devotion or nobody else was "
         "allowed.",
     ),
+    "finish.crowded": (
+        "{authors_phrase} over {total_lines} lines, which is {per_kloc} authors "
+        "per thousand. Nobody owns this.",
+        "{author_count} names in the log against {total_lines} lines, "
+        "{per_kloc} per thousand, across {commit_count} commits. Crowded past "
+        "the point where anyone is responsible.",
+        "Crowded. {authors_phrase} have touched {total_lines} lines, "
+        "{per_kloc} per thousand, and not one of them stayed.",
+    ),
     "finish.abrupt": (
         "It ends abruptly on {last_date}. The final commit says {subject}. It "
         "did not.",
@@ -422,16 +464,59 @@ CELLAR: Final[dict[str, tuple[str, ...]]] = {
     ),
 }
 
-# The score is the one place the tool is useless on purpose, and says so.
+# The verdict states the band and the denominator, and nothing else. It used
+# to state that the number meant nothing, which was true of the old number and
+# is a lie about this one. Every line here names the band it landed in and the
+# count of dimensions that produced it, because a score without its
+# denominator is the thing this rewrite exists to remove.
 VERDICTS: Final[tuple[str, ...]] = (
-    "{score} points. Everything scores between 87 and 94 points. The notes are "
-    "where the truth lives.",
-    "{score} points. The number is a formality. Read the notes again.",
-    "{score} points, because wine scoring is compressed and the sommelier "
-    "respects tradition. The notes are not compressed.",
-    "{score} points. The score has never told anyone anything, and it is not "
-    "starting today.",
+    "{score} points. {band}, on {scored} of {total} dimensions.",
+    "{band}. {score} points, measured over {scored} of {total} dimensions.",
+    "{scored} of {total} dimensions were measured. They give {score} points. "
+    "{band}.",
+    "The number is {score}, from {scored} of {total} dimensions. {band}.",
+    "{score} points across {scored} of {total} dimensions. {band}.",
+    "{band}, at {score} points. {scored} of {total} dimensions carried it.",
 )
+
+# Said in place of a verdict when there is no number. A refusal states what
+# was missing and how much of it, and never rounds the absence up to a score.
+REFUSALS: Final[dict[str, tuple[str, ...]]] = {
+    "no_source_files": (
+        "No score. {name} holds {total_files} files and not one of them is "
+        "source.",
+        "There is nothing here to score. {total_files} files in {name}, zero of "
+        "them code.",
+        "{name} gets no number. {total_files} files were found and none of them "
+        "can be tasted.",
+    ),
+    "unattributed": (
+        "No score. {attributed} of {source_files} source files could be read as "
+        "any language, which is {percent} percent against a floor of {floor}.",
+        "{name} gets no number. {source_files} source files, {attributed} of "
+        "them in a language the tool can name. {percent} percent is not a "
+        "program.",
+        "Unscoreable at {percent} percent. Of {source_files} source files, "
+        "{attributed} were attributed to a language, and the floor is {floor} "
+        "percent.",
+    ),
+    "too_few_dimensions": (
+        "No score. {scored} of {total} dimensions were measured, and the floor "
+        "is {minimum}.",
+        "{name} is unscoreable: {scored} of {total} dimensions reached the "
+        "judge, against a floor of {minimum}.",
+        "Only {scored} of {total} dimensions were measured. Below {minimum} the "
+        "number would be a guess, so there is no number.",
+    ),
+    "unreadable": (
+        "No score. The measurements for {name} and its {total_files} files "
+        "could not be judged.",
+        "{name} produced {total_files} files of measurements the judge could "
+        "not read, so there is no number.",
+        "Unscoreable. Nothing measured across the {total_files} files of "
+        "{name} reached the bands intact.",
+    ),
+}
 
 PAIRINGS: Final[tuple[str, ...]] = (
     "Pairs well with a strong drink and a rewrite.",

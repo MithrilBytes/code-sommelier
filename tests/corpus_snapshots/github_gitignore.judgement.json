@@ -1,4 +1,94 @@
 {
+  "band": "unscoreable",
+  "band_label": "No score",
+  "care_gates": [
+    {
+      "name": "continuous_integration",
+      "passed": true
+    },
+    {
+      "name": "contributing",
+      "passed": true
+    },
+    {
+      "name": "reference_documentation",
+      "passed": true
+    },
+    {
+      "name": "active",
+      "passed": true
+    },
+    {
+      "name": "locked",
+      "passed": true
+    },
+    {
+      "name": "craft",
+      "passed": false
+    },
+    {
+      "name": "complete_coverage",
+      "passed": false
+    }
+  ],
+  "dimensions": [
+    {
+      "cap": 3,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "documentation",
+      "severity": 0
+    },
+    {
+      "cap": 8,
+      "deduction": 0.375,
+      "measured": true,
+      "name": "hygiene",
+      "severity": 3
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "testing",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.0,
+      "measured": false,
+      "name": "structure",
+      "severity": 1
+    },
+    {
+      "cap": 6,
+      "deduction": 0.0,
+      "measured": false,
+      "name": "body",
+      "severity": 2
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "markers",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "history",
+      "severity": 0
+    },
+    {
+      "cap": 2,
+      "deduction": 0.5,
+      "measured": true,
+      "name": "authorship",
+      "severity": 1
+    }
+  ],
   "findings": [
     {
       "course": "label",
@@ -50,6 +140,17 @@
     {
       "course": "palate",
       "facts": {
+        "largest_lines": "705",
+        "largest_path": "Joomla.gitignore",
+        "source_files": "309",
+        "total_lines": "8,850"
+      },
+      "key": "palate.flat",
+      "severity": 1
+    },
+    {
+      "course": "palate",
+      "facts": {
         "average_lines": "28.6",
         "lines": "705",
         "path": "Joomla.gitignore"
@@ -84,6 +185,18 @@
         "author_count": "1,656",
         "authors_phrase": "1,656 authors",
         "commit_count": "4,217",
+        "per_kloc": "187.1",
+        "total_lines": "8,850"
+      },
+      "key": "finish.crowded",
+      "severity": 1
+    },
+    {
+      "course": "finish",
+      "facts": {
+        "author_count": "1,656",
+        "authors_phrase": "1,656 authors",
+        "commit_count": "4,217",
         "commits_phrase": "4,217 commits",
         "fix_commits": "147",
         "fix_percent": "3",
@@ -95,6 +208,46 @@
       "severity": 0
     }
   ],
-  "score": 93,
-  "total_severity": 5
+  "gates": [
+    {
+      "name": "documented",
+      "passed": true
+    },
+    {
+      "name": "tested",
+      "passed": true
+    },
+    {
+      "name": "hygiene",
+      "passed": false
+    },
+    {
+      "name": "dependencies",
+      "passed": false
+    },
+    {
+      "name": "history",
+      "passed": true
+    },
+    {
+      "name": "authorship",
+      "passed": true
+    },
+    {
+      "name": "cadence",
+      "passed": true
+    }
+  ],
+  "refusal": "unattributed",
+  "refusal_facts": {
+    "attributed": "0",
+    "floor": "50",
+    "name": "github_gitignore",
+    "percent": "0",
+    "source_files": "309"
+  },
+  "score": null,
+  "scored_dimensions": 6,
+  "total_dimensions": 8,
+  "total_severity": 7
 }

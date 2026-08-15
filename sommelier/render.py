@@ -22,7 +22,7 @@ from sommelier.collect import (
     RepoMetrics,
     SedimentItem,
 )
-from sommelier.judge import Finding, Judgement
+from sommelier.judge import Dimension, Finding, Gate, Judgement
 from sommelier.voice import Course, TastingCard
 
 __all__ = ["render_card", "render_json", "render_sober"]
@@ -303,14 +303,66 @@ def _sober_sections(metrics: RepoMetrics, judgement: Judgement) -> tuple[_Sectio
         _Section(
             "Judgement",
             (
-                ("score", _count(judgement.score)),
+                ("score", _score(judgement.score)),
+                ("band", judgement.band),
+                ("band label", judgement.band_label),
+                ("dimensions", _denominator(judgement)),
+                ("refusal", _text(judgement.refusal)),
                 ("total severity", _count(judgement.total_severity)),
                 ("findings", _count(len(judgement.findings))),
                 *tuple(_finding_row(item) for item in judgement.findings),
             ),
         )
     )
+    sections.append(
+        _Section(
+            "Dimensions",
+            tuple(_dimension_row(item) for item in judgement.dimensions)
+            or (("nothing scored", "no dimension reached the judge"),),
+        )
+    )
+    # Two sections rather than one, because the base gates decide entry to the
+    # nineties and the care gates decide the top band, and a reader cannot tell
+    # which is which from a gate name alone.
+    sections.append(
+        _Section(
+            "Gates",
+            tuple(_gate_row(item) for item in judgement.gates)
+            or (("no gates", "the gates were not evaluated"),),
+        )
+    )
+    sections.append(
+        _Section(
+            "Care gates",
+            tuple(_gate_row(item) for item in judgement.care_gates)
+            or (("no gates", "the gates were not evaluated"),),
+        )
+    )
     return tuple(sections)
+
+
+def _denominator(judgement: Judgement) -> str:
+    """The denominator, printed beside the score and never separated from it."""
+    return (
+        f"scored on {_count(judgement.scored_dimensions)} of "
+        f"{_count(judgement.total_dimensions)} dimensions"
+    )
+
+
+def _dimension_row(dimension: Dimension) -> tuple[str, str]:
+    if not dimension.measured:
+        return (dimension.name, "not measured, excluded from the score")
+    return (
+        dimension.name,
+        f"severity {_count(dimension.severity)} of {_count(dimension.cap)}, "
+        f"deduction {_ratio(dimension.deduction)}",
+    )
+
+
+def _gate_row(gate: Gate) -> tuple[str, str]:
+    # The identifier, not a prettified version of it. A gate is a published
+    # predicate and the name in the table is the name it is published under.
+    return (gate.name, "passed" if gate.passed else "failed")
 
 
 def _language_rows(languages: Sequence[LanguageShare]) -> tuple[tuple[str, str], ...]:
@@ -420,6 +472,11 @@ def _yes_no(value: bool) -> str:
 
 def _count(value: int) -> str:
     return format(value, ",")
+
+
+def _score(value: int | None) -> str:
+    """A refused score prints as a refusal, never as a number standing in."""
+    return "none" if value is None else _count(value)
 
 
 def _ratio(value: float) -> str:

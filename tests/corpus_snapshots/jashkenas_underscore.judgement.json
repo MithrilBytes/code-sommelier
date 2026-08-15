@@ -1,4 +1,94 @@
 {
+  "band": "outstanding",
+  "band_label": "Outstanding",
+  "care_gates": [
+    {
+      "name": "continuous_integration",
+      "passed": true
+    },
+    {
+      "name": "contributing",
+      "passed": true
+    },
+    {
+      "name": "reference_documentation",
+      "passed": false
+    },
+    {
+      "name": "active",
+      "passed": true
+    },
+    {
+      "name": "locked",
+      "passed": false
+    },
+    {
+      "name": "craft",
+      "passed": false
+    },
+    {
+      "name": "complete_coverage",
+      "passed": false
+    }
+  ],
+  "dimensions": [
+    {
+      "cap": 3,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "documentation",
+      "severity": 0
+    },
+    {
+      "cap": 8,
+      "deduction": 0.375,
+      "measured": true,
+      "name": "hygiene",
+      "severity": 3
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "testing",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.4,
+      "measured": true,
+      "name": "structure",
+      "severity": 2
+    },
+    {
+      "cap": 6,
+      "deduction": 1.0,
+      "measured": true,
+      "name": "body",
+      "severity": 8
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "markers",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.4,
+      "measured": true,
+      "name": "history",
+      "severity": 2
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "authorship",
+      "severity": 0
+    }
+  ],
   "findings": [
     {
       "course": "label",
@@ -114,6 +204,17 @@
       "severity": 2
     },
     {
+      "course": "structure",
+      "facts": {
+        "declared": "0",
+        "ecosystem": "javascript",
+        "manifest_path": "modules/package.json",
+        "source_files": "356"
+      },
+      "key": "structure.austere",
+      "severity": 0
+    },
+    {
       "course": "finish",
       "facts": {
         "gap_days": "342",
@@ -140,6 +241,40 @@
       "severity": 0
     }
   ],
-  "score": 89,
+  "gates": [
+    {
+      "name": "documented",
+      "passed": true
+    },
+    {
+      "name": "tested",
+      "passed": true
+    },
+    {
+      "name": "hygiene",
+      "passed": true
+    },
+    {
+      "name": "dependencies",
+      "passed": true
+    },
+    {
+      "name": "history",
+      "passed": true
+    },
+    {
+      "name": "authorship",
+      "passed": true
+    },
+    {
+      "name": "cadence",
+      "passed": true
+    }
+  ],
+  "refusal": null,
+  "refusal_facts": {},
+  "score": 90,
+  "scored_dimensions": 8,
+  "total_dimensions": 8,
   "total_severity": 15
 }

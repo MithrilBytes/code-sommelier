@@ -17,6 +17,5 @@ Structure    The dependencies are undeclared. 1 files in unstarted import
              whatever was on the machine that day.
 Finish       unstarted has a repository and no commits. The finish is short,
              because there is nothing to finish.
-Verdict      90 points. Everything scores between 87 and 94 points. The notes
-             are where the truth lives.
+Verdict      50 points. Unacceptable, on 5 of 8 dimensions.
 Pairing      Pairs with a second opinion, which the sommelier does not offer.

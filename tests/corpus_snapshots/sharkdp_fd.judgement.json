@@ -1,4 +1,94 @@
 {
+  "band": "outstanding",
+  "band_label": "Outstanding",
+  "care_gates": [
+    {
+      "name": "continuous_integration",
+      "passed": true
+    },
+    {
+      "name": "contributing",
+      "passed": true
+    },
+    {
+      "name": "reference_documentation",
+      "passed": true
+    },
+    {
+      "name": "active",
+      "passed": true
+    },
+    {
+      "name": "locked",
+      "passed": false
+    },
+    {
+      "name": "craft",
+      "passed": false
+    },
+    {
+      "name": "complete_coverage",
+      "passed": false
+    }
+  ],
+  "dimensions": [
+    {
+      "cap": 3,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "documentation",
+      "severity": 0
+    },
+    {
+      "cap": 8,
+      "deduction": 0.375,
+      "measured": true,
+      "name": "hygiene",
+      "severity": 3
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "testing",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.4,
+      "measured": true,
+      "name": "structure",
+      "severity": 2
+    },
+    {
+      "cap": 6,
+      "deduction": 1.0,
+      "measured": true,
+      "name": "body",
+      "severity": 7
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "markers",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "history",
+      "severity": 0
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "authorship",
+      "severity": 0
+    }
+  ],
   "findings": [
     {
       "course": "label",
@@ -53,11 +143,12 @@
     {
       "course": "nose",
       "facts": {
-        "license_name": "Apache-2.0",
+        "readme_bytes": "28,132",
         "readme_lines": "790",
-        "readme_path": "README.md"
+        "readme_path": "README.md",
+        "source_files": "32"
       },
-      "key": "nose.documented",
+      "key": "nose.exhaustive_readme",
       "severity": 0
     },
     {
@@ -130,6 +221,40 @@
       "severity": 0
     }
   ],
-  "score": 90,
+  "gates": [
+    {
+      "name": "documented",
+      "passed": true
+    },
+    {
+      "name": "tested",
+      "passed": true
+    },
+    {
+      "name": "hygiene",
+      "passed": true
+    },
+    {
+      "name": "dependencies",
+      "passed": true
+    },
+    {
+      "name": "history",
+      "passed": true
+    },
+    {
+      "name": "authorship",
+      "passed": true
+    },
+    {
+      "name": "cadence",
+      "passed": true
+    }
+  ],
+  "refusal": null,
+  "refusal_facts": {},
+  "score": 91,
+  "scored_dimensions": 8,
+  "total_dimensions": 8,
   "total_severity": 12
 }

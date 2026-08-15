@@ -20,6 +20,6 @@ Palate       Average length 3.2 lines across 8 files, with others.zzz at 5 and
 Structure    No manifest of any kind. Whatever these 8 files need, they need it
              in secret.
 Finish       No history. The code claims to have always existed.
-Verdict      89 points, because wine scoring is compressed and the sommelier
-             respects tradition. The notes are not compressed.
+Verdict      Unscoreable at 0 percent. Of 8 source files, 0 were attributed to
+             a language, and the floor is 50 percent.
 Pairing      Decant into smaller files and revisit in a year.

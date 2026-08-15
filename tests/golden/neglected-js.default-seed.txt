@@ -28,6 +28,6 @@ Finish       3 commits from 1 author. 33 percent say fix. The last one, on
              a preserve. 1 commit of 3 commits are fixes. 33 percent. At some
              point that stops being maintenance and starts being the shape of
              the thing.
-Verdict      87 points. Everything scores between 87 and 94 points. The notes
-             are where the truth lives.
+Verdict      8 of 8 dimensions were measured. They give 60 points. Below
+             average.
 Pairing      Pairs with a second opinion, which the sommelier does not offer.

@@ -1,4 +1,94 @@
 {
+  "band": "sound",
+  "band_label": "Sound",
+  "care_gates": [
+    {
+      "name": "continuous_integration",
+      "passed": true
+    },
+    {
+      "name": "contributing",
+      "passed": false
+    },
+    {
+      "name": "reference_documentation",
+      "passed": false
+    },
+    {
+      "name": "active",
+      "passed": false
+    },
+    {
+      "name": "locked",
+      "passed": true
+    },
+    {
+      "name": "craft",
+      "passed": false
+    },
+    {
+      "name": "complete_coverage",
+      "passed": true
+    }
+  ],
+  "dimensions": [
+    {
+      "cap": 3,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "documentation",
+      "severity": 0
+    },
+    {
+      "cap": 8,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "hygiene",
+      "severity": 0
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "testing",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.2,
+      "measured": true,
+      "name": "structure",
+      "severity": 1
+    },
+    {
+      "cap": 6,
+      "deduction": 0.1667,
+      "measured": true,
+      "name": "body",
+      "severity": 1
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "markers",
+      "severity": 0
+    },
+    {
+      "cap": 5,
+      "deduction": 0.8,
+      "measured": true,
+      "name": "history",
+      "severity": 4
+    },
+    {
+      "cap": 2,
+      "deduction": 0.0,
+      "measured": true,
+      "name": "authorship",
+      "severity": 0
+    }
+  ],
   "findings": [
     {
       "course": "label",
@@ -129,6 +219,40 @@
       "severity": 0
     }
   ],
-  "score": 92,
+  "gates": [
+    {
+      "name": "documented",
+      "passed": true
+    },
+    {
+      "name": "tested",
+      "passed": true
+    },
+    {
+      "name": "hygiene",
+      "passed": true
+    },
+    {
+      "name": "dependencies",
+      "passed": true
+    },
+    {
+      "name": "history",
+      "passed": true
+    },
+    {
+      "name": "authorship",
+      "passed": true
+    },
+    {
+      "name": "cadence",
+      "passed": false
+    }
+  ],
+  "refusal": null,
+  "refusal_facts": {},
+  "score": 83,
+  "scored_dimensions": 8,
+  "total_dimensions": 8,
   "total_severity": 6
 }

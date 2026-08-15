@@ -103,7 +103,11 @@ Sediment
   largest binary size       0.0 MB
 
 Judgement
-  score                     92
+  score                     83
+  band                      sound
+  band label                Sound
+  dimensions                scored on 8 of 8 dimensions
+  refusal                   none
   total severity            6
   findings                  11
   finding                   label.identity: course label, severity 0
@@ -117,6 +121,34 @@ Judgement
   finding                   finish.dormant: course finish, severity 2
   finding                   finish.the_silence: course finish, severity 2
   finding                   finish.history: course finish, severity 0
+
+Dimensions
+  documentation             severity 0 of 3, deduction 0.0000
+  hygiene                   severity 0 of 8, deduction 0.0000
+  testing                   severity 0 of 2, deduction 0.0000
+  structure                 severity 2 of 5, deduction 0.4000
+  body                      severity 0 of 6, deduction 0.0000
+  markers                   severity 0 of 2, deduction 0.0000
+  history                   severity 4 of 5, deduction 0.8000
+  authorship                severity 0 of 2, deduction 0.0000
+
+Gates
+  documented                failed
+  tested                    passed
+  hygiene                   passed
+  dependencies              failed
+  history                   passed
+  authorship                passed
+  cadence                   failed
+
+Care gates
+  continuous_integration    passed
+  contributing              passed
+  reference_documentation   failed
+  active                    failed
+  locked                    failed
+  craft                     failed
+  complete_coverage         passed
 
 Note: maximum indentation depth and longest function length are proxies for
 complexity. They are not cyclomatic complexity, and neither number should be

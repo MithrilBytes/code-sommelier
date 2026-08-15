@@ -1813,8 +1813,17 @@ def _nose(root: Path, records: Sequence[_FileRecord], directories: Sequence[str]
     has_ci = any(name in rel_paths for name in _CI_FILES) or any(
         record.rel.startswith(_CI_PREFIXES) for record in records
     )
-    has_test_dir = any(
-        directory.rsplit("/", 1)[-1].lower() in _TEST_DIR_NAMES for directory in directories
+    # A directory named tests is not a test suite until something is inside
+    # it. An empty one is the cheapest thing an author can make, and it used
+    # to be enough: it passed a gate that is supposed to cost real work, and
+    # emptying a test directory left the answer unchanged.
+    test_prefixes = tuple(
+        f"{directory}/"
+        for directory in directories
+        if directory.rsplit("/", 1)[-1].lower() in _TEST_DIR_NAMES
+    )
+    has_test_dir = bool(test_prefixes) and any(
+        record.rel.startswith(test_prefixes) for record in records
     )
     has_tests = has_test_dir or any(_TEST_FILE_RE.match(record.name) for record in records)
 

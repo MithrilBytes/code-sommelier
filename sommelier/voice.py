@@ -21,6 +21,7 @@ from sommelier.lines import (
     FOOTNOTE_DROPPED,
     FOOTNOTE_INVENTORY,
     PAIRINGS,
+    REFUSALS,
     VERDICTS,
 )
 
@@ -74,7 +75,10 @@ class TastingCard:
     courses: tuple[Course, ...]
     verdict: str
     pairing: str
-    score: int
+
+    score: int | None
+    """None when the repository was refused a number. The verdict says why."""
+
     footnotes: tuple[str, ...]
 
 
@@ -121,6 +125,40 @@ def _speak(finding: Finding, base: int) -> str | None:
         return None
 
 
+def _verdict(judgement: Judgement, base: int) -> str:
+    """The closing line: the band and the denominator, or the refusal.
+
+    A judgement with no score is not given a number wrapped in an apology. It
+    draws from a different set of lines that states what was missing, so the
+    card can be read without the reader ever inferring a score that was never
+    computed.
+    """
+    if judgement.refusal is not None:
+        templates = REFUSALS.get(judgement.refusal)
+        if templates:
+            site = f"refusal:{judgement.refusal}"
+            template = templates[_pick(base, site, len(templates))]
+            try:
+                return template.format(**judgement.refusal_facts)
+            except (KeyError, IndexError):
+                # Same contract as _speak: the style gate fails the build on a
+                # template citing a fact its code does not carry, and the
+                # sommelier still finishes the tasting if one reaches a reader.
+                pass
+        return REFUSALS["no_source_files"][0].format(
+            name=judgement.refusal_facts.get("name", ""),
+            total_files=judgement.refusal_facts.get("total_files", "0"),
+        )
+
+    template = VERDICTS[_pick(base, "verdict", len(VERDICTS))]
+    return template.format(
+        score=judgement.score,
+        band=judgement.band_label,
+        scored=judgement.scored_dimensions,
+        total=judgement.total_dimensions,
+    )
+
+
 def pour(
     metrics: RepoMetrics, judgement: Judgement, *, seed: int | None = None
 ) -> TastingCard:
@@ -147,9 +185,7 @@ def pour(
         if sentences:
             courses.append(Course(name=COURSE_TITLES[course], body=" ".join(sentences)))
 
-    verdict = VERDICTS[_pick(base, "verdict", len(VERDICTS))].format(
-        score=judgement.score
-    )
+    verdict = _verdict(judgement, base)
     pairing = PAIRINGS[_pick(base, "pairing", len(PAIRINGS))]
     footnotes = tuple(
         FOOTNOTE_INVENTORY
