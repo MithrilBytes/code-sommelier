@@ -1,10 +1,21 @@
 # code-sommelier
 
-Point it at a git repository and it measures repo age, file sizes, complexity
-proxies, dependency health, commit history and hygiene problems. It then
-presents those findings as a wine tasting card, delivered with rather more
-confidence than the situation warrants. Every line on the card is generated
-from one of those measurements, and `--sober` prints the measurements instead.
+**Your repository is about to be tasted. It will not enjoy the experience.**
+
+Point `sommelier` at a git repository and it performs real static analysis:
+age, file sizes, nesting depth, dependency health, commit history, and
+everything that got committed by accident. It reads the findings back as a wine
+tasting card, in the voice of a critic who has seen better and expected worse.
+
+Every sentence on the card is generated from a measurement, and no sentence
+survives that cannot print the number behind it. `--sober` prints the numbers
+and keeps its opinions to itself.
+
+The score took the longest to get right. It runs to 100 across six bands, and
+**you cannot reach 90 by not being bad**: below 90 the tool deducts for defects,
+and at 90 every gate has to be met at once. A repository it cannot read is
+refused a number rather than handed a flattering one. A repository that hides
+its history scores lower for hiding it.
 
 ## The card
 
