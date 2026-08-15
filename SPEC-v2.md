@@ -24,30 +24,37 @@ It is the one that matters most, because it is the one that ends the project.
 Every measurement in this document comes from the ten public repositories
 pinned in `tests/corpus_manifest.json`, each fixed at a commit. Tasted with v1:
 
-| repo | score | files | lines | depth | largest* | tests | commits |
-|---|---|---|---|---|---|---|---|
-| antirez/kilo | 89 | 2 | 1,315 | 6 | 1,308 | no | 20 |
-| github/gitignore | 93 | 309 | 8,850 | 0 | 705 | yes | 4,217 |
-| golang/example | 92 | 55 | 3,943 | 5 | 283 | yes | 76 |
-| jashkenas/underscore | 89 | 356 | 169,160 | 9 | 1,966 | yes | 2,892 |
-| kelseyhightower/envconfig | 90 | 9 | 1,658 | 6 | 864 | yes | 132 |
-| pallets/itsdangerous | 92 | 19 | 1,783 | 5 | 404 | yes | 677 |
-| psf/requests | 91 | 58 | 11,584 | 7 | 1,850 | yes | 6,490 |
-| rbenv/rbenv | 94 | 30 | 2,219 | 5 | 164 | yes | 855 |
-| sharkdp/fd | 90 | 32 | 8,841 | 7 | 2,528 | yes | 2,005 |
-| sindresorhus/slugify | 91 | 4 | 689 | 4 | 286 | yes | 71 |
+| repo | score | files | attributed | lines | depth | largest | tests | commits |
+|---|---|---|---|---|---|---|---|---|
+| antirez/kilo | 89 | 2 | 2 | 1,315 | 6 | 1,308 | no | 20 |
+| github/gitignore | 93 | 309 | 0 | 8,850 | 0 | 705 | yes | 4,217 |
+| golang/example | 92 | 55 | 46 | 3,943 | 5 | 283 | yes | 76 |
+| jashkenas/underscore | 89 | 356 | 355 | 176,589 | 9 | 4,811 | yes | 2,892 |
+| kelseyhightower/envconfig | 90 | 9 | 8 | 1,658 | 6 | 864 | yes | 132 |
+| pallets/itsdangerous | 92 | 19 | 18 | 1,783 | 5 | 404 | yes | 677 |
+| psf/requests | 91 | 58 | 48 | 12,828 | 7 | 3,094 | yes | 6,490 |
+| rbenv/rbenv | 94 | 30 | 6 | 2,219 | 5 | 164 | yes | 855 |
+| sharkdp/fd | 90 | 32 | 31 | 9,191 | 7 | 2,878 | yes | 2,005 |
+| sindresorhus/slugify | 91 | 4 | 4 | 689 | 4 | 286 | no | 71 |
 
-`largest*` is understated for any file over 64 KiB, per Part 3 defect 1. The
+The `attributed` column is how many of those source files any language
+detector could actually read, which is the number the v1 score ignored. The
 inputs span 246 times in size. The scores span five points, standard
 deviation 1.58. The ordering is worse than the spread:
 
-> **`github/gitignore` scores 93. It contains no program.** It is a collection
-> of ignore templates. `antirez/kilo`, a hand-written text editor in 1,300 lines
-> of C that people read specifically to learn from, scores 89.
+> **The two highest scores belong to the two repositories the tool could barely
+> read.** `rbenv/rbenv` takes the top score of 94 with 6 of its 30 files
+> attributed to any language. `github/gitignore` takes 93 with **zero of 309**,
+> because it contains no program at all. `antirez/kilo`, a hand-written text
+> editor in 1,300 lines of C that people read specifically to learn from,
+> scores 89.
 
-A scale that ranks a folder of config templates four points above a piece of
-craft is not measuring anything. That single inversion is the whole argument for
-Part 1.
+That is not a scale with a calibration problem. It is a scale that rewards
+being illegible, because every unmeasured dimension silently scored as clean.
+The same defect pays out through a second door: `git clone --depth 1` on
+`pallets/itsdangerous` scores 93 where the full clone scores 92. Withholding
+information is the single most reliable way to raise a v1 score, and that is
+the whole argument for Part 1.
 
 On the prose, the numbers are worse than they look:
 
