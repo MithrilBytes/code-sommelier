@@ -221,9 +221,8 @@ test em-dash ban
 
 ## Status
 
-Work in progress, roughly a third of the way through the v2 specification in
-[SPEC-v2.md](SPEC-v2.md). Everything documented above is implemented and under
-test. What follows is not.
+Work in progress. Everything documented above is implemented and under test.
+What follows is not.
 
 **Built and working**
 
