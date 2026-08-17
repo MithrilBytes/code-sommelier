@@ -3,6 +3,11 @@
 **Real static analysis, read back as tasting notes by a critic who has seen
 things.**
 
+> **Work in progress.** The tool runs, is tested, and does what the sections
+> below describe. It is not finished. The scoring model, the tasting material
+> and the output are all still moving, so numbers and wording will change
+> between commits. See [Status](#status) for what is built and what is not.
+
 Point `sommelier` at a git repository and it measures age, file sizes, nesting
 depth, dependency health, commit history, and everything that got committed by
 accident. It reads those findings back as a wine tasting card, with total
@@ -23,34 +28,30 @@ its history scores lower for hiding it.
 ```
 CODE SOMMELIER                                   tasting no. 86
 
-The label    todo-app, written in JavaScript, across 3 files. That is the last
-             neutral sentence in this tasting. 1 secrets files, tracked,
-             versioned, and backed up with admirable diligence to every clone
-             that has ever been made. .env among them. 12 committed vendored
-             files, 60 percent of everything here. That is not a repository, it
-             is a warehouse with a git remote.
-Vintage      2019. The first commit landed on 2019-01-15 and the last on
-             2019-11-03, 0.8 years apart, across 3 commits. First committed on
-             2019-01-15, 7 years ago, and 3 commits have followed. Old, and not
-             in the way that adds value.
+The label    todo-app. JavaScript, 3 files, 955 lines. It exists, which is the
+             strongest thing that can be said for it so far. 1 secrets files,
+             tracked, versioned, and backed up with admirable diligence to
+             every clone that has ever been made. .env among them. 12 of the 20
+             files here are vendored, which is 60 percent of the repository.
+             The sommelier will pretend not to have seen that.
+Vintage      2019 to 2019, 3 commits. The arithmetic is not flattering. 7.6
+             years old. Age is not the same as improvement.
 Nose         todo-app has no .gitignore of any kind, not even a copied one.
              Everything it has ever produced by accident is a candidate for the
              permanent record, and across 20 files the record has been keeping.
-             36 unresolved markers, 30 of them TODOs. src/legacy.js has 20 and
-             has clearly been asking for help for some time. There is no
-             README. 3 source files, 955 lines, and not one sentence explaining
-             why.
-Palate       Body: 3 files, 318.3 lines on average, peaking at 900 lines in
-             src/legacy.js. One file, src/legacy.js, contains 900 lines against
-             an average of 318.3. Nobody decided this. It accumulated.
+             37.7 markers per thousand lines. That is not a list of tasks, it
+             is a diary. No README. The reader is expected to deduce 955 lines
+             of intent from first principles.
+Palate       3 files, 955 lines, nesting to depth 2. One file, src/legacy.js,
+             contains 900 lines against an average of 318.3. Nobody decided
+             this. It accumulated.
 Structure    5 javascript dependencies, unlocked. Two people installing this on
              the same day will not get the same project.
-Finish       3 commits from 1 author. 33 percent say fix. The last one, on
-             2019-11-03, says fix login again. Nothing has been committed for
-             2,474 days. The last was 2019-11-03. This is not a project, it is
-             a preserve. 1 commit of 3 commits are fixes. 33 percent. At some
-             point that stops being maintenance and starts being the shape of
-             the thing.
+Finish       The last word on the matter is fix login again. Nothing has been
+             committed for 2,479 days. The last was 2019-11-03. This is not a
+             project, it is a preserve. 33 percent of the history says fix, 1
+             of 3 commits. At some point that stops being maintenance and
+             starts being the shape of the thing.
 Verdict      8 of 8 dimensions were measured. They give 60 points. Below
              average.
 Pairing      Pairs with a second opinion, which the sommelier does not offer.
@@ -217,6 +218,48 @@ fix vintage on shallow clones
 rm unused nesting scanner
 test em-dash ban
 ```
+
+## Status
+
+Work in progress, roughly a third of the way through the v2 specification in
+[SPEC-v2.md](SPEC-v2.md). Everything documented above is implemented and under
+test. What follows is not.
+
+**Built and working**
+
+- Measurement, with an explicit record of what could not be measured.
+- The scoring model: gates, six bands, refusal for repositories nothing can
+  read, and renormalisation over measured dimensions.
+- The content-planning layer that stops a course repeating itself.
+- 333 tests, `mypy --strict`, and CI across Python 3.11, 3.12 and 3.13.
+
+**Not built yet**
+
+- **The grammar engine.** Tasting lines are still drawn from a flat list, so
+  roughly a fifth of the sentences printed across ten repositories also appear
+  on another repository's card. This is the largest remaining piece of work.
+- **The precision floor.** No detector publishes a precision figure yet, and
+  nothing stops a low-confidence detector speaking in prose rather than only
+  printing a number.
+- **Calibration.** Scores order within a band by deduction, not against a
+  reference population, so there is no percentile behind the number.
+- **The leaderboard.** Not started.
+
+**Known gaps in what is built**
+
+- Eleven findings across the ten pinned repositories are measured and judged
+  and then never said, because a finding reserves every fact it might cite
+  before anything knows which sentence it will actually print.
+- The attribution floor that decides whether a repository can be scored at all
+  is a round number rather than a calibrated one.
+- The dependency gate tests whether a lockfile exists, not whether it agrees
+  with the manifest.
+
+**A note on the material.** The house rule for this project is that every
+tasting line is written by a person who meant it. The lines currently in
+`lines.py` were not, and are placeholder material pending a rewrite. The claims
+the tool makes about itself at runtime are narrower and are enforced by tests:
+no model, no network, and the only binary it can execute is git.
 
 ## Licence
 
